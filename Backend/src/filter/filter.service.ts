@@ -33,11 +33,11 @@ export class FilterService {
     return this.itemModel.find(filter).exec();
   }
 
-  async filterByPlace(placeType?: 'maison' | 'appartement' | 'studio'): Promise<Item[]> {
+  async filterByTypeOfHousing(typeOfHousing?: 'maison' | 'appartement' | 'studio'): Promise<Item[]> {
     const filter: any = {};
 
-    if (placeType) {
-      filter['placeType'] = placeType;
+    if (typeOfHousing) {
+      filter['typeOfHousing'] = typeOfHousing;
     }
 
     return this.itemModel.find(filter).exec();

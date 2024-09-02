@@ -22,10 +22,10 @@ export class FilterController {
     return this.filterService.filterBySize(minSize, maxSize);
   }
 
-  @Get('place')
-  async filterByPlace(
-    @Query('placeType') placeType?: 'maison' | 'appartement' | 'studio',
+  @Get('typeOfHousing')
+  async filterByTypeOfHousing(
+    @Query('typeOfHousing') typeOfHousing?: 'maison' | 'appartement' | 'studio',
   ): Promise<Item[]> {
-    return this.filterService.filterByPlace(placeType);
+    return this.filterService.filterByPlace(typeOfHousing);
   }
 }

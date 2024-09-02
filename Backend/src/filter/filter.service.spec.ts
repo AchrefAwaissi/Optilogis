@@ -74,17 +74,23 @@ describe('FilterService', () => {
     });
   });
 
-  describe('filterByPlace', () => {
-    it('should call the model with the correct filter for placeType', async () => {
-      const placeType = 'maison';
-      await service.filterByPlace(placeType);
-      expect(mockItemModel.find).toHaveBeenCalledWith({ placeType });
+  describe('filterByTypeOfHousing', () => {
+    it('should call the model with the correct filter for typeOfHousing', async () => {
+      const typeOfHousing = 'maison';
+      await service.filterByTypeOfHousing(typeOfHousing);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ typeOfHousing });
     });
 
-    it('should handle other placeTypes correctly', async () => {
-      const placeType = 'appartement';
-      await service.filterByPlace(placeType);
-      expect(mockItemModel.find).toHaveBeenCalledWith({ placeType });
+    it('should handle other typeOfHousing values correctly', async () => {
+      const typeOfHousing = 'appartement';
+      await service.filterByTypeOfHousing(typeOfHousing);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ typeOfHousing });
+    });
+
+    it('should handle another typeOfHousing value correctly', async () => {
+      const typeOfHousing = 'studio';
+      await service.filterByTypeOfHousing(typeOfHousing);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ typeOfHousing });
     });
   });
 });

@@ -93,4 +93,107 @@ describe('FilterService', () => {
       expect(mockItemModel.find).toHaveBeenCalledWith({ typeOfHousing });
     });
   });
+
+  describe('filterByName', () => {
+    it('should call the model with the correct filter for name', async () => {
+      const name = 'TestName';
+      await service.filterByName(name);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ name: { $regex: new RegExp(name, 'i') } });
+    });
+  });
+
+  describe('filterByTitle', () => {
+    it('should call the model with the correct filter for title', async () => {
+      const title = 'TestTitle';
+      await service.filterByTitle(title);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ title: { $regex: new RegExp(title, 'i') } });
+    });
+  });
+
+  describe('filterByAddress', () => {
+    it('should call the model with the correct filter for address', async () => {
+      const address = '123 Main St';
+      await service.filterByAddress(address);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ address: { $regex: new RegExp(address, 'i') } });
+    });
+  });
+
+  describe('filterByCity', () => {
+    it('should call the model with the correct filter for city', async () => {
+      const city = 'Paris';
+      await service.filterByCity(city);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ city: { $regex: new RegExp(city, 'i') } });
+    });
+  });
+
+  describe('filterByCountry', () => {
+    it('should call the model with the correct filter for country', async () => {
+      const country = 'France';
+      await service.filterByCountry(country);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ country: { $regex: new RegExp(country, 'i') } });
+    });
+  });
+
+  describe('filterByRooms', () => {
+    it('should call the model with the correct filter for minRooms', async () => {
+      const minRooms = 2;
+      await service.filterByRooms(minRooms);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ rooms: { $gte: minRooms } });
+    });
+
+    it('should call the model with the correct filter for maxRooms', async () => {
+      const maxRooms = 5;
+      await service.filterByRooms(undefined, maxRooms);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ rooms: { $lte: maxRooms } });
+    });
+
+    it('should call the model with the correct filter for both minRooms and maxRooms', async () => {
+      const minRooms = 2;
+      const maxRooms = 5;
+      await service.filterByRooms(minRooms, maxRooms);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ rooms: { $gte: minRooms, $lte: maxRooms } });
+    });
+  });
+
+  describe('filterByBedrooms', () => {
+    it('should call the model with the correct filter for minBedrooms', async () => {
+      const minBedrooms = 1;
+      await service.filterByBedrooms(minBedrooms);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ bedrooms: { $gte: minBedrooms } });
+    });
+
+    it('should call the model with the correct filter for maxBedrooms', async () => {
+      const maxBedrooms = 3;
+      await service.filterByBedrooms(undefined, maxBedrooms);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ bedrooms: { $lte: maxBedrooms } });
+    });
+
+    it('should call the model with the correct filter for both minBedrooms and maxBedrooms', async () => {
+      const minBedrooms = 1;
+      const maxBedrooms = 3;
+      await service.filterByBedrooms(minBedrooms, maxBedrooms);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ bedrooms: { $gte: minBedrooms, $lte: maxBedrooms } });
+    });
+  });
+
+  describe('filterByArea', () => {
+    it('should call the model with the correct filter for minArea', async () => {
+      const minArea = 20;
+      await service.filterByArea(minArea);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ area: { $gte: minArea } });
+    });
+
+    it('should call the model with the correct filter for maxArea', async () => {
+      const maxArea = 100;
+      await service.filterByArea(undefined, maxArea);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ area: { $lte: maxArea } });
+    });
+
+    it('should call the model with the correct filter for both minArea and maxArea', async () => {
+      const minArea = 20;
+      const maxArea = 100;
+      await service.filterByArea(minArea, maxArea);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ area: { $gte: minArea, $lte: maxArea } });
+    });
+  });
 });

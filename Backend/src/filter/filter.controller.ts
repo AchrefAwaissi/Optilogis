@@ -26,6 +26,65 @@ export class FilterController {
   async filterByTypeOfHousing(
     @Query('typeOfHousing') typeOfHousing?: 'maison' | 'appartement' | 'studio',
   ): Promise<Item[]> {
-    return this.filterService.filterByPlace(typeOfHousing);
+    return this.filterService.filterByTypeOfHousing(typeOfHousing);
+  }
+
+  @Get('name')
+  async filterByName(
+    @Query('name') name?: string,
+  ): Promise<Item[]> {
+    return this.filterService.filterByName(name);
+  }
+
+  @Get('title')
+  async filterByTitle(
+    @Query('title') title?: string,
+  ): Promise<Item[]> {
+    return this.filterService.filterByTitle(title);
+  }
+
+  @Get('address')
+  async filterByAddress(
+    @Query('address') address?: string,
+  ): Promise<Item[]> {
+    return this.filterService.filterByAddress(address);
+  }
+
+  @Get('city')
+  async filterByCity(
+    @Query('city') city?: string,
+  ): Promise<Item[]> {
+    return this.filterService.filterByCity(city);
+  }
+
+  @Get('country')
+  async filterByCountry(
+    @Query('country') country?: string,
+  ): Promise<Item[]> {
+    return this.filterService.filterByCountry(country);
+  }
+
+  @Get('rooms')
+  async filterByRooms(
+    @Query('minRooms') minRooms?: number,
+    @Query('maxRooms') maxRooms?: number,
+  ): Promise<Item[]> {
+    return this.filterService.filterByRooms(minRooms, maxRooms);
+  }
+
+  @Get('bedrooms')
+  async filterByBedrooms(
+    @Query('minBedrooms') minBedrooms?: number,
+    @Query('maxBedrooms') maxBedrooms?: number,
+  ): Promise<Item[]> {
+    return this.filterService.filterByBedrooms(minBedrooms, maxBedrooms);
+  }
+
+  @Get('area')
+  async filterByArea(
+    @Query('minArea') minArea?: number,
+    @Query('maxArea') maxArea?: number,
+  ): Promise<Item[]> {
+    return this.filterService.filterByArea(minArea, maxArea);
   }
 }

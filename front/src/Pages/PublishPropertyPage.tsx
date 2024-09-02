@@ -1,9 +1,10 @@
 import React from 'react';
+import CreatePublication from '../Component/CreatePublication';
 
 const PublishPropertyPage = () => {
   return (
     <div>
-      publish
+      <CreatePublication/>
     </div>
   );
 }

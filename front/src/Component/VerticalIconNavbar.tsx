@@ -23,9 +23,9 @@ const VerticalNavbar = () => {
     }`;
 
   const menuItems = [
-    { icon: faDollarSign, label: 'Buy', path: '/buy' },
+    { icon: faDollarSign, label: 'Home', path: '/' },
     { icon: faUserGroup, label: 'Colocation', path: '/matching' },
-    { icon: faHome, label: 'Rent', path: '/rent' },
+    { icon: faHome, label: 'Rent', path: '/search' },
     { icon: faChartBar, label: 'Compare', path: '/compare' },
     { icon: faCog, label: 'Settings', path: '/settings' },
   ];
@@ -70,7 +70,7 @@ const VerticalNavbar = () => {
       <div className="p-4">
         <button className="w-full flex items-center justify-center px-4 py-2 bg-[#006845] text-white rounded-md hover:bg-[#005536]">
           <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-          Logout /login
+          Login / Logout
         </button>
       </div>
     </div>

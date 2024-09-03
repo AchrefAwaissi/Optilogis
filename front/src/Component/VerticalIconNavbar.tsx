@@ -1,42 +1,69 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import HomeIcon from '../image/house.png';
-import Search from '../image/Group 238736.png';
-import DollarIcon from '../image/dollar.png';
-import ShareIcon from '../image/share.png';
-import SettingsIcon from '../image/setting-2.png';
-import PortalIcon from '../image/portal.png';
-import MatchingIcon from '../image/percent.png'; 
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faHouseChimney,
+  faSearch,
+  faDollarSign,
+  faShareNodes,
+  faGear,
+  faUserGroup,
+  faDoorOpen
+} from '@fortawesome/free-solid-svg-icons';
 
 const VerticalIconNavbar: React.FC = () => {
+  const location = useLocation();
+  const [activeIcon, setActiveIcon] = useState(location.pathname);
+
+  const iconClass = (path: string, isLastIcon: boolean = false) =>
+    `w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 ${
+      activeIcon === path 
+        ? 'bg-[#006845] text-white' 
+        : `bg-transparent ${isLastIcon ? 'text-gray-400 hover:text-white' : 'text-gray-400 hover:text-gray-600'}`
+    }`;
+
   return (
     <div className="flex flex-col items-center w-16 h-screen bg-white border-r border-gray-200">
       <div className="flex-1 flex flex-col items-center pt-4">
-        <Link to="/search" className="mb-8">
-          <img src={Search} alt="Search" className="w-6 h-6" />
+        <Link to="/search" className="mb-8" onClick={() => setActiveIcon('/search')}>
+          <div className={iconClass('/search')}>
+            <FontAwesomeIcon icon={faSearch} className="text-base" /> {/* Ajustement de la taille de l'icône */}
+          </div>
         </Link>
         <div className="text-sm font-medium mb-4">Menu</div>
         <div className="flex flex-col items-center space-y-6">
-          <Link to="/" className="w-10 h-10 flex items-center justify-center">
-            <img src={HomeIcon} alt="Home" className="w-6 h-6" />
+          <Link to="/" onClick={() => setActiveIcon('/')}>
+            <div className={iconClass('/')}>
+              <FontAwesomeIcon icon={faHouseChimney} className="text-base" /> {/* Ajustement de la taille de l'icône */}
+            </div>
           </Link>
-          <Link to="/publish" className="w-10 h-10 flex items-center justify-center">
-            <img src={ShareIcon} alt="Publish" className="w-6 h-6" />
+          <Link to="/publish" onClick={() => setActiveIcon('/publish')}>
+            <div className={iconClass('/publish')}>
+              <FontAwesomeIcon icon={faShareNodes} className="text-base" /> {/* Ajustement de la taille de l'icône */}
+            </div>
           </Link>
-          <Link to="/search" className="w-10 h-10 flex items-center justify-center">
-            <img src={DollarIcon} alt="Search" className="w-6 h-6" />
+          <Link to="/matching" onClick={() => setActiveIcon('/matching')}>
+            <div className={iconClass('/matching')}>
+            <FontAwesomeIcon icon={faDollarSign} className="fa-solid fa-house-chimney-heart" />
+            </div>
           </Link>
-          <Link to="/matching" className="w-10 h-10 flex items-center justify-center">
-            <img src={MatchingIcon} alt="Matching" className="w-6 h-6" />
+          <Link to="/matching" onClick={() => setActiveIcon('/matching')}>
+            <div className={iconClass('/matching')}>
+              <FontAwesomeIcon icon={faUserGroup} className="text-base" /> {/* Ajustement de la taille de l'icône */}
+            </div>
           </Link>
-          <Link to="/settings" className="w-10 h-10 flex items-center justify-center">
-            <img src={SettingsIcon} alt="Settings" className="w-6 h-6" />
+          <Link to="/settings" onClick={() => setActiveIcon('/settings')}>
+            <div className={iconClass('/settings')}>
+              <FontAwesomeIcon icon={faGear} className="text-base" /> {/* Ajustement de la taille de l'icône */}
+            </div>
           </Link>
         </div>
       </div>
       <div className="mt-auto mb-8">
-        <Link to="/portal" className="w-10 h-10 bg-green-700 rounded-lg flex items-center justify-center">
-          <img src={PortalIcon} alt="Portal" className="w-6 h-6" />
+        <Link to="/portal" onClick={() => setActiveIcon('/portal')}>
+          <div className={iconClass('/portal', true)}>
+            <FontAwesomeIcon icon={faDoorOpen} className="text-base" /> {/* Ajustement de la taille de l'icône */}
+          </div>
         </Link>
       </div>
     </div>

@@ -61,11 +61,18 @@ const HomePage: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       <aside className="w-64 bg-white shadow-md">
-        <Filter />
+        <Filter  />
       </aside>
-      <main className="flex-1 overflow-y-auto p-6">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-6">Available Houses</h1>
-        <HouseListings houses={filteredHouses} onHouseSelect={handleHouseSelect} />
+      <main className="flex-1 flex overflow-hidden">
+        <div className="flex-1 overflow-y-auto p-6">
+          <HouseListings houses={filteredHouses} onHouseSelect={handleHouseSelect} />
+        </div>
+        <div className="w-[500px] bg-white shadow-md">
+          {/* Map component will go here */}
+          <div className="h-full flex items-center justify-center text-gray-500">
+            Map Component (500px width)
+          </div>
+        </div>
       </main>
     </div>
   );

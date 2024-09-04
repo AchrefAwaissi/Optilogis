@@ -19,7 +19,8 @@ interface House {
 
 const HomePage: React.FC = () => {
   const [houses, setHouses] = useState<House[]>([]);
-  const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchHouses();
@@ -27,53 +28,54 @@ const HomePage: React.FC = () => {
 
   const fetchHouses = async () => {
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:5000/item');
       if (!response.ok) {
         throw new Error('Failed to fetch houses');
       }
       const data: House[] = await response.json();
       setHouses(data);
-      setFilteredHouses(data);
+      setError(null);
     } catch (error) {
       console.error('Error fetching houses:', error);
+      setError('Failed to load houses. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleHouseSelect = (house: House) => {
     console.log('Selected house:', house);
-  };
-
-  const handleFilterChange = (filterCriteria: any) => {
-    // Apply filters to the houses
-    const filtered = houses.filter(house => {
-      return (
-        (!filterCriteria.location || house.city.toLowerCase().includes(filterCriteria.location.toLowerCase())) &&
-        (!filterCriteria.typeOfPlace.length || filterCriteria.typeOfPlace.includes(house.typeOfHousing)) &&
-        house.price >= filterCriteria.minPrice &&
-        house.price <= filterCriteria.maxPrice &&
-        house.area >= filterCriteria.minSize &&
-        (filterCriteria.maxSize === 0 || house.area <= filterCriteria.maxSize)
-      );
-    });
-    setFilteredHouses(filtered);
+    // Implement navigation or modal opening logic here
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <aside className="w-64 bg-white shadow-md">
-        <Filter  />
-      </aside>
-      <main className="flex-1 flex overflow-hidden">
-        <div className="flex-1 overflow-y-auto p-6">
-          <HouseListings houses={filteredHouses} onHouseSelect={handleHouseSelect} />
+    <div className="flex h-screen overflow-hidden">
+      {/* Filter Section */}
+      <div className="w-64 bg-white border-r border-gray-200 overflow-y-auto">
+        <Filter />
+      </div>
+
+      {/* House Listings Section */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <h2 className="text-2xl font-bold mb-4">
+          {houses.length} Results in Scotland
+        </h2>
+        {loading ? (
+          <p>Loading houses...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <HouseListings houses={houses} onHouseSelect={handleHouseSelect} />
+        )}
+      </div>
+
+      {/* Map Section */}
+      <div className="w-1/3 bg-gray-100">
+        <div className="h-full flex items-center justify-center text-gray-500">
+          Map Component (Placeholder)
         </div>
-        <div className="w-[500px] bg-white shadow-md">
-          {/* Map component will go here */}
-          <div className="h-full flex items-center justify-center text-gray-500">
-            Map Component (500px width)
-          </div>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import HouseListings from '../Component/HouseListings';
 import Filter from '../Component/Filter';
+import { FilterCriteria, Location } from '../types';
 
 interface House {
   _id: string;
@@ -19,12 +20,25 @@ interface House {
 
 const HomePage: React.FC = () => {
   const [houses, setHouses] = useState<House[]>([]);
+  const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
+    location: '',
+    minPrice: 0,
+    maxPrice: 10000,
+    minSize: 0,
+    maxSize: 1000,
+    typeOfHousing: '',
+  });
 
   useEffect(() => {
     fetchHouses();
   }, []);
+
+  useEffect(() => {
+    filterHouses();
+  }, [houses, filterCriteria]);
 
   const fetchHouses = async () => {
     try {
@@ -35,6 +49,7 @@ const HomePage: React.FC = () => {
       }
       const data: House[] = await response.json();
       setHouses(data);
+      setFilteredHouses(data);
       setError(null);
     } catch (error) {
       console.error('Error fetching houses:', error);
@@ -42,6 +57,26 @@ const HomePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const filterHouses = () => {
+    const filtered = houses.filter((house) => {
+      const matchesLocation = !filterCriteria.location || 
+        (house.city && house.city.toLowerCase().includes(filterCriteria.location.toLowerCase())) || 
+        (house.address && house.address.toLowerCase().includes(filterCriteria.location.toLowerCase()));
+      // Add more filter conditions here as needed
+      return matchesLocation;
+    });
+    setFilteredHouses(filtered);
+  };
+
+  const handleFilterChange = (newCriteria: Partial<FilterCriteria>) => {
+    setFilterCriteria((prevCriteria) => ({ ...prevCriteria, ...newCriteria }));
+  };
+
+  const handleLocationSelect = (location: Location) => {
+    console.log('Selected location:', location);
+    // You can use this location data for additional functionality if needed
   };
 
   const handleHouseSelect = (house: House) => {
@@ -53,20 +88,24 @@ const HomePage: React.FC = () => {
     <div className="flex h-screen overflow-hidden">
       {/* Filter Section */}
       <div className="w-[250px] bg-white overflow-y-auto m-4">
-        <Filter />
+        <Filter
+          onFilterChange={handleFilterChange}
+          onLocationSelect={handleLocationSelect}
+          filterCriteria={filterCriteria}
+        />
       </div>
 
       {/* House Listings Section */}
       <div className="w-[450px] overflow-y-auto p-4 m-4">
         <h2 className="text-2xl font-bold mb-4">
-          {houses.length} Results in Scotland
+          {filteredHouses.length} Results in {filterCriteria.location || 'Scotland'}
         </h2>
         {loading ? (
           <p>Loading houses...</p>
         ) : error ? (
           <p className="text-red-500">{error}</p>
         ) : (
-          <HouseListings houses={houses} onHouseSelect={handleHouseSelect} />
+          <HouseListings houses={filteredHouses} onHouseSelect={handleHouseSelect} />
         )}
       </div>
 

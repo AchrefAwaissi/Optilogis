@@ -209,11 +209,13 @@ const VerticalIconNavbar: React.FC = () => {
       </div>
 
       <div className="p-4">
-        <button className="w-full flex items-center justify-center px-4 py-2 bg-[#006845] text-white rounded-md hover:bg-[#005536]">
-          <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-          Login / Logout
-        </button>
-      </div>
+  <button className="w-12 flex items-center justify-center px-4 py-2 bg-[#006845] text-white rounded-md hover:bg-[#005536]">
+    <FontAwesomeIcon 
+      icon={faSignOutAlt} 
+    />
+  </button>
+</div>
+
     </nav>
   );
 };

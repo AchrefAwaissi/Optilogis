@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import HouseListings from '../Component/HouseListings';
 import Filter from '../Component/Filter';
 import { FilterCriteria, Location, House } from '../types';
+import MapComponent from '../Component/Map';
 
 const HomePage: React.FC = () => {
   const [houses, setHouses] = useState<House[]>([]);
@@ -114,7 +115,7 @@ const HomePage: React.FC = () => {
         }}
       >
         <div className="h-full flex items-center justify-center text-gray-500">
-          Map Component (Placeholder)
+          <MapComponent/>
         </div>
       </div>
     </div>

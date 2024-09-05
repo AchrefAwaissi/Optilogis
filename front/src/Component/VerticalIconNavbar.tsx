@@ -167,7 +167,7 @@ const VerticalIconNavbar: React.FC = () => {
 
   const menuItems = [
     { icon: faDollarSign, label: 'Home', path: '/' },
-    { icon: faUserGroup, label: 'Colocation', path: '/matching' },
+    { icon: faUserGroup, label: 'Colocation', path: '/publish' },
     { icon: faHome, label: 'Rent', path: '/search' },
     { icon: faChartBar, label: 'Compare', path: '/compare' },
     { icon: faCog, label: 'Settings', path: '/settings' },

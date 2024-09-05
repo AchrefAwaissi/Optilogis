@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faMapMarkerAlt,
@@ -63,11 +63,21 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ onFilterChange, onLocat
     setShowSuggestions(false);
   };
 
-  useEffect(() => {
-    const handleClickOutside = () => setShowSuggestions(false);
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
+  const handleTypeOfPlaceChange = (type: FilterCriteria['typeOfHousing']) => {
+    if (type === '') {
+      // Si 'All' est sélectionné, on réinitialise le filtre de type
+      onFilterChange({ typeOfHousing: '' });
+    } else {
+      // Sinon, on bascule la sélection du type
+      onFilterChange({ 
+        typeOfHousing: filterCriteria.typeOfHousing === type ? '' : type 
+      });
+    }
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFilterChange({ maxPrice: parseInt(e.target.value) });
+  };
 
   return (
     <div className="flex flex-col h-screen bg-white w-64">
@@ -104,20 +114,69 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ onFilterChange, onLocat
           )}
         </div>
 
-        {/* Placeholder for other filter sections */}
         <div className="p-4">
           <h3 className="text-sm font-semibold text-gray-500 mb-2">Type of Place</h3>
-          {/* Type of Place filter content */}
+          <ul>
+            {[
+              { label: 'All', value: '' },
+              { label: 'Studio', value: 'studio' },
+              { label: 'Apartment', value: 'appartement' },
+              { label: 'Maison', value: 'maison' }
+            ].map((type) => (
+              <li key={type.value}>
+                <label className="flex items-center py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={type.value === '' ? filterCriteria.typeOfHousing === '' : filterCriteria.typeOfHousing === type.value}
+                    onChange={() => handleTypeOfPlaceChange(type.value as FilterCriteria['typeOfHousing'])}
+                    className="form-checkbox h-5 w-5 text-[#006845] rounded focus:ring-[#006845]"
+                  />
+                  <span className="ml-3">{type.label}</span>
+                </label>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div className="p-4">
           <h3 className="text-sm font-semibold text-gray-500 mb-2">Price Range</h3>
-          {/* Price Range filter content */}
+          <input
+            type="range"
+            min="100"
+            max="10000"
+            value={filterCriteria.maxPrice}
+            onChange={handlePriceChange}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+          />
+          <div className="flex justify-between mt-2 text-sm text-gray-600">
+            <span>$100</span>
+            <span>${filterCriteria.maxPrice}</span>
+          </div>
         </div>
 
         <div className="p-4">
           <h3 className="text-sm font-semibold text-gray-500 mb-2">Size</h3>
-          {/* Size filter content */}
+          <div className="flex space-x-2">
+            <div className="flex-1">
+              <input
+                type="number"
+                value={filterCriteria.minSize || ''}
+                onChange={(e) => onFilterChange({ minSize: parseInt(e.target.value) })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+                placeholder="Min"
+              />
+            </div>
+            <div className="flex-1">
+              <input
+                type="number"
+                value={filterCriteria.maxSize || ''}
+                onChange={(e) => onFilterChange({ maxSize: parseInt(e.target.value) })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+                placeholder="Max"
+              />
+            </div>
+          </div>
+          <p className="mt-1 text-xs text-gray-500">Square meters</p>
         </div>
       </div>
 

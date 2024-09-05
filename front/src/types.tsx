@@ -11,6 +11,8 @@ export interface House {
     area: number;
     name: string;
     description: string;
+    latitude?: number;
+    longitude?: number;
   }
   
   export interface FilterCriteria {
@@ -26,4 +28,12 @@ export interface House {
     location: string;
     lat: number;
     lon: number;
+  }
+  
+  export interface MapProps {
+    houses: House[];
+    selectedLocation: Location | null;
+    onLocationSelect: (location: Location) => void;
+    center?: [number, number];
+    zoom?: number;
   }

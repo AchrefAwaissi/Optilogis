@@ -9,6 +9,7 @@ const HomePage: React.FC = () => {
   const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
     location: '',
     minPrice: 0,
@@ -58,11 +59,6 @@ const HomePage: React.FC = () => {
       const matchesType = !filterCriteria.typeOfHousing || 
         (house.typeOfHousing && house.typeOfHousing.toLowerCase().includes(filterCriteria.typeOfHousing.toLowerCase()));
 
-      // Debugging logs
-      console.log('Filter type:', filterCriteria.typeOfHousing);
-      console.log('House type:', house.typeOfHousing);
-      console.log('Matches type:', matchesType);
-
       return matchesLocation && matchesPrice && matchesSize && matchesType;
     });
     setFilteredHouses(filtered);
@@ -74,6 +70,7 @@ const HomePage: React.FC = () => {
 
   const handleLocationSelect = (location: Location) => {
     console.log('Selected location:', location);
+    setSelectedLocation(location);
     setFilterCriteria((prevCriteria) => ({ ...prevCriteria, location: location.location }));
   };
 
@@ -108,15 +105,12 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Map Section */}
-      <div
-        className="flex-1 bg-gray-100 m-4"
-        style={{
-          borderRadius: '10px',
-        }}
-      >
-        <div className="h-full flex items-center justify-center text-gray-500">
-          <MapComponent/>
-        </div>
+      <div className="flex-1 bg-gray-100 m-4" style={{ borderRadius: '10px' }}>
+        <MapComponent
+          houses={filteredHouses}
+          selectedLocation={selectedLocation}
+          onLocationSelect={handleLocationSelect}
+        />
       </div>
     </div>
   );

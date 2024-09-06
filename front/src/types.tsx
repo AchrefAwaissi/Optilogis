@@ -38,19 +38,21 @@ export interface MapProps {
   zoom?: number;
 }
 
-export interface School {
-  id: number;
-  name: string;
-  lat: number;
-  lng: number;
-}
+export type POIType = 'school' | 'hospital' | 'supermarket' | 'restaurant';
 
 export interface POI {
   id: string;
   name: string;
   lat: number;
   lon: number;
-  type: 'hospital' | 'school' | 'supermarket';
+  type: POIType;
+}
+
+export interface EnhancedPOI extends POI {
+  additionalInfo?: string;
+  rating: number;
+  userRatingsTotal: number;
+  placeId: string;
 }
 
 export interface NeighborhoodInfo {
@@ -58,11 +60,6 @@ export interface NeighborhoodInfo {
   description: string;
   lat: number;
   lon: number;
-}
-
-export interface EnhancedPOI extends POI {
-  additionalInfo?: string;
-  stars?: number;
 }
 
 export interface EnhancedNeighborhoodInfo extends NeighborhoodInfo {
@@ -91,13 +88,3 @@ export const getRouteType = (type: string): string => {
       return 'Transit';
   }
 };
-export interface EnhancedPOI {
-  id: string;
-  name: string;
-  lat: number;
-  lon: number;
-  type: 'hospital' | 'school' | 'supermarket';
-  rating: number;
-  userRatingsTotal: number;
-  placeId: string;
-}

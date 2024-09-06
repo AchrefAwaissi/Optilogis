@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, Circle, InfoWindow } from '@react-google-maps/api';
 import axios from 'axios';
-import { X, School, Star, ExternalLink, Hospital, ShoppingCart } from 'lucide-react';
-import { House, MapProps, Location, EnhancedPOI } from '../types';
+import { X, School, Star, ExternalLink, Hospital, ShoppingCart, Utensils } from 'lucide-react';
+import { House, MapProps, EnhancedPOI, POIType } from '../types';
 
 interface PlaceResult extends google.maps.places.PlaceResult {
   rating?: number;
@@ -25,13 +25,14 @@ const MapComponent: React.FC<MapProps> = ({
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>({ lat: center[0], lng: center[1] });
-  const [mapZoom, setMapZoom] = useState(zoom);
-  const [schools, setSchools] = useState<EnhancedPOI[]>([]);
-  const [hospitals, setHospitals] = useState<EnhancedPOI[]>([]);
-  const [supermarkets, setSupermarkets] = useState<EnhancedPOI[]>([]);
-  const [showSchools, setShowSchools] = useState(true);
-  const [showHospitals, setShowHospitals] = useState(true);
-  const [showSupermarkets, setShowSupermarkets] = useState(true);
+  const [mapZoom] = useState(zoom);
+  const [pois, setPois] = useState<EnhancedPOI[]>([]);
+  const [showPois, setShowPois] = useState({
+    school: true,
+    hospital: true,
+    supermarket: true,
+    restaurant: true
+  });
   const [searchRadius, setSearchRadius] = useState(2000);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,13 +47,7 @@ const MapComponent: React.FC<MapProps> = ({
     }
   }, [selectedLocation, map]);
 
-  useEffect(() => {
-    if (selectedHouse && selectedHouse.latitude && selectedHouse.longitude) {
-      fetchPOIs(selectedHouse.latitude, selectedHouse.longitude);
-    }
-  }, [selectedHouse, searchRadius]);
-
-  const fetchPOIs = async (lat: number, lon: number) => {
+  const fetchPOIs = useCallback(async (lat: number, lon: number) => {
     setLoading(true);
     setError(null);
     try {
@@ -68,22 +63,25 @@ const MapComponent: React.FC<MapProps> = ({
           node["shop"="supermarket"](around:${searchRadius},${lat},${lon});
           way["shop"="supermarket"](around:${searchRadius},${lat},${lon});
           relation["shop"="supermarket"](around:${searchRadius},${lat},${lon});
+          node["amenity"="restaurant"](around:${searchRadius},${lat},${lon});
+          way["amenity"="restaurant"](around:${searchRadius},${lat},${lon});
+          relation["amenity"="restaurant"](around:${searchRadius},${lat},${lon});
         );
         out center;
       `;
       const response = await axios.get('https://overpass-api.de/api/interpreter', { params: { data: query } });
-      const newSchools: EnhancedPOI[] = [];
-      const newHospitals: EnhancedPOI[] = [];
-      const newSupermarkets: EnhancedPOI[] = [];
-
-      await Promise.all(response.data.elements.map(async (el: any) => {
+      const newPois: EnhancedPOI[] = await Promise.all(response.data.elements.map(async (el: any) => {
+        const poiType: POIType = el.tags.amenity === 'school' ? 'school' :
+                                 el.tags.amenity === 'hospital' ? 'hospital' :
+                                 el.tags.amenity === 'restaurant' ? 'restaurant' :
+                                 el.tags.shop === 'supermarket' ? 'supermarket' : 'school';
         const poi: EnhancedPOI = {
           id: el.id.toString(),
           name: el.tags.name || 'Unnamed POI',
           lat: el.lat || el.center.lat,
           lon: el.lon || el.center.lon,
-          type: el.tags.amenity as 'school' | 'hospital' || el.tags.shop as 'supermarket',
-          additionalInfo: el.tags['school:type'] || el.tags.healthcare || el.tags.shop || el.tags.amenity,
+          type: poiType,
+          additionalInfo: el.tags['school:type'] || el.tags.healthcare || el.tags.shop || el.tags.cuisine || el.tags.amenity,
           rating: 0,
           userRatingsTotal: 0,
           placeId: '',
@@ -96,25 +94,23 @@ const MapComponent: React.FC<MapProps> = ({
           poi.placeId = placeDetails.place_id || '';
         }
 
-        if (poi.type === 'school') {
-          newSchools.push(poi);
-        } else if (poi.type === 'hospital') {
-          newHospitals.push(poi);
-        } else if (poi.type === 'supermarket') {
-          newSupermarkets.push(poi);
-        }
+        return poi;
       }));
 
-      setSchools(newSchools);
-      setHospitals(newHospitals);
-      setSupermarkets(newSupermarkets);
+      setPois(newPois);
     } catch (err) {
       setError('Failed to fetch POIs. Please try again.');
       console.error('Error fetching POIs:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchRadius]);
+
+  useEffect(() => {
+    if (selectedHouse && selectedHouse.latitude && selectedHouse.longitude) {
+      fetchPOIs(selectedHouse.latitude, selectedHouse.longitude);
+    }
+  }, [selectedHouse, fetchPOIs]);
 
   const fetchGooglePlaceDetails = async (name: string, lat: number, lon: number): Promise<PlaceResult | null> => {
     if (!isLoaded || !map) return null;
@@ -183,12 +179,29 @@ const MapComponent: React.FC<MapProps> = ({
     return `https://www.google.com/maps/place/?q=place_id:${placeId}`;
   };
 
+  const getMarkerIcon = (type: POIType) => {
+    switch (type) {
+      case 'school':
+        return 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
+      case 'hospital':
+        return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+      case 'supermarket':
+        return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
+      case 'restaurant':
+        return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+      default:
+        return 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png';
+    }
+  };
+
+  const filteredPois = pois.filter(poi => showPois[poi.type]);
+
   const renderPOIMarker = (poi: EnhancedPOI) => (
     <Marker
       key={poi.id}
       position={{ lat: poi.lat, lng: poi.lon }}
       icon={{
-        url: `http://maps.google.com/mapfiles/ms/icons/${poi.type === 'school' ? 'blue' : poi.type === 'hospital' ? 'red' : 'green'}-dot.png`,
+        url: getMarkerIcon(poi.type),
         scaledSize: new window.google.maps.Size(30, 30)
       }}
       onClick={() => setActiveInfoWindow(poi.id)}
@@ -266,9 +279,7 @@ const MapComponent: React.FC<MapProps> = ({
             }}
           />
         )}
-        {showSchools && schools.map(renderPOIMarker)}
-        {showHospitals && hospitals.map(renderPOIMarker)}
-        {showSupermarkets && supermarkets.map(renderPOIMarker)}
+        {filteredPois.map(renderPOIMarker)}
       </GoogleMap>
 
       <div className="absolute top-2 right-2 bg-white p-4 rounded shadow-md z-[1000]">
@@ -299,48 +310,61 @@ const MapComponent: React.FC<MapProps> = ({
               <input
                 type="checkbox"
                 id="showSchools"
-                checked={showSchools}
-                onChange={() => setShowSchools(!showSchools)}
+                checked={showPois.school}
+                onChange={() => setShowPois(prev => ({ ...prev, school: !prev.school }))}
                 className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
               <label htmlFor="showSchools" className="flex items-center">
                 <School className="mr-2 text-blue-500" />
-                <span>Show Schools ({schools.length})</span>
+                <span>Show Schools ({pois.filter(poi => poi.type === 'school').length})</span>
               </label>
             </div>
             <div className="flex items-center mb-2">
               <input
                 type="checkbox"
                 id="showHospitals"
-                checked={showHospitals}
-                onChange={() => setShowHospitals(!showHospitals)}
+                checked={showPois.hospital}
+                onChange={() => setShowPois(prev => ({ ...prev, hospital: !prev.hospital }))}
                 className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                />
-                <label htmlFor="showHospitals" className="flex items-center">
-                  <Hospital className="mr-2 text-red-500" />
-                  <span>Show Hospitals ({hospitals.length})</span>
-                </label>
-              </div>
-              <div className="flex items-center mb-2">
-                <input
-                  type="checkbox"
-                  id="showSupermarkets"
-                  checked={showSupermarkets}
-                  onChange={() => setShowSupermarkets(!showSupermarkets)}
-                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                />
-                <label htmlFor="showSupermarkets" className="flex items-center">
-                  <ShoppingCart className="mr-2 text-green-500" />
-                  <span>Show Supermarkets ({supermarkets.length})</span>
-                </label>
-              </div>
-            </>
-          )}
-          {loading && <p className="mt-2">Loading POIs...</p>}
-          {error && <p className="mt-2 text-red-500">{error}</p>}
-        </div>
+              />
+              <label htmlFor="showHospitals" className="flex items-center">
+                <Hospital className="mr-2 text-red-500" />
+                <span>Show Hospitals ({pois.filter(poi => poi.type === 'hospital').length})</span>
+              </label>
+            </div>
+            <div className="flex items-center mb-2">
+              <input
+                type="checkbox"
+                id="showSupermarkets"
+                checked={showPois.supermarket}
+                onChange={() => setShowPois(prev => ({ ...prev, supermarket: !prev.supermarket }))}
+                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label htmlFor="showSupermarkets" className="flex items-center">
+                <ShoppingCart className="mr-2 text-green-500" />
+                <span>Show Supermarkets ({pois.filter(poi => poi.type === 'supermarket').length})</span>
+              </label>
+            </div>
+            <div className="flex items-center mb-2">
+              <input
+                type="checkbox"
+                id="showRestaurants"
+                checked={showPois.restaurant}
+                onChange={() => setShowPois(prev => ({ ...prev, restaurant: !prev.restaurant }))}
+                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label htmlFor="showRestaurants" className="flex items-center">
+                <Utensils className="mr-2 text-yellow-500" />
+                <span>Show Restaurants ({pois.filter(poi => poi.type === 'restaurant').length})</span>
+              </label>
+            </div>
+          </>
+        )}
+        {loading && <p className="mt-2">Loading POIs...</p>}
+        {error && <p className="mt-2 text-red-500">{error}</p>}
       </div>
-    ) : <></>;
-  };
-  
-  export default MapComponent;
+    </div>
+  ) : <></>;
+};
+
+export default MapComponent;

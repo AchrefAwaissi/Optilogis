@@ -91,3 +91,13 @@ export const getRouteType = (type: string): string => {
       return 'Transit';
   }
 };
+export interface EnhancedPOI {
+  id: string;
+  name: string;
+  lat: number;
+  lon: number;
+  type: 'school';
+  rating: number;
+  userRatingsTotal: number;
+  placeId: string;
+}

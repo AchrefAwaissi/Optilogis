@@ -1,8 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, Circle, InfoWindow } from '@react-google-maps/api';
 import axios from 'axios';
-import { X, School } from 'lucide-react';
+import { X, School, Star, ExternalLink } from 'lucide-react';
 import { House, MapProps, Location, EnhancedPOI } from '../types';
+
+// Définir une interface pour le résultat du service Places
+interface PlaceResult extends google.maps.places.PlaceResult {
+  rating?: number;
+  user_ratings_total?: number;
+  place_id?: string;
+}
 
 const MapComponent: React.FC<MapProps> = ({ 
   houses, 
@@ -11,9 +18,10 @@ const MapComponent: React.FC<MapProps> = ({
   center = [44.8378, -0.5792], 
   zoom = 13 
 }) => {
-  const { isLoaded } = useJsApiLoader({
+  const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: "AIzaSyAh0yrnHc34HwncDoKBMYutdQCSueTc9FA"
+    googleMapsApiKey: "AIzaSyAh0yrnHc34HwncDoKBMYutdQCSueTc9FA",
+    libraries: ['places']
   });
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -55,14 +63,28 @@ const MapComponent: React.FC<MapProps> = ({
         out center;
       `;
       const response = await axios.get('https://overpass-api.de/api/interpreter', { params: { data: query } });
-      const newSchools: EnhancedPOI[] = response.data.elements.map((el: any) => ({
-        id: el.id.toString(),
-        name: el.tags.name || 'Unnamed School',
-        lat: el.lat || el.center.lat,
-        lon: el.lon || el.center.lon,
-        type: 'school',
-        additionalInfo: el.tags['school:type'] || 'School',
-        stars: Math.floor(Math.random() * 5) + 1
+      const newSchools: EnhancedPOI[] = await Promise.all(response.data.elements.map(async (el: any) => {
+        const school: EnhancedPOI = {
+          id: el.id.toString(),
+          name: el.tags.name || 'Unnamed School',
+          lat: el.lat || el.center.lat,
+          lon: el.lon || el.center.lon,
+          type: 'school' as const,
+          additionalInfo: el.tags['school:type'] || 'School',
+          rating: 0,
+          userRatingsTotal: 0,
+          placeId: '',
+        };
+        
+        // Fetch Google Places details
+        const placeDetails = await fetchGooglePlaceDetails(school.name, school.lat, school.lon);
+        if (placeDetails) {
+          school.rating = placeDetails.rating || 0;
+          school.userRatingsTotal = placeDetails.user_ratings_total || 0;
+          school.placeId = placeDetails.place_id || '';
+        }
+
+        return school;
       }));
       setSchools(newSchools);
     } catch (err) {
@@ -71,6 +93,27 @@ const MapComponent: React.FC<MapProps> = ({
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchGooglePlaceDetails = async (name: string, lat: number, lon: number): Promise<PlaceResult | null> => {
+    if (!isLoaded || !map) return null;
+    
+    const service = new google.maps.places.PlacesService(map);
+    const request: google.maps.places.FindPlaceFromQueryRequest = {
+      query: name,
+      fields: ['name', 'rating', 'user_ratings_total', 'place_id'],
+      locationBias: new google.maps.LatLng(lat, lon),
+    };
+
+    return new Promise((resolve) => {
+      service.findPlaceFromQuery(request, (results, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
+          resolve(results[0] as PlaceResult);
+        } else {
+          resolve(null);
+        }
+      });
+    });
   };
 
   const handleHouseClick = (house: House) => {
@@ -99,11 +142,29 @@ const MapComponent: React.FC<MapProps> = ({
     return deg * (Math.PI/180);
   };
 
-  const renderStars = (count: number) => {
-    return Array(count).fill(0).map((_, index) => (
-      <span key={index} className="text-yellow-400">★</span>
-    ));
+  const renderStars = (rating: number) => {
+    return (
+      <div className="flex items-center">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            size={16}
+            fill={rating >= star ? "gold" : "none"}
+            stroke="gold"
+          />
+        ))}
+        <span className="ml-1">{rating.toFixed(1)}</span>
+      </div>
+    );
   };
+
+  const getGoogleMapsUrl = (placeId: string) => {
+    return `https://www.google.com/maps/place/?q=place_id:${placeId}`;
+  };
+
+  if (loadError) {
+    return <div>Map cannot be loaded right now, sorry.</div>;
+  }
 
   return isLoaded ? (
     <div className="relative">
@@ -161,10 +222,23 @@ const MapComponent: React.FC<MapProps> = ({
                   {selectedHouse && selectedHouse.latitude && selectedHouse.longitude && (
                     <p>Distance: {calculateDistance(selectedHouse.latitude, selectedHouse.longitude, school.lat, school.lon).toFixed(2)} km</p>
                   )}
-                  <div className="flex items-center">
-                    {renderStars(school.stars || 0)}
-                    <span className="ml-1">{school.stars}/5</span>
-                  </div>
+                  {school.rating > 0 && (
+                    <div className="mt-2">
+                      {renderStars(school.rating)}
+                      <p className="text-sm text-gray-500">({school.userRatingsTotal} reviews)</p>
+                    </div>
+                  )}
+                  {school.placeId && (
+                    <a
+                      href={getGoogleMapsUrl(school.placeId)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center mt-2 text-blue-500 hover:underline"
+                    >
+                      View on Google Maps
+                      <ExternalLink size={14} className="ml-1" />
+                    </a>
+                  )}
                 </div>
               </InfoWindow>
             )}

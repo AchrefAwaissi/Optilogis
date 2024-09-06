@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, Circle, InfoWindow } from '@react-google-maps/api';
 import axios from 'axios';
-import { X, School, Star, ExternalLink, Hospital } from 'lucide-react';
+import { X, School, Star, ExternalLink, Hospital, ShoppingCart } from 'lucide-react';
 import { House, MapProps, Location, EnhancedPOI } from '../types';
 
 interface PlaceResult extends google.maps.places.PlaceResult {
@@ -28,8 +28,10 @@ const MapComponent: React.FC<MapProps> = ({
   const [mapZoom, setMapZoom] = useState(zoom);
   const [schools, setSchools] = useState<EnhancedPOI[]>([]);
   const [hospitals, setHospitals] = useState<EnhancedPOI[]>([]);
+  const [supermarkets, setSupermarkets] = useState<EnhancedPOI[]>([]);
   const [showSchools, setShowSchools] = useState(true);
   const [showHospitals, setShowHospitals] = useState(true);
+  const [showSupermarkets, setShowSupermarkets] = useState(true);
   const [searchRadius, setSearchRadius] = useState(2000);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,12 +65,16 @@ const MapComponent: React.FC<MapProps> = ({
           node["amenity"="hospital"](around:${searchRadius},${lat},${lon});
           way["amenity"="hospital"](around:${searchRadius},${lat},${lon});
           relation["amenity"="hospital"](around:${searchRadius},${lat},${lon});
+          node["shop"="supermarket"](around:${searchRadius},${lat},${lon});
+          way["shop"="supermarket"](around:${searchRadius},${lat},${lon});
+          relation["shop"="supermarket"](around:${searchRadius},${lat},${lon});
         );
         out center;
       `;
       const response = await axios.get('https://overpass-api.de/api/interpreter', { params: { data: query } });
       const newSchools: EnhancedPOI[] = [];
       const newHospitals: EnhancedPOI[] = [];
+      const newSupermarkets: EnhancedPOI[] = [];
 
       await Promise.all(response.data.elements.map(async (el: any) => {
         const poi: EnhancedPOI = {
@@ -76,8 +82,8 @@ const MapComponent: React.FC<MapProps> = ({
           name: el.tags.name || 'Unnamed POI',
           lat: el.lat || el.center.lat,
           lon: el.lon || el.center.lon,
-          type: el.tags.amenity as 'school' | 'hospital',
-          additionalInfo: el.tags['school:type'] || el.tags.healthcare || el.tags.amenity,
+          type: el.tags.amenity as 'school' | 'hospital' || el.tags.shop as 'supermarket',
+          additionalInfo: el.tags['school:type'] || el.tags.healthcare || el.tags.shop || el.tags.amenity,
           rating: 0,
           userRatingsTotal: 0,
           placeId: '',
@@ -94,11 +100,14 @@ const MapComponent: React.FC<MapProps> = ({
           newSchools.push(poi);
         } else if (poi.type === 'hospital') {
           newHospitals.push(poi);
+        } else if (poi.type === 'supermarket') {
+          newSupermarkets.push(poi);
         }
       }));
 
       setSchools(newSchools);
       setHospitals(newHospitals);
+      setSupermarkets(newSupermarkets);
     } catch (err) {
       setError('Failed to fetch POIs. Please try again.');
       console.error('Error fetching POIs:', err);
@@ -174,6 +183,47 @@ const MapComponent: React.FC<MapProps> = ({
     return `https://www.google.com/maps/place/?q=place_id:${placeId}`;
   };
 
+  const renderPOIMarker = (poi: EnhancedPOI) => (
+    <Marker
+      key={poi.id}
+      position={{ lat: poi.lat, lng: poi.lon }}
+      icon={{
+        url: `http://maps.google.com/mapfiles/ms/icons/${poi.type === 'school' ? 'blue' : poi.type === 'hospital' ? 'red' : 'green'}-dot.png`,
+        scaledSize: new window.google.maps.Size(30, 30)
+      }}
+      onClick={() => setActiveInfoWindow(poi.id)}
+    >
+      {activeInfoWindow === poi.id && (
+        <InfoWindow onCloseClick={() => setActiveInfoWindow(null)}>
+          <div>
+            <h3 className="font-bold">{poi.name}</h3>
+            <p>Type: {poi.additionalInfo}</p>
+            {selectedHouse && selectedHouse.latitude && selectedHouse.longitude && (
+              <p>Distance: {calculateDistance(selectedHouse.latitude, selectedHouse.longitude, poi.lat, poi.lon).toFixed(2)} km</p>
+            )}
+            {poi.rating > 0 && (
+              <div className="mt-2">
+                {renderStars(poi.rating)}
+                <p className="text-sm text-gray-500">({poi.userRatingsTotal} reviews)</p>
+              </div>
+            )}
+            {poi.placeId && (
+              <a
+                href={getGoogleMapsUrl(poi.placeId)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center mt-2 text-blue-500 hover:underline"
+              >
+                View on Google Maps
+                <ExternalLink size={14} className="ml-1" />
+              </a>
+            )}
+          </div>
+        </InfoWindow>
+      )}
+    </Marker>
+  );
+
   if (loadError) {
     return <div>Map cannot be loaded right now, sorry.</div>;
   }
@@ -216,86 +266,9 @@ const MapComponent: React.FC<MapProps> = ({
             }}
           />
         )}
-        {showSchools && schools.map((school) => (
-          <Marker
-            key={school.id}
-            position={{ lat: school.lat, lng: school.lon }}
-            icon={{
-              url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-              scaledSize: new window.google.maps.Size(30, 30)
-            }}
-            onClick={() => setActiveInfoWindow(school.id)}
-          >
-            {activeInfoWindow === school.id && (
-              <InfoWindow onCloseClick={() => setActiveInfoWindow(null)}>
-                <div>
-                  <h3 className="font-bold">{school.name}</h3>
-                  <p>Type: {school.additionalInfo}</p>
-                  {selectedHouse && selectedHouse.latitude && selectedHouse.longitude && (
-                    <p>Distance: {calculateDistance(selectedHouse.latitude, selectedHouse.longitude, school.lat, school.lon).toFixed(2)} km</p>
-                  )}
-                  {school.rating > 0 && (
-                    <div className="mt-2">
-                      {renderStars(school.rating)}
-                      <p className="text-sm text-gray-500">({school.userRatingsTotal} reviews)</p>
-                    </div>
-                  )}
-                  {school.placeId && (
-                    <a
-                      href={getGoogleMapsUrl(school.placeId)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center mt-2 text-blue-500 hover:underline"
-                    >
-                      View on Google Maps
-                      <ExternalLink size={14} className="ml-1" />
-                    </a>
-                  )}
-                </div>
-              </InfoWindow>
-            )}
-          </Marker>
-        ))}
-        {showHospitals && hospitals.map((hospital) => (
-          <Marker
-            key={hospital.id}
-            position={{ lat: hospital.lat, lng: hospital.lon }}
-            icon={{
-              url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-              scaledSize: new window.google.maps.Size(30, 30)
-            }}
-            onClick={() => setActiveInfoWindow(hospital.id)}
-          >
-            {activeInfoWindow === hospital.id && (
-              <InfoWindow onCloseClick={() => setActiveInfoWindow(null)}>
-                <div>
-                  <h3 className="font-bold">{hospital.name}</h3>
-                  <p>Type: {hospital.additionalInfo}</p>
-                  {selectedHouse && selectedHouse.latitude && selectedHouse.longitude && (
-                    <p>Distance: {calculateDistance(selectedHouse.latitude, selectedHouse.longitude, hospital.lat, hospital.lon).toFixed(2)} km</p>
-                  )}
-                  {hospital.rating > 0 && (
-                    <div className="mt-2">
-                      {renderStars(hospital.rating)}
-                      <p className="text-sm text-gray-500">({hospital.userRatingsTotal} reviews)</p>
-                    </div>
-                  )}
-                  {hospital.placeId && (
-                    <a
-                      href={getGoogleMapsUrl(hospital.placeId)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center mt-2 text-blue-500 hover:underline"
-                    >
-                      View on Google Maps
-                      <ExternalLink size={14} className="ml-1" />
-                    </a>
-                  )}
-                </div>
-              </InfoWindow>
-            )}
-          </Marker>
-        ))}
+        {showSchools && schools.map(renderPOIMarker)}
+        {showHospitals && hospitals.map(renderPOIMarker)}
+        {showSupermarkets && supermarkets.map(renderPOIMarker)}
       </GoogleMap>
 
       <div className="absolute top-2 right-2 bg-white p-4 rounded shadow-md z-[1000]">
@@ -330,7 +303,7 @@ const MapComponent: React.FC<MapProps> = ({
                 onChange={() => setShowSchools(!showSchools)}
                 className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
-<label htmlFor="showSchools" className="flex items-center">
+              <label htmlFor="showSchools" className="flex items-center">
                 <School className="mr-2 text-blue-500" />
                 <span>Show Schools ({schools.length})</span>
               </label>
@@ -342,19 +315,32 @@ const MapComponent: React.FC<MapProps> = ({
                 checked={showHospitals}
                 onChange={() => setShowHospitals(!showHospitals)}
                 className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label htmlFor="showHospitals" className="flex items-center">
-                <Hospital className="mr-2 text-red-500" />
-                <span>Show Hospitals ({hospitals.length})</span>
-              </label>
-            </div>
-          </>
-        )}
-        {loading && <p className="mt-2">Loading POIs...</p>}
-        {error && <p className="mt-2 text-red-500">{error}</p>}
+                />
+                <label htmlFor="showHospitals" className="flex items-center">
+                  <Hospital className="mr-2 text-red-500" />
+                  <span>Show Hospitals ({hospitals.length})</span>
+                </label>
+              </div>
+              <div className="flex items-center mb-2">
+                <input
+                  type="checkbox"
+                  id="showSupermarkets"
+                  checked={showSupermarkets}
+                  onChange={() => setShowSupermarkets(!showSupermarkets)}
+                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                />
+                <label htmlFor="showSupermarkets" className="flex items-center">
+                  <ShoppingCart className="mr-2 text-green-500" />
+                  <span>Show Supermarkets ({supermarkets.length})</span>
+                </label>
+              </div>
+            </>
+          )}
+          {loading && <p className="mt-2">Loading POIs...</p>}
+          {error && <p className="mt-2 text-red-500">{error}</p>}
+        </div>
       </div>
-    </div>
-  ) : <></>;
-};
-
-export default MapComponent;
+    ) : <></>;
+  };
+  
+  export default MapComponent;

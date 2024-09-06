@@ -244,7 +244,7 @@ const MapComponent: React.FC<MapProps> = ({
   return isLoaded ? (
     <div className="relative">
       <GoogleMap
-        mapContainerStyle={{ height: '70vh', width: '100%' }}
+        mapContainerStyle={{ height: '90vh', width: '100%' }}
         center={mapCenter}
         zoom={mapZoom}
         onLoad={setMap}

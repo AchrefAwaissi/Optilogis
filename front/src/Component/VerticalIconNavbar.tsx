@@ -146,7 +146,7 @@ import {
   faSignOutAlt,
   faSearch
 } from '@fortawesome/free-solid-svg-icons';
-
+import logo from '../image/logoa.png'
 const VerticalIconNavbar: React.FC = () => {
   const location = useLocation();
   const [activeIcon, setActiveIcon] = useState(location.pathname);
@@ -175,10 +175,12 @@ const VerticalIconNavbar: React.FC = () => {
 
   return (
     <nav className="w-56 bg-white border-r border-gray-200 flex flex-col h-screen">
-      <div className="flex justify-center py-4">
-        <div className="w-12 h-12 bg-gray-200 rounded-sm flex items-center justify-center">
-          <span className="text-xs font-bold">LOGO</span>
-        </div>
+    <div className="flex justify-center py-4">
+      <img
+    src={logo}  
+    alt="Logo"
+    className="w-30 h-20 object-contain"
+      />
       </div>
 
       <div className="px-4 mb-4">

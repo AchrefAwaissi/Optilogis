@@ -96,7 +96,7 @@ export interface EnhancedPOI {
   name: string;
   lat: number;
   lon: number;
-  type: 'school';
+  type: 'hospital' | 'school';
   rating: number;
   userRatingsTotal: number;
   placeId: string;

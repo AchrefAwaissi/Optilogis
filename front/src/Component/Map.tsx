@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { GoogleMap, useJsApiLoader, Marker, Circle, InfoWindow } from '@react-google-maps/api';
 import axios from 'axios';
-import { X, School, Star, ExternalLink } from 'lucide-react';
+import { X, School, Star, ExternalLink, Hospital } from 'lucide-react';
 import { House, MapProps, Location, EnhancedPOI } from '../types';
 
-// Définir une interface pour le résultat du service Places
 interface PlaceResult extends google.maps.places.PlaceResult {
   rating?: number;
   user_ratings_total?: number;
@@ -28,7 +27,9 @@ const MapComponent: React.FC<MapProps> = ({
   const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>({ lat: center[0], lng: center[1] });
   const [mapZoom, setMapZoom] = useState(zoom);
   const [schools, setSchools] = useState<EnhancedPOI[]>([]);
+  const [hospitals, setHospitals] = useState<EnhancedPOI[]>([]);
   const [showSchools, setShowSchools] = useState(true);
+  const [showHospitals, setShowHospitals] = useState(true);
   const [searchRadius, setSearchRadius] = useState(2000);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,11 +46,11 @@ const MapComponent: React.FC<MapProps> = ({
 
   useEffect(() => {
     if (selectedHouse && selectedHouse.latitude && selectedHouse.longitude) {
-      fetchSchools(selectedHouse.latitude, selectedHouse.longitude);
+      fetchPOIs(selectedHouse.latitude, selectedHouse.longitude);
     }
   }, [selectedHouse, searchRadius]);
 
-  const fetchSchools = async (lat: number, lon: number) => {
+  const fetchPOIs = async (lat: number, lon: number) => {
     setLoading(true);
     setError(null);
     try {
@@ -59,37 +60,48 @@ const MapComponent: React.FC<MapProps> = ({
           node["amenity"="school"](around:${searchRadius},${lat},${lon});
           way["amenity"="school"](around:${searchRadius},${lat},${lon});
           relation["amenity"="school"](around:${searchRadius},${lat},${lon});
+          node["amenity"="hospital"](around:${searchRadius},${lat},${lon});
+          way["amenity"="hospital"](around:${searchRadius},${lat},${lon});
+          relation["amenity"="hospital"](around:${searchRadius},${lat},${lon});
         );
         out center;
       `;
       const response = await axios.get('https://overpass-api.de/api/interpreter', { params: { data: query } });
-      const newSchools: EnhancedPOI[] = await Promise.all(response.data.elements.map(async (el: any) => {
-        const school: EnhancedPOI = {
+      const newSchools: EnhancedPOI[] = [];
+      const newHospitals: EnhancedPOI[] = [];
+
+      await Promise.all(response.data.elements.map(async (el: any) => {
+        const poi: EnhancedPOI = {
           id: el.id.toString(),
-          name: el.tags.name || 'Unnamed School',
+          name: el.tags.name || 'Unnamed POI',
           lat: el.lat || el.center.lat,
           lon: el.lon || el.center.lon,
-          type: 'school' as const,
-          additionalInfo: el.tags['school:type'] || 'School',
+          type: el.tags.amenity as 'school' | 'hospital',
+          additionalInfo: el.tags['school:type'] || el.tags.healthcare || el.tags.amenity,
           rating: 0,
           userRatingsTotal: 0,
           placeId: '',
         };
         
-        // Fetch Google Places details
-        const placeDetails = await fetchGooglePlaceDetails(school.name, school.lat, school.lon);
+        const placeDetails = await fetchGooglePlaceDetails(poi.name, poi.lat, poi.lon);
         if (placeDetails) {
-          school.rating = placeDetails.rating || 0;
-          school.userRatingsTotal = placeDetails.user_ratings_total || 0;
-          school.placeId = placeDetails.place_id || '';
+          poi.rating = placeDetails.rating || 0;
+          poi.userRatingsTotal = placeDetails.user_ratings_total || 0;
+          poi.placeId = placeDetails.place_id || '';
         }
 
-        return school;
+        if (poi.type === 'school') {
+          newSchools.push(poi);
+        } else if (poi.type === 'hospital') {
+          newHospitals.push(poi);
+        }
       }));
+
       setSchools(newSchools);
+      setHospitals(newHospitals);
     } catch (err) {
-      setError('Failed to fetch schools. Please try again.');
-      console.error('Error fetching schools:', err);
+      setError('Failed to fetch POIs. Please try again.');
+      console.error('Error fetching POIs:', err);
     } finally {
       setLoading(false);
     }
@@ -125,7 +137,7 @@ const MapComponent: React.FC<MapProps> = ({
   };
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371; // Radius of the earth in km
+    const R = 6371;
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
     const a = 
@@ -134,7 +146,7 @@ const MapComponent: React.FC<MapProps> = ({
       Math.sin(dLon/2) * Math.sin(dLon/2)
     ; 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    const d = R * c; // Distance in km
+    const d = R * c;
     return d;
   };
 
@@ -244,11 +256,51 @@ const MapComponent: React.FC<MapProps> = ({
             )}
           </Marker>
         ))}
+        {showHospitals && hospitals.map((hospital) => (
+          <Marker
+            key={hospital.id}
+            position={{ lat: hospital.lat, lng: hospital.lon }}
+            icon={{
+              url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+              scaledSize: new window.google.maps.Size(30, 30)
+            }}
+            onClick={() => setActiveInfoWindow(hospital.id)}
+          >
+            {activeInfoWindow === hospital.id && (
+              <InfoWindow onCloseClick={() => setActiveInfoWindow(null)}>
+                <div>
+                  <h3 className="font-bold">{hospital.name}</h3>
+                  <p>Type: {hospital.additionalInfo}</p>
+                  {selectedHouse && selectedHouse.latitude && selectedHouse.longitude && (
+                    <p>Distance: {calculateDistance(selectedHouse.latitude, selectedHouse.longitude, hospital.lat, hospital.lon).toFixed(2)} km</p>
+                  )}
+                  {hospital.rating > 0 && (
+                    <div className="mt-2">
+                      {renderStars(hospital.rating)}
+                      <p className="text-sm text-gray-500">({hospital.userRatingsTotal} reviews)</p>
+                    </div>
+                  )}
+                  {hospital.placeId && (
+                    <a
+                      href={getGoogleMapsUrl(hospital.placeId)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center mt-2 text-blue-500 hover:underline"
+                    >
+                      View on Google Maps
+                      <ExternalLink size={14} className="ml-1" />
+                    </a>
+                  )}
+                </div>
+              </InfoWindow>
+            )}
+          </Marker>
+        ))}
       </GoogleMap>
 
       <div className="absolute top-2 right-2 bg-white p-4 rounded shadow-md z-[1000]">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="font-bold">School Filter</h3>
+          <h3 className="font-bold">POI Filters</h3>
           <button onClick={() => setShowFilters(!showFilters)} className="text-gray-500 hover:text-gray-700">
             {showFilters ? <X size={20} /> : 'Show Filters'}
           </button>
@@ -278,14 +330,27 @@ const MapComponent: React.FC<MapProps> = ({
                 onChange={() => setShowSchools(!showSchools)}
                 className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
-              <label htmlFor="showSchools" className="flex items-center">
+<label htmlFor="showSchools" className="flex items-center">
                 <School className="mr-2 text-blue-500" />
                 <span>Show Schools ({schools.length})</span>
               </label>
             </div>
+            <div className="flex items-center mb-2">
+              <input
+                type="checkbox"
+                id="showHospitals"
+                checked={showHospitals}
+                onChange={() => setShowHospitals(!showHospitals)}
+                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              />
+              <label htmlFor="showHospitals" className="flex items-center">
+                <Hospital className="mr-2 text-red-500" />
+                <span>Show Hospitals ({hospitals.length})</span>
+              </label>
+            </div>
           </>
         )}
-        {loading && <p className="mt-2">Loading schools...</p>}
+        {loading && <p className="mt-2">Loading POIs...</p>}
         {error && <p className="mt-2 text-red-500">{error}</p>}
       </div>
     </div>

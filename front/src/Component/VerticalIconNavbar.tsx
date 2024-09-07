@@ -152,7 +152,7 @@ const VerticalIconNavbar: React.FC = () => {
   const [activeIcon, setActiveIcon] = useState(location.pathname);
 
   const iconClass = (path: string) =>
-    `w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 ${
+    `w-10 h-10 rounded-fsull flex items-center justify-center transition-all duration-200 ${
       activeIcon === path
         ? 'bg-[#006845] text-white'
         : 'bg-transparent text-gray-400 hover:text-gray-600'

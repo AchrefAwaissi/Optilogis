@@ -53,6 +53,7 @@ export interface EnhancedPOI extends POI {
   rating: number;
   userRatingsTotal: number;
   placeId: string;
+  stars?: number; // Ajoutez cette ligne
 }
 
 export interface NeighborhoodInfo {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Item } from '../item/item.iterface';
+import { Item } from '../item/item.interface';
 
 @Injectable()
 export class FilterService {
@@ -127,6 +127,38 @@ export class FilterService {
     }
     if (maxArea !== undefined) {
       filter['area'] = { ...filter['area'], $lte: maxArea };
+    }
+
+    return this.itemModel.find(filter).exec();
+  }
+
+  
+  async filterByExposure(exposure?: string): Promise<Item[]> {
+    const filter: any = {};
+
+    if (exposure) {
+      filter['exposure'] = { $regex: new RegExp(exposure, 'i') };
+    }
+
+    return this.itemModel.find(filter).exec();
+  }
+
+  
+  async filterByFurnished(furnished?: boolean): Promise<Item[]> {
+    const filter: any = {};
+
+    if (furnished !== undefined) {
+      filter['furnished'] = furnished;
+    }
+
+    return this.itemModel.find(filter).exec();
+  }
+  
+  async filterByAccessibility(accessibility?: boolean): Promise<Item[]> {
+    const filter: any = {};
+
+    if (accessibility !== undefined) {
+      filter['accessibility'] = accessibility;
     }
 
     return this.itemModel.find(filter).exec();

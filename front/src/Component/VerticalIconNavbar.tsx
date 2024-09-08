@@ -42,7 +42,7 @@
 //           <div className="flex justify-between h-16">
 //             <div className="flex">
 //               <div className="flex-shrink-0 flex items-center">
-//                 <button 
+//                 <button
 //                   onClick={() => setIsDrawerOpen(!isDrawerOpen)}
 //                   className="mr-2 text-gray-500 hover:text-gray-700"
 //                 >
@@ -117,7 +117,7 @@
 
 //       {/* Overlay to close drawer when clicking outside */}
 //       {isDrawerOpen && (
-//         <div 
+//         <div
 //           className="fixed inset-0 bg-black bg-opacity-50 z-30"
 //           onClick={() => setIsDrawerOpen(false)}
 //         ></div>
@@ -132,11 +132,9 @@
 // };
 
 // export default TopNavbar;
-
-
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faDollarSign,
   faUserGroup,
@@ -144,53 +142,53 @@ import {
   faChartBar,
   faCog,
   faSignOutAlt,
-  faSearch
-} from '@fortawesome/free-solid-svg-icons';
-import logo from '../image/logoa.png'
+  faSearch,
+} from "@fortawesome/free-solid-svg-icons";
+import logo from "../image/logoa.png";
+
 const VerticalIconNavbar: React.FC = () => {
   const location = useLocation();
   const [activeIcon, setActiveIcon] = useState(location.pathname);
 
   const iconClass = (path: string) =>
-    `w-10 h-10 rounded-fsull flex items-center justify-center transition-all duration-200 ${
+    `w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
       activeIcon === path
-        ? 'bg-[#006845] text-white'
-        : 'bg-transparent text-gray-400 hover:text-gray-600'
+        ? "bg-white text-blue-600 shadow-md"
+        : "bg-blue-100 text-blue-500 hover:bg-blue-200 hover:text-blue-700"
     }`;
 
   const navItemClass = (path: string) =>
-    `flex items-center w-full px-4 py-3 transition-all duration-200 ${
+    `flex items-center w-full px-6 py-3 transition-all duration-300 ${
       activeIcon === path
-        ? 'text-[#006845]'
-        : 'text-gray-600 hover:text-[#006845]'
+        ? "bg-blue-100 text-blue-700"
+        : "text-blue-600 hover:bg-blue-50 hover:text-blue-800"
     }`;
 
   const menuItems = [
-    { icon: faDollarSign, label: 'Home', path: '/' },
-    { icon: faUserGroup, label: 'Colocation', path: '/publish' },
-    { icon: faHome, label: 'Rent', path: '/search' },
-    { icon: faChartBar, label: 'Compare', path: '/compare' },
-    { icon: faCog, label: 'Settings', path: '/settings' },
+    { icon: faDollarSign, label: "Home", path: "/" },
+    { icon: faUserGroup, label: "Colocation", path: "/publish" },
+    { icon: faHome, label: "Rent", path: "/search" },
+    { icon: faChartBar, label: "Compare", path: "/compare" },
+    { icon: faCog, label: "Settings", path: "/settings" },
   ];
 
   return (
-    <nav className="w-56 bg-white border-r border-gray-200 flex flex-col h-screen">
-    <div className="flex justify-center py-4">
-      <img
-    src={logo}  
-    alt="Logo"
-    className="w-30 h-20 object-contain"
-      />
+    <nav className="w-64 bg-gradient-to-b from-blue-50 to-blue-100 flex flex-col h-screen shadow-lg">
+      <div className="flex justify-center py-6 bg-blue-100">
+        <img src={logo} alt="Logo" className="w-36 h-24 object-contain" />
       </div>
 
-      <div className="px-4 mb-4">
+      <div className="px-6 py-4">
         <div className="relative">
           <input
             type="text"
             placeholder="Search"
-            className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#006845]"
+            className="w-full pl-10 pr-4 py-2 rounded-full bg-white border border-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-300 text-blue-800 placeholder-blue-300"
           />
-          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+          <FontAwesomeIcon
+            icon={faSearch}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400"
+          />
         </div>
       </div>
 
@@ -205,19 +203,17 @@ const VerticalIconNavbar: React.FC = () => {
             <div className={iconClass(item.path)}>
               <FontAwesomeIcon icon={item.icon} className="text-lg" />
             </div>
-            <span className="ml-3">{item.label}</span>
+            <span className="ml-4 font-medium">{item.label}</span>
           </Link>
         ))}
       </div>
 
-      <div className="p-4">
-  <button className="w-12 flex items-center justify-center px-4 py-2 bg-[#006845] text-white rounded-md hover:bg-[#005536]">
-    <FontAwesomeIcon 
-      icon={faSignOutAlt} 
-    />
-  </button>
-</div>
-
+      <div className="p-6">
+        <button className="w-full flex items-center justify-center px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-300">
+          <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+          <span>Logout</span>
+        </button>
+      </div>
     </nav>
   );
 };

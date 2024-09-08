@@ -1,76 +1,44 @@
-import React from 'react';
-import { Heart, Home, Building, Box } from 'lucide-react';
-import { House } from '../types';
+import React from "react";
+import { House } from "../types";
 
 interface HouseListingsProps {
   houses: House[];
   onHouseSelect: (house: House) => void;
 }
 
-const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect }) => {
-  const getHousingTypeIcon = (type?: string) => {
-    if (!type) return null;
-    
-    switch (type.toLowerCase()) {
-      case 'house':
-        return <Home className="h-5 w-5 text-blue-500" />;
-      case 'apartment':
-        return <Building className="h-5 w-5 text-green-500" />;
-      case 'studio':
-        return <Box className="h-5 w-5 text-purple-500" />;
-      default:
-        return null;
-    }
-  };
-
+const HouseListings: React.FC<HouseListingsProps> = ({
+  houses,
+  onHouseSelect,
+}) => {
   return (
     <div className="space-y-4">
       {houses.map((house) => (
         <div
           key={house._id}
-          className="bg-white shadow-md rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-300"
+          className="w-[248px] h-[260px] relative bg-white rounded-[15px] shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer"
           onClick={() => onHouseSelect(house)}
-          style={{ height: '180px' }}
         >
-          <div className="flex flex-col sm:flex-row h-full">
-            <div className="relative sm:w-2/5 h-full">
-              <img
-                src={house.image ? `http://localhost:5000/uploads/${house.image}` : "/api/placeholder/400/300"}
-                alt={`${house.address}, ${house.city}`}
-                className="w-full h-full object-cover"
-              />
-              <button 
-                className="absolute top-2 right-2 bg-white rounded-full p-1 hover:bg-gray-100 transition-colors duration-200"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  console.log('Added to favorites:', house._id);
-                }}
-              >
-                <Heart className="h-6 w-6 text-gray-500" />
-              </button>
-            </div>
-            <div className="p-4 sm:w-3/5 h-full flex flex-col justify-between">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-semibold">{house.title}</h3>
-                  {house.typeOfHousing && (
-                    <div className="flex items-center">
-                      {getHousingTypeIcon(house.typeOfHousing)}
-                      <span className="ml-1 text-sm text-gray-600 capitalize">{house.typeOfHousing}</span>
-                    </div>
-                  )}
-                </div>
-                <p className="text-gray-600 mb-2">{house.address}, {house.city}</p>
-                <p className="text-gray-800 font-bold">${house.price.toLocaleString()} per month</p>
-                <div className="mt-2 text-sm text-gray-600">
-                  <span className="mr-2">{house.rooms} rooms</span>
-                  <span className="mr-2">{house.bedrooms} bedrooms</span>
-                  <span>{house.area} m²</span>
-                </div>
-              </div>
-              <p className="mt-2 text-sm text-gray-500 line-clamp-3">{house.description}</p>
-            </div>
+          <img
+            className="w-[228px] h-[118px] mx-auto mt-[10px] rounded-[15px] object-cover"
+            src={
+              house.image
+                ? `http://localhost:5000/uploads/${house.image}`
+                : "https://via.placeholder.com/228x118"
+            }
+            alt={`${house.title}`}
+          />
+          <div className="px-4 pt-2">
+            <h3 className="text-[14px] font-medium text-[#331832] truncate">
+              {house.title}
+            </h3>
+            <p className="text-[12px] text-[#bbbdc8] truncate">{`${house.address}, ${house.city}`}</p>
+            <p className="text-[14px] font-medium text-[#47a000] mt-1">
+              ${house.price.toLocaleString()}
+            </p>
           </div>
+          <button className="absolute bottom-4 left-4 w-[216px] h-[30px] bg-white rounded-[9px] border border-[#47a000] text-[#47a000] text-xs font-normal hover:bg-[#47a000] hover:text-white transition-colors duration-200">
+            View details
+          </button>
         </div>
       ))}
     </div>
@@ -78,3 +46,63 @@ const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect }) 
 };
 
 export default HouseListings;
+// import React from "react";
+// import { House } from "../types";
+// import { Heart } from "lucide-react"; // Assurez-vous que lucide-react est installé
+
+// interface HouseListingsProps {
+//   houses: House[];
+//   onHouseSelect: (house: House) => void;
+// }
+
+// const HouseListings: React.FC<HouseListingsProps> = ({
+//   houses,
+//   onHouseSelect,
+// }) => {
+//   return (
+//     <div className="space-y-4">
+//       {houses.map((house) => (
+//         <div
+//           key={house._id}
+//           className="w-[383px] h-[147px] relative bg-white rounded-[9px] shadow-md hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+//           onClick={() => onHouseSelect(house)}
+//         >
+//           <img
+//             className="w-[117px] h-[127px] absolute left-[10px] top-[10px] rounded-[9px] object-cover"
+//             src={
+//               house.image
+//                 ? `http://localhost:5000/uploads/${house.image}`
+//                 : "https://via.placeholder.com/117x127"
+//             }
+//             alt={`${house.title}`}
+//           />
+//           <div className="w-[230px] h-[105px] absolute left-[143px] top-[21px]">
+//             <div className="flex justify-between items-center">
+//               <h3 className="text-black text-base font-normal font-['Poppins'] tracking-tight">
+//                 {house.title}
+//               </h3>
+//               <Heart
+//                 className="w-5 h-5 text-gray-400 hover:text-red-500 transition-colors duration-200 cursor-pointer"
+//                 onClick={(e) => {
+//                   e.stopPropagation();
+//                   console.log("Favorited:", house._id);
+//                 }}
+//               />
+//             </div>
+//             <p className="absolute top-[36px] text-[#a1a1a1] text-sm font-normal font-['Poppins'] tracking-tight">{`${house.address}, ${house.city}`}</p>
+//             <p className="absolute top-[81px]">
+//               <span className="text-[#47a000] text-base font-normal font-['Poppins'] tracking-tight">
+//                 ${house.price.toLocaleString()}
+//               </span>
+//               <span className="text-black/40 text-[10px] font-normal font-['Poppins'] tracking-tight ml-1">
+//                 /month
+//               </span>
+//             </p>
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   );
+// };
+
+// export default HouseListings;

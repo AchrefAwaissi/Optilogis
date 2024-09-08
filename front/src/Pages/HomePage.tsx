@@ -56,7 +56,7 @@
 
 //       const matchesSize = house.area >= criteria.minSize && house.area <= criteria.maxSize;
 
-//       const matchesType = !criteria.typeOfHousing || 
+//       const matchesType = !criteria.typeOfHousing ||
 //         (house.typeOfHousing && house.typeOfHousing.toLowerCase().includes(criteria.typeOfHousing.toLowerCase()));
 
 //       return matchesLocation && matchesPrice && matchesSize && matchesType;
@@ -126,28 +126,27 @@
 
 // export default HomePage;
 
-
-
-
-import React, { useState, useEffect } from 'react';
-import HouseListings from '../Component/HouseListings';
-import Filter from '../Component/Filter';
-import { FilterCriteria, Location, House } from '../types';
-import MapComponent from '../Component/Map';
+import React, { useState, useEffect } from "react";
+import HouseListings from "../Component/HouseListings";
+import Filter from "../Component/Filter";
+import { FilterCriteria, Location, House } from "../types";
+import MapComponent from "../Component/Map";
 
 const HomePage: React.FC = () => {
   const [houses, setHouses] = useState<House[]>([]);
   const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
+    null
+  );
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
-    location: '',
+    location: "",
     minPrice: 0,
     maxPrice: 10000,
     minSize: 0,
     maxSize: 1000,
-    typeOfHousing: '',
+    typeOfHousing: "",
   });
 
   useEffect(() => {
@@ -161,17 +160,17 @@ const HomePage: React.FC = () => {
   const fetchHouses = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/item');
+      const response = await fetch("http://localhost:5000/item");
       if (!response.ok) {
-        throw new Error('Failed to fetch houses');
+        throw new Error("Failed to fetch houses");
       }
       const data: House[] = await response.json();
       setHouses(data);
       setFilteredHouses(data);
       setError(null);
     } catch (error) {
-      console.error('Error fetching houses:', error);
-      setError('Failed to load houses. Please try again later.');
+      console.error("Error fetching houses:", error);
+      setError("Failed to load houses. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -179,16 +178,31 @@ const HomePage: React.FC = () => {
 
   const filterHouses = () => {
     const filtered = houses.filter((house) => {
-      const matchesLocation = !filterCriteria.location ||
-        (house.city && house.city.toLowerCase().includes(filterCriteria.location.toLowerCase())) ||
-        (house.address && house.address.toLowerCase().includes(filterCriteria.location.toLowerCase()));
+      const matchesLocation =
+        !filterCriteria.location ||
+        (house.city &&
+          house.city
+            .toLowerCase()
+            .includes(filterCriteria.location.toLowerCase())) ||
+        (house.address &&
+          house.address
+            .toLowerCase()
+            .includes(filterCriteria.location.toLowerCase()));
 
-      const matchesPrice = house.price >= filterCriteria.minPrice && house.price <= filterCriteria.maxPrice;
+      const matchesPrice =
+        house.price >= filterCriteria.minPrice &&
+        house.price <= filterCriteria.maxPrice;
 
-      const matchesSize = house.area >= filterCriteria.minSize && house.area <= filterCriteria.maxSize;
+      const matchesSize =
+        house.area >= filterCriteria.minSize &&
+        house.area <= filterCriteria.maxSize;
 
-      const matchesType = !filterCriteria.typeOfHousing || 
-        (house.typeOfHousing && house.typeOfHousing.toLowerCase().includes(filterCriteria.typeOfHousing.toLowerCase()));
+      const matchesType =
+        !filterCriteria.typeOfHousing ||
+        (house.typeOfHousing &&
+          house.typeOfHousing
+            .toLowerCase()
+            .includes(filterCriteria.typeOfHousing.toLowerCase()));
 
       return matchesLocation && matchesPrice && matchesSize && matchesType;
     });
@@ -200,13 +214,16 @@ const HomePage: React.FC = () => {
   };
 
   const handleLocationSelect = (location: Location) => {
-    console.log('Selected location:', location);
+    console.log("Selected location:", location);
     setSelectedLocation(location);
-    setFilterCriteria((prevCriteria) => ({ ...prevCriteria, location: location.location }));
+    setFilterCriteria((prevCriteria) => ({
+      ...prevCriteria,
+      location: location.location,
+    }));
   };
 
   const handleHouseSelect = (house: House) => {
-    console.log('Selected house:', house);
+    console.log("Selected house:", house);
     // Implement navigation or modal opening logic here
   };
 
@@ -222,21 +239,25 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* House Listings Section */}
-      <div className="w-[450px] overflow-y-auto p-4 m-4">
+      <div className="w-[350px] overflow-y-auto p-4 m-4">
         <h2 className="text-2xl font-bold mb-4">
-          {filteredHouses.length} Results in {filterCriteria.location || 'All Locations'}
+          {filteredHouses.length} Results in{" "}
+          {filterCriteria.location || "All Locations"}
         </h2>
         {loading ? (
           <p>Loading houses...</p>
         ) : error ? (
           <p className="text-red-500">{error}</p>
         ) : (
-          <HouseListings houses={filteredHouses} onHouseSelect={handleHouseSelect} />
+          <HouseListings
+            houses={filteredHouses}
+            onHouseSelect={handleHouseSelect}
+          />
         )}
       </div>
 
       {/* Map Section */}
-      <div className="flex-1 bg-gray-100 m-4" style={{ borderRadius: '10px' }}>
+      <div className="flex-1 bg-gray-100 m-4" style={{ borderRadius: "10px" }}>
         <MapComponent
           houses={filteredHouses}
           selectedLocation={selectedLocation}
@@ -245,6 +266,6 @@ const HomePage: React.FC = () => {
       </div>
     </div>
   );
-}
+};
 
 export default HomePage;

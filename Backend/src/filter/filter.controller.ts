@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { FilterService } from './filter.service';
-import { Item } from '../item/item.iterface';
+import { Item } from '../item/item.interface';
 
 @Controller('filter')
 export class FilterController {
@@ -86,5 +86,29 @@ export class FilterController {
     @Query('maxArea') maxArea?: number,
   ): Promise<Item[]> {
     return this.filterService.filterByArea(minArea, maxArea);
+  }
+
+  
+  @Get('exposure')
+  async filterByExposure(
+    @Query('exposure') exposure?: string,
+  ): Promise<Item[]> {
+    return this.filterService.filterByExposure(exposure);
+  }
+
+
+  @Get('furnished')
+  async filterByFurnished(
+    @Query('furnished') furnished?: boolean,
+  ): Promise<Item[]> {
+    return this.filterService.filterByFurnished(furnished);
+  }
+
+  
+  @Get('accessibility')
+  async filterByAccessibility(
+    @Query('accessibility') accessibility?: boolean,
+  ): Promise<Item[]> {
+    return this.filterService.filterByAccessibility(accessibility);
   }
 }

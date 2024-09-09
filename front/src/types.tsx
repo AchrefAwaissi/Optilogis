@@ -1,20 +1,20 @@
 export interface House {
   _id: string;
-  image: string;
+  name?: string;
+  description?: string;
   price: number;
+  image?: string;
+  title?: string;
   address: string;
   city: string;
-  typeOfHousing: string | undefined;
-  title: string;
-  rooms: number;
-  bedrooms: number;
-  area: number;
-  name: string;
-  description: string;
+  country: string;
+  typeOfHousing?: string;
+  rooms?: number;
+  bedrooms?: number;
+  area?: number;
   latitude?: number;
   longitude?: number;
 }
-
 export interface FilterCriteria {
   location: string;
   minPrice: number;

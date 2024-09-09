@@ -1,9 +1,11 @@
 import React from 'react';
+import PropertyDetails from './PropertyDetails';
 
 const SettingsPage = () => {
   return (
     <div>
-      settings
+    <PropertyDetails></PropertyDetails>
+
     </div>
   );
 }

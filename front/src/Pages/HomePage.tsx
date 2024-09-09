@@ -131,15 +131,14 @@ import HouseListings from "../Component/HouseListings";
 import Filter from "../Component/Filter";
 import { FilterCriteria, Location, House } from "../types";
 import MapComponent from "../Component/Map";
+import { useNavigate } from "react-router-dom";
 
 const HomePage: React.FC = () => {
   const [houses, setHouses] = useState<House[]>([]);
   const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
-    null
-  );
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
     location: "",
     minPrice: 0,
@@ -148,6 +147,8 @@ const HomePage: React.FC = () => {
     maxSize: 1000,
     typeOfHousing: "",
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchHouses();
@@ -194,6 +195,7 @@ const HomePage: React.FC = () => {
         house.price <= filterCriteria.maxPrice;
 
       const matchesSize =
+        house.area !== undefined &&
         house.area >= filterCriteria.minSize &&
         house.area <= filterCriteria.maxSize;
 
@@ -223,13 +225,11 @@ const HomePage: React.FC = () => {
   };
 
   const handleHouseSelect = (house: House) => {
-    console.log("Selected house:", house);
-    // Implement navigation or modal opening logic here
+    navigate("/property-details", { state: { house } });
   };
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Filter Section */}
       <div className="w-[250px] bg-white overflow-y-auto m-4">
         <Filter
           onFilterChange={handleFilterChange}
@@ -238,7 +238,6 @@ const HomePage: React.FC = () => {
         />
       </div>
 
-      {/* House Listings Section */}
       <div className="w-[350px] overflow-y-auto p-4 m-4">
         <h2 className="text-2xl font-bold mb-4">
           {filteredHouses.length} Results in{" "}
@@ -256,7 +255,6 @@ const HomePage: React.FC = () => {
         )}
       </div>
 
-      {/* Map Section */}
       <div className="flex-1 bg-gray-100 m-4" style={{ borderRadius: "10px" }}>
         <MapComponent
           houses={filteredHouses}

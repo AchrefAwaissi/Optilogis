@@ -47,7 +47,7 @@ const App: React.FC = () => {
               <Route path="/search" element={<SearchPage />} />
               <Route path="/matching" element={<MatchingProfilePage />} />
               <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/property/:id" element={<PropertyDetails />} />
+              <Route path="/property-details" element={<PropertyDetails />} />
             </Routes>
           </main>
         </div>

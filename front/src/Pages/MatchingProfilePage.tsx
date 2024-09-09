@@ -1,9 +1,10 @@
 import React from 'react';
+import PropertyDetails from './PropertyDetails';
 
 const MatchingProfilePage = () => {
   return (
     <div>
-      profile
+      <PropertyDetails></PropertyDetails>
     </div>
   );
 }

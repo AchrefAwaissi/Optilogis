@@ -4,8 +4,7 @@ import PropertyDetails from './PropertyDetails';
 const SettingsPage = () => {
   return (
     <div>
-    <PropertyDetails></PropertyDetails>
-
+hh
     </div>
   );
 }

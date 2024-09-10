@@ -3,8 +3,7 @@ import PropertyDetails from './PropertyDetails';
 
 const MatchingProfilePage = () => {
   return (
-    <div>
-      <PropertyDetails></PropertyDetails>
+    <div>hh
     </div>
   );
 }

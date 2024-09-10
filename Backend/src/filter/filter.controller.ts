@@ -88,14 +88,12 @@ export class FilterController {
     return this.filterService.filterByArea(minArea, maxArea);
   }
 
-  
   @Get('exposure')
   async filterByExposure(
     @Query('exposure') exposure?: string,
-  ): Promise<Item[]> {
+  ): Promise<string[]> {
     return this.filterService.filterByExposure(exposure);
   }
-
 
   @Get('furnished')
   async filterByFurnished(
@@ -104,11 +102,33 @@ export class FilterController {
     return this.filterService.filterByFurnished(furnished);
   }
 
-  
   @Get('accessibility')
   async filterByAccessibility(
     @Query('accessibility') accessibility?: boolean,
   ): Promise<Item[]> {
     return this.filterService.filterByAccessibility(accessibility);
+  }
+
+  @Get('floor')
+  async filterByFloor(
+    @Query('minFloor') minFloor?: number,
+    @Query('maxFloor') maxFloor?: number,
+  ): Promise<Item[]> {
+    return this.filterService.filterByFloor(minFloor, maxFloor);
+  }
+
+  @Get('annexArea')
+  async filterByAnnexArea(
+    @Query('minAnnexArea') minAnnexArea?: number,
+    @Query('maxAnnexArea') maxAnnexArea?: number,
+  ): Promise<Item[]> {
+    return this.filterService.filterByAnnexArea(minAnnexArea, maxAnnexArea);
+  }
+
+  @Get('exterior')
+  async filterByExterior(
+    @Query('exterior') exterior?: boolean,
+  ): Promise<Item[]> {
+    return this.filterService.filterByExterior(exterior);
   }
 }

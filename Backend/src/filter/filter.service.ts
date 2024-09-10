@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Item } from '../item/item.iterface';
+import { Item } from '../item/item.interface'; // Assurez-vous que le chemin et le nom du fichier sont corrects
 
 @Injectable()
 export class FilterService {
@@ -132,7 +132,6 @@ export class FilterService {
     return this.itemModel.find(filter).exec();
   }
 
-  
   async filterByExposure(exposure?: string): Promise<Item[]> {
     const filter: any = {};
 
@@ -143,7 +142,6 @@ export class FilterService {
     return this.itemModel.find(filter).exec();
   }
 
-  
   async filterByFurnished(furnished?: boolean): Promise<Item[]> {
     const filter: any = {};
 
@@ -153,12 +151,48 @@ export class FilterService {
 
     return this.itemModel.find(filter).exec();
   }
-  
+
   async filterByAccessibility(accessibility?: boolean): Promise<Item[]> {
     const filter: any = {};
 
     if (accessibility !== undefined) {
       filter['accessibility'] = accessibility;
+    }
+
+    return this.itemModel.find(filter).exec();
+  }
+
+  async filterByFloor(minFloor?: number, maxFloor?: number): Promise<Item[]> {
+    const filter: any = {};
+
+    if (minFloor !== undefined) {
+      filter['floor'] = { $gte: minFloor };
+    }
+    if (maxFloor !== undefined) {
+      filter['floor'] = { ...filter['floor'], $lte: maxFloor };
+    }
+
+    return this.itemModel.find(filter).exec();
+  }
+
+  async filterByAnnexArea(minAnnexArea?: number, maxAnnexArea?: number): Promise<Item[]> {
+    const filter: any = {};
+
+    if (minAnnexArea !== undefined) {
+      filter['annexArea'] = { $gte: minAnnexArea };
+    }
+    if (maxAnnexArea !== undefined) {
+      filter['annexArea'] = { ...filter['annexArea'], $lte: maxAnnexArea };
+    }
+
+    return this.itemModel.find(filter).exec();
+  }
+
+  async filterByExterior(exterior?: boolean): Promise<Item[]> {
+    const filter: any = {};
+
+    if (exterior !== undefined) {
+      filter['exterior'] = exterior;
     }
 
     return this.itemModel.find(filter).exec();

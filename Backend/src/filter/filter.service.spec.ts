@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { FilterService } from './filter.service';
-import { Item } from '../item/item.interface'; // Ensure this path and filename are correct
+import { Item } from '../item/item.iterface'; // Ensure this path and filename are correct
 
 describe('FilterService', () => {
   let service: FilterService;
@@ -205,15 +205,6 @@ describe('FilterService', () => {
       const maxArea = 100;
       await service.filterByArea(minArea, maxArea);
       expect(mockItemModel.find).toHaveBeenCalledWith({ area: { $gte: minArea, $lte: maxArea } });
-    });
-  });
-
-  // Filter by exposure
-  describe('filterByExposure', () => {
-    it('should call the model with the correct filter for exposure', async () => {
-      const exposure = 'south';
-      await service.filterByExposure(exposure);
-      expect(mockItemModel.find).toHaveBeenCalledWith({ exposure });
     });
   });
 

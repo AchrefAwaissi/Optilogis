@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { FilterService } from './filter.service';
-import { Item } from '../item/item.interface';
+import { Item } from '../item/item.iterface';
 
 describe('FilterService', () => {
   let service: FilterService;

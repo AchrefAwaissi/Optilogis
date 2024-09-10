@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Item } from '../item/item.interface';
+import { Item } from '../item/item.iterface';
 
 @Injectable()
 export class FilterService {

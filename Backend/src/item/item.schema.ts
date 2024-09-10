@@ -15,4 +15,9 @@ export const ItemSchema = new Schema({
   area: { type: Number, required: false },
   latitude: { type: Number, required: false },
   longitude: { type: Number, required: false },
+  exposure: { type: String, required: false},
+  furnished: { type: Boolean, required: false},
+  accessibility: { type: String, required: false},
 });
+
+//TODO étage, surface annexe et extérieur verifier sur seloger

@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { FilterService } from './filter.service';
-import { Item } from '../item/item.interface';
+import { Item } from '../item/item.iterface';
 
 @Controller('filter')
 export class FilterController {
@@ -89,11 +89,12 @@ export class FilterController {
   }
 
   @Get('exposure')
-  async filterByExposure(
-    @Query('exposure') exposure?: string,
-  ): Promise<string[]> {
-    return this.filterService.filterByExposure(exposure);
-  }
+async filterByExposure(
+  @Query('exposure') exposure?: string,
+): Promise<Item[]> {
+  return this.filterService.filterByExposure(exposure);
+}
+
 
   @Get('furnished')
   async filterByFurnished(

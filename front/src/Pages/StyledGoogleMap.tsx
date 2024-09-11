@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react';
-import { GoogleMap, useJsApiLoader } from '@react-google-maps/api';
-import type { Libraries } from '@react-google-maps/api/dist/utils/make-load-script-url';
-
-const libraries: Libraries = ['places'];
+import { GoogleMap } from '@react-google-maps/api';
+import { useGoogleMapsLoader } from '../Component/googleMapsConfig';
 
 const mapContainerStyle = {
   width: '100%',
@@ -15,10 +13,7 @@ interface StyledGoogleMapProps {
 }
 
 const StyledGoogleMap: React.FC<StyledGoogleMapProps> = ({ lat, lng }) => {
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: "AIzaSyAh0yrnHc34HwncDoKBMYutdQCSueTc9FA",
-    libraries,
-  });
+  const { isLoaded, loadError } = useGoogleMapsLoader();
 
   const center = useMemo(() => ({ lat, lng }), [lat, lng]);
 

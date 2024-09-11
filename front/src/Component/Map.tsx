@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { GoogleMap, useJsApiLoader, Marker, Circle, InfoWindow, Polyline } from '@react-google-maps/api';
+import { GoogleMap, Marker, Circle, InfoWindow, Polyline } from '@react-google-maps/api';
 import axios from 'axios';
 import { X, School, Star, ExternalLink, Hospital, ShoppingCart, Utensils, Bus, Car, Bike } from 'lucide-react';
 import { House, MapProps, EnhancedPOI, POIType } from '../types';
+import { useGoogleMapsLoader, mapContainerStyle, defaultCenter, defaultZoom, getMarkerIcon, getGoogleMapsUrl } from './googleMapsConfig';
 
 interface PlaceResult extends google.maps.places.PlaceResult {
   rating?: number;
@@ -10,21 +11,27 @@ interface PlaceResult extends google.maps.places.PlaceResult {
   place_id?: string;
 }
 
-const MapComponent: React.FC<MapProps> = ({ 
+interface UpdatedMapProps extends Omit<MapProps, 'center'> {
+  center?: { lat: number; lng: number } | [number, number];
+}
+
+const MapComponent: React.FC<UpdatedMapProps> = ({ 
   houses, 
   selectedLocation, 
   onLocationSelect,
-  center = [44.8378, -0.5792], 
-  zoom = 13 
+  center = defaultCenter, 
+  zoom = defaultZoom 
 }) => {
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: "AIzaSyAh0yrnHc34HwncDoKBMYutdQCSueTc9FA",
-    libraries: ['places']
-  });
+  const { isLoaded, loadError } = useGoogleMapsLoader();
 
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>({ lat: center[0], lng: center[1] });
+  const [mapCenter, setMapCenter] = useState<google.maps.LatLngLiteral>(() => {
+    if (Array.isArray(center)) {
+      return { lat: center[0], lng: center[1] };
+    } else {
+      return center;
+    }
+  });
   const [mapZoom] = useState(zoom);
   const [pois, setPois] = useState<EnhancedPOI[]>([]);
   const [showPois, setShowPois] = useState({
@@ -82,12 +89,10 @@ const MapComponent: React.FC<MapProps> = ({
           setTransitRoutes(result);
           directionsRenderer?.setDirections(result);
 
-          // Extraire les détails de l'itinéraire
           const route = result.routes[0];
           const distance = route.legs[0].distance?.text || 'N/A';
           const duration = route.legs[0].duration?.text || 'N/A';
 
-          // Mettre à jour les détails de l'itinéraire
           setRouteDetails(prev => ({
             ...prev,
             [travelMode.toLowerCase()]: { distance, duration },
@@ -228,25 +233,6 @@ const MapComponent: React.FC<MapProps> = ({
     );
   };
 
-  const getGoogleMapsUrl = (placeId: string) => {
-    return `https://www.google.com/maps/place/?q=place_id:${placeId}`;
-  };
-
-  const getMarkerIcon = (type: POIType) => {
-    switch (type) {
-      case 'school':
-        return 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
-      case 'hospital':
-        return 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
-      case 'supermarket':
-        return 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
-      case 'restaurant':
-        return 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
-      default:
-        return 'http://maps.google.com/mapfiles/ms/icons/purple-dot.png';
-    }
-  };
-
   const filteredPois = pois.filter(poi => showPois[poi.type]);
 
   const renderPOIMarker = (poi: EnhancedPOI) => (
@@ -297,7 +283,7 @@ const MapComponent: React.FC<MapProps> = ({
   return isLoaded ? (
     <div className="relative">
       <GoogleMap
-        mapContainerStyle={{ height: '90vh', width: '100%' }}
+        mapContainerStyle={mapContainerStyle}
         center={mapCenter}
         zoom={mapZoom}
         onLoad={setMap}

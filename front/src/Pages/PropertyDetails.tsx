@@ -31,7 +31,7 @@ interface InfoCardProps {
 }
 
 const InfoCard: React.FC<InfoCardProps> = ({ children }) => (
-  <div className="w-full md:w-28 h-8 md:h-10 bg-gray-100 rounded-md flex items-center justify-center text-sm">
+  <div className="w-28 h-10 bg-gray-100 rounded-md flex items-center justify-center text-sm">
     {children}
   </div>
 );
@@ -102,9 +102,9 @@ const PropertyDetails: React.FC = () => {
         </div>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
           <div className="text-2xl font-bold mb-2 md:mb-0">${house.price.toLocaleString()}/ month</div>
-          <div className="flex space-x-2">
-            <button className="bg-teal-700 text-white px-4 py-2 rounded-md text-sm md:text-base">Rent now</button>
-            <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md text-sm md:text-base">View 3D tour</button>
+          <div className="flex flex-row space-x-2">
+            <button className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap">Rent now</button>
+            <button className="w-28 md:w-auto h-10 bg-gray-200 text-gray-700 px-4 rounded-md text-xs md:text-sm whitespace-nowrap">View 3D tour</button>
           </div>
         </div>
         <h2 className="text-xl font-medium mt-6 mb-2">Overview</h2>

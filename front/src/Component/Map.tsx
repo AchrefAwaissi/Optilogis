@@ -333,17 +333,27 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
       </GoogleMap>
 
       <div className="absolute top-2 right-2 bg-white p-4 rounded shadow-md">
-        <div className="flex justify-between items-center mb-2">
-          {/* <h3 className="font-bold">Filtre</h3> */}
-          <button onClick={() => setShowFilters(!showFilters)} className="text-gray-500 hover:text-gray-700">
-            {showFilters ? <X size={20} /> : 'Afficher les filtres'}
-          </button>
-        </div>
+  <div className="mb-2">
+    <h3 className="font-bold text-lg mb-2">Explorateur de quartier</h3>
+    <button 
+      onClick={() => setShowFilters(!showFilters)} 
+      className="text-gray-500 hover:text-gray-700"
+    >
+      {showFilters ? (
+        <X size={20} />
+      ) : (
+        <span className="text-sm sm:text-base">
+          <span className="block">Découvrir les alentours</span>
+          <span className="block"></span>
+        </span>
+      )}
+    </button>
+  </div>
         {showFilters && selectedHouse && (
           <>
             <p className="mb-2">Selected: {selectedHouse.title}</p>
             <div className="mb-2">
-              <label className="block text-sm font-medium text-gray-700">Search Radius</label>
+              <label className="block text-sm font-medium text-gray-700">Rayon</label>
               <select 
                 value={searchRadius} 
                 onChange={(e) => setSearchRadius(parseInt(e.target.value))}
@@ -366,7 +376,7 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
               />
               <label htmlFor="showSchools" className="flex items-center">
                 <School className="mr-2 text-blue-500" />
-                <span>Show Schools ({pois.filter(poi => poi.type === 'school').length})</span>
+                <span>Écoles ({pois.filter(poi => poi.type === 'school').length})</span>
               </label>
             </div>
             <div className="flex items-center mb-2">
@@ -379,7 +389,7 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
               />
               <label htmlFor="showHospitals" className="flex items-center">
                 <Hospital className="mr-2 text-red-500" />
-                <span>Show Hospitals ({pois.filter(poi => poi.type === 'hospital').length})</span>
+                <span>Hopitaux ({pois.filter(poi => poi.type === 'hospital').length})</span>
               </label>
             </div>
             <div className="flex items-center mb-2">
@@ -392,7 +402,7 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
               />
               <label htmlFor="showSupermarkets" className="flex items-center">
                 <ShoppingCart className="mr-2 text-green-500" />
-                <span>Show Supermarkets ({pois.filter(poi => poi.type === 'supermarket').length})</span>
+                <span>Supermarchés ({pois.filter(poi => poi.type === 'supermarket').length})</span>
               </label>
             </div>
             <div className="flex items-center mb-2">
@@ -405,11 +415,11 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
               />
               <label htmlFor="showRestaurants" className="flex items-center">
                 <Utensils className="mr-2 text-yellow-500" />
-                <span>Show Restaurants ({pois.filter(poi => poi.type === 'restaurant').length})</span>
+                <span>Restaurants ({pois.filter(poi => poi.type === 'restaurant').length})</span>
               </label>
             </div>
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700">Route Search</label>
+              <label className="block text-sm font-medium text-gray-700">Itinéraire</label>
               <input
                 type="text"
                 value={transitAddress}
@@ -423,7 +433,7 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
                   className="inline-flex flex-col justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                 >
                   <Bus size={16} className="mb-1" />
-                  Transit
+                  Transport
                   {routeDetails.transit && (
                     <div className="text-xs mt-1">
                       <div>{routeDetails.transit.distance}</div>
@@ -436,7 +446,7 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
                   className="inline-flex flex-col justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   <Car size={16} className="mb-1" />
-                  Car
+                  Voiture
                   {routeDetails.driving && (
                     <div className="text-xs mt-1">
                       <div>{routeDetails.driving.distance}</div>
@@ -449,7 +459,7 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
                   className="inline-flex flex-col justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 >
                   <Bike size={16} className="mb-1" />
-                  Bike
+                  Vélo
                   {routeDetails.bicycling && (
                     <div className="text-xs mt-1">
                       <div>{routeDetails.bicycling.distance}</div>

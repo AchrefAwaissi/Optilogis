@@ -51,9 +51,9 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick }) 
 
   return (
     <nav
-      className={`bg-gradient-to-b from-blue-50 to-blue-100 h-screen shadow-lg transition-all duration-300 ${
+      className={`hidden md:flex bg-gradient-to-b from-blue-50 to-blue-100 h-screen shadow-lg transition-all duration-300 ${
         isOpen ? "w-64" : "w-20"
-      } flex flex-col`}
+      } flex-col`}
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >

@@ -3,7 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faMapMarkerAlt,
   faChevronDown,
-  faBuilding
+  faBuilding,
+  faTimes,
+  faFilter
 } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { FilterCriteria, Location } from '../types';
@@ -12,6 +14,8 @@ interface PropertyFilterProps {
   onFilterChange: (criteria: Partial<FilterCriteria>) => void;
   onLocationSelect: (location: Location) => void;
   filterCriteria: FilterCriteria;
+  isOpen?: boolean;
+  onToggle?: () => void;
 }
 
 interface Suggestion {
@@ -20,9 +24,16 @@ interface Suggestion {
   lon: string;
 }
 
-const PropertyFilter: React.FC<PropertyFilterProps> = ({ onFilterChange, onLocationSelect, filterCriteria }) => {
+const PropertyFilter: React.FC<PropertyFilterProps> = ({
+  onFilterChange,
+  onLocationSelect,
+  filterCriteria,
+  isOpen = false,
+  onToggle
+}) => {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(isOpen);
 
   const handleLocationChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -65,10 +76,8 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ onFilterChange, onLocat
 
   const handleTypeOfPlaceChange = (type: FilterCriteria['typeOfHousing']) => {
     if (type === '') {
-      // Si 'Tous' est sélectionné, on réinitialise le filtre de type
       onFilterChange({ typeOfHousing: '' });
     } else {
-      // Sinon, on bascule la sélection du type
       onFilterChange({ 
         typeOfHousing: filterCriteria.typeOfHousing === type ? '' : type 
       });
@@ -79,13 +88,42 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ onFilterChange, onLocat
     onFilterChange({ maxPrice: parseInt(e.target.value) });
   };
 
-  return (
-    <div className="flex flex-col h-screen bg-white w-64">
-      <div className="p-4">
-        <h2 className="text-xl font-semibold text-gray-800">Filtres</h2>
-      </div>
+  const toggleFilter = () => {
+    if (onToggle) {
+      onToggle();
+    } else {
+      setIsFilterOpen(!isFilterOpen);
+    }
+  };
 
-      <div className="flex-1 overflow-y-auto">
+  return (
+    <>
+      {!onToggle && (
+        <div className="md:hidden">
+          <button 
+            onClick={toggleFilter}
+            className="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg z-50"
+          >
+            <FontAwesomeIcon icon={isFilterOpen ? faTimes : faFilter} />
+          </button>
+        </div>
+      )}
+
+      <div className={`
+        ${onToggle ? '' : 'fixed inset-0 bg-white z-40'}
+        overflow-y-auto transition-transform duration-300 ease-in-out
+        md:relative md:inset-auto md:block md:bg-transparent
+        ${onToggle ? '' : isFilterOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+      `}>
+        {!onToggle && (
+          <div className="p-4 md:sticky md:top-0 bg-white">
+            <h2 className="text-xl font-semibold text-gray-800">Filtres</h2>
+            <button onClick={toggleFilter} className="md:hidden absolute top-4 right-4 text-gray-500">
+              <FontAwesomeIcon icon={faTimes} />
+            </button>
+          </div>
+        )}
+
         <div className="p-4">
           <h3 className="text-sm font-semibold text-gray-500 mb-2">Localisation</h3>
           <div className="relative">
@@ -189,15 +227,15 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({ onFilterChange, onLocat
           </div>
           <p className="mt-1 text-xs text-gray-500">Mètres carrés</p>
         </div>
-      </div>
 
-      <div className="p-4">
-        <button className="w-full flex items-center justify-center px-4 py-2 bg-[#006845] text-white rounded-md hover:bg-[#005536]">
-          <FontAwesomeIcon icon={faBuilding} className="mr-2" />
-          Appliquer les filtres
-        </button>
+        <div className="p-4">
+          <button className="w-full flex items-center justify-center px-4 py-2 bg-[#006845] text-white rounded-md hover:bg-[#005536]">
+            <FontAwesomeIcon icon={faBuilding} className="mr-2" />
+            Appliquer les filtres
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

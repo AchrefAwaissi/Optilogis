@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMap, faList } from "@fortawesome/free-solid-svg-icons";
 import HouseListings from "../Component/HouseListings";
 import Filter from "../Component/Filter";
-import { FilterCriteria, Location, House } from "../types";
 import MapComponent from "../Component/Map";
-import { useNavigate } from "react-router-dom";
+import { FilterCriteria, Location, House } from "../types";
 
 const HomePage: React.FC = () => {
   const [houses, setHouses] = useState<House[]>([]);
@@ -19,8 +21,13 @@ const HomePage: React.FC = () => {
     maxSize: 1000,
     typeOfHousing: "",
   });
+  const [showMap, setShowMap] = useState(false);
 
   const navigate = useNavigate();
+
+  const toggleMap = () => {
+    setShowMap(!showMap);
+  };
 
   useEffect(() => {
     fetchHouses();
@@ -101,39 +108,55 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <div className="w-[250px] bg-white overflow-y-auto m-4">
-        <Filter
-          onFilterChange={handleFilterChange}
-          onLocationSelect={handleLocationSelect}
-          filterCriteria={filterCriteria}
-        />
-      </div>
-
-      <div className="w-[500px] overflow-y-auto p-4 m-4">
-        <h2 className="text-2xl font-bold mb-4">
-          {filteredHouses.length} Results in{" "}
-          {filterCriteria.location || "All Locations"}
-        </h2>
-        {loading ? (
-          <p>Loading houses...</p>
-        ) : error ? (
-          <p className="text-red-500">{error}</p>
-        ) : (
-          <HouseListings
-            houses={filteredHouses}
-            onHouseSelect={handleHouseSelect}
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden relative">
+      {/* Filter component */}
+      <div className="w-full md:w-[250px] bg-white overflow-y-auto">
+        <div className="m-4">
+          <Filter
+            onFilterChange={handleFilterChange}
+            onLocationSelect={handleLocationSelect}
+            filterCriteria={filterCriteria}
           />
-        )}
+        </div>
       </div>
 
-      <div className="flex-1 bg-gray-100 m-4" style={{ borderRadius: "10px" }}>
-        <MapComponent
-          houses={filteredHouses}
-          selectedLocation={selectedLocation}
-          onLocationSelect={handleLocationSelect}
-        />
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+        {/* House listings */}
+        <div className={`w-full md:w-[500px] overflow-y-auto p-4 ${showMap ? 'hidden' : 'block'} md:block`}>
+          <h2 className="text-2xl font-bold mb-4">
+            {filteredHouses.length} Results in{" "}
+            {filterCriteria.location || "All Locations"}
+          </h2>
+          {loading ? (
+            <p>Loading houses...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : (
+            <HouseListings
+              houses={filteredHouses}
+              onHouseSelect={handleHouseSelect}
+            />
+          )}
+        </div>
+
+        {/* Map component */}
+        <div className={`flex-1 bg-gray-100 ${showMap ? 'block' : 'hidden'} md:block h-[calc(100vh-64px)] md:h-auto`}>
+          <MapComponent
+            houses={filteredHouses}
+            selectedLocation={selectedLocation}
+            onLocationSelect={handleLocationSelect}
+          />
+        </div>
       </div>
+
+      {/* Map toggle button */}
+      <button
+        className="md:hidden fixed bottom-4 left-4 z-10 bg-blue-500 text-white p-3 rounded-full shadow-lg"
+        onClick={toggleMap}
+      >
+        <FontAwesomeIcon icon={showMap ? faList : faMap} />
+      </button>
     </div>
   );
 };

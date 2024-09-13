@@ -332,11 +332,11 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
         ))}
       </GoogleMap>
 
-      <div className="absolute top-2 right-2 bg-white p-4 rounded shadow-md z-[1000]">
+      <div className="absolute top-2 right-2 bg-white p-4 rounded shadow-md">
         <div className="flex justify-between items-center mb-2">
-          <h3 className="font-bold">POI Filters</h3>
+          {/* <h3 className="font-bold">Filtre</h3> */}
           <button onClick={() => setShowFilters(!showFilters)} className="text-gray-500 hover:text-gray-700">
-            {showFilters ? <X size={20} /> : 'Show Filters'}
+            {showFilters ? <X size={20} /> : 'Afficher les filtres'}
           </button>
         </div>
         {showFilters && selectedHouse && (
@@ -461,7 +461,7 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
             </div>
           </>
         )}
-        {loading && <p className="mt-2">Loading POIs...</p>}
+        {loading && <p className="mt-2">Chargement...</p>}
         {error && <p className="mt-2 text-red-500">{error}</p>}
       </div>
     </div>

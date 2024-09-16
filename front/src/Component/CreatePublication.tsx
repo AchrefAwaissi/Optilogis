@@ -31,7 +31,7 @@ const CreatePublication: React.FC = () => {
     cellar: false,
     exterior: false
   });
-  const [image, setImage] = useState<File | null>(null);
+  const [images, setImages] = useState<File[]>([]);
   const [message, setMessage] = useState('');
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -87,7 +87,7 @@ const CreatePublication: React.FC = () => {
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setImage(e.target.files[0]);
+      setImages(Array.from(e.target.files));
     }
   };
 
@@ -99,9 +99,9 @@ const CreatePublication: React.FC = () => {
     Object.entries(formData).forEach(([key, value]) => {
       submitData.append(key, value.toString());
     });
-    if (image) {
-      submitData.append('image', image);
-    }
+    images.forEach(image => {
+      submitData.append('images', image);
+    });
 
     try {
       const response = await axios.post('http://localhost:5000/item', submitData, {
@@ -125,6 +125,7 @@ const CreatePublication: React.FC = () => {
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
+
   return (
     <div className="max-w-md mx-auto h-screen flex flex-col">
       <h2 className="text-2xl font-bold mb-6 text-center p-4">Créer une publication</h2>
@@ -241,9 +242,9 @@ const CreatePublication: React.FC = () => {
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               >
-                <option value="">Sélectionnez un type de logement</option>
-                <option value="maison">Maison</option>
+                <option value="">Sélectionner un type</option>
                 <option value="appartement">Appartement</option>
+                <option value="maison">Maison</option>
                 <option value="studio">Studio</option>
               </select>
             </div>
@@ -272,7 +273,7 @@ const CreatePublication: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="area" className="block text-sm font-medium text-gray-700">Surface (m²)</label>
+              <label htmlFor="area" className="block text-sm font-medium text-gray-700">Superficie</label>
               <input
                 id="area"
                 name="area"
@@ -280,45 +281,43 @@ const CreatePublication: React.FC = () => {
                 value={formData.area}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="Surface en m²"
+                placeholder="Superficie en m²"
               />
             </div>
             <div>
               <label htmlFor="exposure" className="block text-sm font-medium text-gray-700">Exposition</label>
-              <select
+              <input
                 id="exposure"
                 name="exposure"
+                type="text"
                 value={formData.exposure}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              >
-                <option value="">Sélectionnez l'exposition</option>
-                <option value="nord">Nord</option>
-                <option value="sud">Sud</option>
-                <option value="est">Est</option>
-                <option value="ouest">Ouest</option>
-              </select>
+                placeholder="Exposition"
+              />
             </div>
-            <div className="flex space-x-4">
-              <label className="flex items-center">
+            <div>
+              <label htmlFor="furnished" className="block text-sm font-medium text-gray-700">
                 <input
-                  type="checkbox"
+                  id="furnished"
                   name="furnished"
+                  type="checkbox"
                   checked={formData.furnished}
                   onChange={handleChange}
-                  className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mr-2"
                 />
-                <span className="ml-2 text-sm text-gray-700">Meublé</span>
+                Meublé
               </label>
-              <label className="flex items-center">
+              <label htmlFor="notFurnished" className="block text-sm font-medium text-gray-700">
                 <input
-                  type="checkbox"
+                  id="notFurnished"
                   name="notFurnished"
+                  type="checkbox"
                   checked={formData.notFurnished}
                   onChange={handleChange}
-                  className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mr-2"
                 />
-                <span className="ml-2 text-sm text-gray-700">Non meublé</span>
+                Non meublé
               </label>
             </div>
             <div>
@@ -346,7 +345,7 @@ const CreatePublication: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="annexArea" className="block text-sm font-medium text-gray-700">Surface annexe (m²)</label>
+              <label htmlFor="annexArea" className="block text-sm font-medium text-gray-700">Surface annexe</label>
               <input
                 id="annexArea"
                 name="annexArea"
@@ -357,42 +356,81 @@ const CreatePublication: React.FC = () => {
                 placeholder="Surface annexe en m²"
               />
             </div>
-            <div className="space-y-2">
-              <p className="block text-sm font-medium text-gray-700">Options annexes</p>
-              {['parking', 'garage', 'basement', 'storageUnit', 'cellar'].map((option) => (
-                <label key={option} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name={option}
-                    checked={formData[option as keyof typeof formData] as boolean}
-                    onChange={handleChange}
-                    className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">
-                    {option === 'storageUnit' ? 'Box' : option.charAt(0).toUpperCase() + option.slice(1)}
-                  </span>
-                </label>
-              ))}
-            </div>
             <div>
-              <label htmlFor="exterior" className="flex items-center">
+              <label htmlFor="parking" className="block text-sm font-medium text-gray-700">
+                <input
+                  id="parking"
+                  name="parking"
+                  type="checkbox"
+                  checked={formData.parking}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Parking
+              </label>
+              <label htmlFor="garage" className="block text-sm font-medium text-gray-700">
+                <input
+                  id="garage"
+                  name="garage"
+                  type="checkbox"
+                  checked={formData.garage}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Garage
+              </label>
+              <label htmlFor="basement" className="block text-sm font-medium text-gray-700">
+                <input
+                  id="basement"
+                  name="basement"
+                  type="checkbox"
+                  checked={formData.basement}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Sous-sol
+              </label>
+              <label htmlFor="storageUnit" className="block text-sm font-medium text-gray-700">
+                <input
+                  id="storageUnit"
+                  name="storageUnit"
+                  type="checkbox"
+                  checked={formData.storageUnit}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Local de stockage
+              </label>
+              <label htmlFor="cellar" className="block text-sm font-medium text-gray-700">
+                <input
+                  id="cellar"
+                  name="cellar"
+                  type="checkbox"
+                  checked={formData.cellar}
+                  onChange={handleChange}
+                  className="mr-2"
+                />
+                Cave
+              </label>
+              <label htmlFor="exterior" className="block text-sm font-medium text-gray-700">
                 <input
                   id="exterior"
                   name="exterior"
                   type="checkbox"
                   checked={formData.exterior}
                   onChange={handleChange}
-                  className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  className="mr-2"
                 />
-                <span className="ml-2 text-sm text-gray-700">Extérieur</span>
+                Extérieur
               </label>
             </div>
             <div>
-              <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image</label>
+              <label htmlFor="images" className="block text-sm font-medium text-gray-700">Images</label>
               <input
-                id="image"
-                name="image"
+                id="images"
+                name="images"
                 type="file"
+                multiple
                 onChange={handleImageChange}
                 className="mt-1 block w-full text-sm text-gray-500
                   file:mr-4 file:py-2 file:px-4
@@ -418,5 +456,6 @@ const CreatePublication: React.FC = () => {
       </div>
     </div>
   );
-}
+};
+
 export default CreatePublication;

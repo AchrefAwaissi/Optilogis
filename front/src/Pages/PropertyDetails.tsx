@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faHome, faCar, faPaintBrush, faTshirt, faDog, faDollarSign } from '@fortawesome/free-solid-svg-icons';
@@ -14,7 +14,7 @@ interface House {
   rooms: number;
   bedrooms: number;
   area: number;
-  image: string;
+  images: string[]; // Changed to an array of images
   description?: string;
 }
 
@@ -50,6 +50,13 @@ const PropertyDetails: React.FC = () => {
   const location = useLocation();
   const house: House = location.state?.house;
 
+  // Default to the first image or a placeholder if no images are available
+  const [selectedImage, setSelectedImage] = useState<string>(
+    house.images.length > 0
+      ? `http://localhost:5000/uploads/${house.images[0]}`
+      : 'https://via.placeholder.com/800x400'
+  );
+
   if (!house) {
     return <div className="p-4">No property details available.</div>;
   }
@@ -59,21 +66,24 @@ const PropertyDetails: React.FC = () => {
       <div className="w-full md:w-[60%] md:pr-4">
         <div className="relative">
           <img
-            src={house.image ? `http://localhost:5000/uploads/${house.image}` : 'https://via.placeholder.com/800x400'}
+            src={selectedImage}
             alt={house.title}
             className="w-full h-48 md:h-80 object-cover rounded-lg"
           />
         </div>
-        <div className="flex mt-4 space-x-2 md:space-x-4 overflow-x-auto pb-2">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <img
-              key={i}
-              src={house.image ? `http://localhost:5000/uploads/${house.image}` : 'https://via.placeholder.com/100x100'}
-              alt={`${house.title} view ${i}`}
-              className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-md flex-shrink-0"
-            />
-          ))}
-        </div>
+        {house.images.length > 1 && (
+          <div className="flex mt-4 space-x-2 md:space-x-4 overflow-x-auto pb-2">
+            {house.images.map((image, index) => (
+              <img
+                key={index}
+                src={`http://localhost:5000/uploads/${image}`}
+                alt={`${house.title} view ${index + 1}`}
+                className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-md flex-shrink-0 cursor-pointer"
+                onClick={() => setSelectedImage(`http://localhost:5000/uploads/${image}`)}
+              />
+            ))}
+          </div>
+        )}
         <div className="mt-4 h-64 md:h-80">
           <StyledGoogleMap lat={44.8378} lng={-0.5792} />
         </div>

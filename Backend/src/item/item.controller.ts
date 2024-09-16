@@ -6,11 +6,11 @@ import {
   Param,
   Post,
   Put,
-  UploadedFile,
+  UploadedFiles,
   UseInterceptors,
   NotFoundException,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ItemService } from './item.service';
 import { GeocodingService } from './geocoding.service';
 import { Item } from './item.iterface';
@@ -26,7 +26,7 @@ export class ItemController {
 
   @Post()
   @UseInterceptors(
-    FileInterceptor('image', {
+    FilesInterceptor('images', 10, { // Accepte jusqu'à 10 images
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
@@ -39,13 +39,13 @@ export class ItemController {
     }),
   )
   async create(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[], // Plusieurs fichiers
     @Body() item: Item,
   ): Promise<Item> {
-    if (file) {
-      item.image = file.filename;
+    if (files && files.length > 0) {
+      item.images = files.map((file) => file.filename); // Stocke plusieurs images
     }
-    console.log('Received item:', item);
+    console.log('Received item with images:', item);
 
     // Géocodage de l'adresse
     const coordinates = await this.geocodingService.getCoordinates(
@@ -77,7 +77,7 @@ export class ItemController {
 
   @Put(':id')
   @UseInterceptors(
-    FileInterceptor('image', {
+    FilesInterceptor('images', 10, { // Accepte jusqu'à 10 images pour la mise à jour
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
@@ -91,11 +91,11 @@ export class ItemController {
   )
   async update(
     @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[], // Plusieurs fichiers
     @Body() item: Item,
   ): Promise<Item> {
-    if (file) {
-      item.image = file.filename; // Met à jour l'image si un fichier est fourni
+    if (files && files.length > 0) {
+      item.images = files.map((file) => file.filename); // Met à jour les images
     }
 
     // Géocodage de l'adresse si elle a été modifiée

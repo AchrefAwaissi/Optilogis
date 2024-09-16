@@ -15,11 +15,11 @@ describe('ItemController', () => {
     name: 'Cozy Apartment',
     description: 'A beautiful apartment in the city center',
     price: 1000,
-    image: 'apartment.jpg',
+    images: ['apartment1.jpg', 'apartment2.jpg'], // Multiple images
     title: 'City Center Apartment',
     address: '123 Main St',
     city: 'New York',
-    country: 'USA',
+    country: 'France',
     typeOfHousing: 'Apartment',
     rooms: 3,
     bedrooms: 2,
@@ -58,50 +58,53 @@ describe('ItemController', () => {
     expect(controller).toBeDefined();
   });
 
-/*   describe('create', () => {
-    it('should create an item', async () => {
-      const mockFile = { filename: 'apartment.jpg' } as Express.Multer.File;
+  describe('create', () => {
+    it('should create an item with multiple images', async () => {
+      const mockFiles = [
+        { filename: 'apartment1.jpg' } as Express.Multer.File,
+        { filename: 'apartment2.jpg' } as Express.Multer.File,
+      ];
       const mockCoordinates = { lat: 40.7128, lng: -74.0060 };
       
       geocodingService.getCoordinates.mockResolvedValue(mockCoordinates);
       itemService.create.mockResolvedValue(mockItem as Item & Document);
 
-      const result = await controller.create(mockFile, mockItem as Item);
+      const result = await controller.create(mockFiles, mockItem as Item);
 
-      expect(geocodingService.getCoordinates).toHaveBeenCalledWith('123 Main St', 'New York', 'USA');
+      expect(geocodingService.getCoordinates).toHaveBeenCalledWith('123 Main St', 'New York', 'France');
       expect(itemService.create).toHaveBeenCalledWith({
         ...mockItem,
-        image: 'apartment.jpg',
+        images: ['apartment1.jpg', 'apartment2.jpg'], // Vérification des images
         latitude: 40.7128,
         longitude: -74.0060,
       });
       expect(result).toEqual(mockItem);
     });
 
-    it('should create an item without an image', async () => {
-      const itemWithoutImage: Partial<Item> = { ...mockItem, image: undefined };
+    it('should create an item without images', async () => {
+      const itemWithoutImages: Partial<Item> = { ...mockItem, images: undefined };
       const mockCoordinates = { lat: 40.7128, lng: -74.0060 };
       
       geocodingService.getCoordinates.mockResolvedValue(mockCoordinates);
-      itemService.create.mockResolvedValue(itemWithoutImage as Item & Document);
+      itemService.create.mockResolvedValue(itemWithoutImages as Item & Document);
 
-      const result = await controller.create(undefined, itemWithoutImage as Item);
+      const result = await controller.create([], itemWithoutImages as Item);
 
-      expect(geocodingService.getCoordinates).toHaveBeenCalledWith('123 Main St', 'New York', 'USA');
+      expect(geocodingService.getCoordinates).toHaveBeenCalledWith('123 Main St', 'New York', 'France');
       expect(itemService.create).toHaveBeenCalledWith({
-        ...itemWithoutImage,
+        ...itemWithoutImages,
         latitude: 40.7128,
         longitude: -74.0060,
       });
-      expect(result).toEqual(itemWithoutImage);
+      expect(result).toEqual(itemWithoutImages);
     });
-  }); */
+  });
 
   describe('findAll', () => {
     it('should return an array of items', async () => {
       const mockItems: (Item & Document)[] = [
         mockItem as Item & Document,
-        { ...mockItem, name: 'Another Apartment' } as Item & Document
+        { ...mockItem, name: 'Another Apartment' } as Item & Document,
       ];
       itemService.findAll.mockResolvedValue(mockItems);
 
@@ -129,18 +132,21 @@ describe('ItemController', () => {
     });
   });
 
-/*   describe('update', () => {
-    it('should update an item', async () => {
-      const mockFile = { filename: 'updated.jpg' } as Express.Multer.File;
-      const updatedItem: Partial<Item> = { ...mockItem, name: 'Updated Apartment', image: 'updated.jpg' };
+  describe('update', () => {
+    it('should update an item with new images', async () => {
+      const mockFiles = [
+        { filename: 'updated1.jpg' } as Express.Multer.File,
+        { filename: 'updated2.jpg' } as Express.Multer.File,
+      ];
+      const updatedItem: Partial<Item> = { ...mockItem, name: 'Updated Apartment', images: ['updated1.jpg', 'updated2.jpg'] };
       const mockCoordinates = { lat: 40.7129, lng: -74.0061 };
       
       geocodingService.getCoordinates.mockResolvedValue(mockCoordinates);
       itemService.update.mockResolvedValue(updatedItem as Item & Document);
 
-      const result = await controller.update('1', mockFile, updatedItem as Item);
+      const result = await controller.update('1', mockFiles, updatedItem as Item);
 
-      expect(geocodingService.getCoordinates).toHaveBeenCalledWith('123 Main St', 'New York', 'USA');
+      expect(geocodingService.getCoordinates).toHaveBeenCalledWith('123 Main St', 'New York', 'France');
       expect(itemService.update).toHaveBeenCalledWith('1', {
         ...updatedItem,
         latitude: 40.7129,
@@ -149,16 +155,16 @@ describe('ItemController', () => {
       expect(result).toEqual(updatedItem);
     });
 
-    it('should update an item without changing the image', async () => {
+    it('should update an item without changing images', async () => {
       const updatedItem: Partial<Item> = { ...mockItem, name: 'Updated Apartment' };
       const mockCoordinates = { lat: 40.7129, lng: -74.0061 };
       
       geocodingService.getCoordinates.mockResolvedValue(mockCoordinates);
       itemService.update.mockResolvedValue(updatedItem as Item & Document);
 
-      const result = await controller.update('1', undefined, updatedItem as Item);
+      const result = await controller.update('1', [], updatedItem as Item);
 
-      expect(geocodingService.getCoordinates).toHaveBeenCalledWith('123 Main St', 'New York', 'USA');
+      expect(geocodingService.getCoordinates).toHaveBeenCalledWith('123 Main St', 'New York', 'France');
       expect(itemService.update).toHaveBeenCalledWith('1', {
         ...updatedItem,
         latitude: 40.7129,
@@ -170,9 +176,9 @@ describe('ItemController', () => {
     it('should throw NotFoundException if item to update is not found', async () => {
       itemService.update.mockResolvedValue(null);
 
-      await expect(controller.update('1', null, mockItem as Item)).rejects.toThrow(NotFoundException);
+      await expect(controller.update('1', [], mockItem as Item)).rejects.toThrow(NotFoundException);
     });
-  }); */
+  });
 
   describe('delete', () => {
     it('should delete an item', async () => {

@@ -136,7 +136,7 @@ describe('FilterService', () => {
   // Filter by country
   describe('filterByCountry', () => {
     it('should call the model with the correct filter for country', async () => {
-      const country = 'France';
+      const country = 'USA';
       await service.filterByCountry(country);
       expect(mockItemModel.find).toHaveBeenCalledWith({ country: { $regex: new RegExp(country, 'i') } });
     });

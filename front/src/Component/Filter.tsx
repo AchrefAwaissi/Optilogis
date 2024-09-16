@@ -102,7 +102,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
         <div className="md:hidden">
           <button 
             onClick={toggleFilter}
-            className="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg z-50"
+            className="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg z-10"
           >
             <FontAwesomeIcon icon={isFilterOpen ? faTimes : faFilter} />
           </button>

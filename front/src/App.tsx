@@ -64,7 +64,7 @@ const App: React.FC = () => {
         </div>
       </div>
       {showAuthModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
           {isSignUp ? (
             <SignUp
               onClose={() => setShowAuthModal(false)}

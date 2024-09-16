@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import CombinedNavbar from './Component/VerticalIconNavbar';
 import HorizontalNavbar from './Component/HorizontalNavbar';
 import HomePage from './Pages/HomePage';
@@ -40,6 +41,7 @@ const App: React.FC = () => {
   };
 
   return (
+    <AuthProvider>
     <Router>
       <div className="flex h-screen overflow-hidden">
         <CombinedNavbar onAuthClick={() => handleAuthClick(false)} />
@@ -81,6 +83,7 @@ const App: React.FC = () => {
         </div>
       )}
     </Router>
+    </AuthProvider>
   );
 };
 

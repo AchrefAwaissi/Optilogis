@@ -6,12 +6,15 @@ import {
   Delete,
   Body, 
   Param,
+  UseGuards,
+  Request,
   ValidationPipe 
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { JwtAuthGuard } from './jwt-auth.guard'; // Assurez-vous d'avoir créé ce guard
 
 @Controller('auth')
 export class AuthController {
@@ -30,7 +33,17 @@ export class AuthController {
     );
   }
 
-  // Nouvelles routes CRUD
+  // Route pour mettre à jour l'utilisateur actuellement authentifié
+  @UseGuards(JwtAuthGuard)
+  @Put('update')
+  async updateCurrentUser(
+    @Request() req,
+    @Body(ValidationPipe) updateUserDto: UpdateUserDto
+  ) {
+    return this.authService.update(req.user.userId, updateUserDto);
+  }
+
+  // Autres routes CRUD existantes
 
   @Get('users')
   async findAll() {

@@ -8,7 +8,8 @@ import SearchPage from './Pages/SearchPage';
 import MatchingProfilePage from './Pages/MatchingProfilePage';
 import SettingsPage from './Pages/SettingsPage';
 import PropertyDetails from './Pages/PropertyDetails';
-import AuthPopup from './Component/AuthPopup';
+import SignIn from './Component/SignIn';
+import SignUp from './Component/SignUp';
 
 interface User {
   username: string;
@@ -16,29 +17,39 @@ interface User {
 }
 
 const App: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
-  const [showAuthPopup, setShowAuthPopup] = useState<boolean>(false);
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [isSignUp, setIsSignUp] = useState<boolean>(false);
 
-  const handleLogin = (userData: User) => {
+  const handleAuthSuccess = (userData: User) => {
     setUser(userData);
-    setIsLoggedIn(true);
-    setShowAuthPopup(false);
+    setShowAuthModal(false);
   };
 
   const handleLogout = () => {
     setUser(null);
-    setIsLoggedIn(false);
+  };
+
+  const handleAuthClick = (signup: boolean = false) => {
+    setIsSignUp(signup);
+    setShowAuthModal(true);
+  };
+
+  const toggleAuthMode = () => {
+    setIsSignUp(!isSignUp);
   };
 
   return (
     <Router>
       <div className="flex h-screen overflow-hidden">
-        <CombinedNavbar onAuthClick={() => setShowAuthPopup(true)} />
+        <CombinedNavbar onAuthClick={() => handleAuthClick(false)} />
         <div className="flex-1 flex flex-col overflow-hidden">
-          {isLoggedIn && user && (
-            <HorizontalNavbar user={user} onLogout={handleLogout} />
-          )}
+          <HorizontalNavbar
+            user={user}
+            onLogout={handleLogout}
+            onSignInClick={() => handleAuthClick(false)}
+            onSignUpClick={() => handleAuthClick(true)}
+          />
 
           <main className="flex-1 overflow-hidden">
             <Routes>
@@ -52,11 +63,22 @@ const App: React.FC = () => {
           </main>
         </div>
       </div>
-      {showAuthPopup && (
-        <AuthPopup
-          onClose={() => setShowAuthPopup(false)}
-          onLogin={handleLogin}
-        />
+      {showAuthModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          {isSignUp ? (
+            <SignUp
+              onClose={() => setShowAuthModal(false)}
+              onToggleForm={toggleAuthMode}
+              onSuccess={handleAuthSuccess}
+            />
+          ) : (
+            <SignIn
+              onClose={() => setShowAuthModal(false)}
+              onToggleForm={toggleAuthMode}
+              onSuccess={handleAuthSuccess}
+            />
+          )}
+        </div>
       )}
     </Router>
   );

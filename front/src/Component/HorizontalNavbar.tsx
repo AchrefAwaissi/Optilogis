@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faTimes, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import logo from "../image/logoa.png";
 
 interface User {
   username: string;
@@ -48,7 +49,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <span className="font-semibold text-xl text-gray-800">Your Logo</span>
+          <img src={logo} alt="Logo" className="w-12 h-12 object-contain transition-all duration-300" />
           </div>
           <div className="hidden lg:block">
             {user && (

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { FilterService } from './filter.service';
-import { Item } from '../item/item.iterface';
+import { Item } from '../item/item.iterface'; // Ensure this path and filename are correct
 
 describe('FilterService', () => {
   let service: FilterService;
@@ -32,6 +32,7 @@ describe('FilterService', () => {
     expect(service).toBeDefined();
   });
 
+  // Filter by price
   describe('filterByPrice', () => {
     it('should call the model with the correct filter for minPrice', async () => {
       const minPrice = 100;
@@ -53,6 +54,7 @@ describe('FilterService', () => {
     });
   });
 
+  // Filter by size
   describe('filterBySize', () => {
     it('should call the model with the correct filter for minSize', async () => {
       const minSize = 50;
@@ -74,6 +76,7 @@ describe('FilterService', () => {
     });
   });
 
+  // Filter by type of housing
   describe('filterByTypeOfHousing', () => {
     it('should call the model with the correct filter for typeOfHousing', async () => {
       const typeOfHousing = 'maison';
@@ -94,6 +97,7 @@ describe('FilterService', () => {
     });
   });
 
+  // Filter by name
   describe('filterByName', () => {
     it('should call the model with the correct filter for name', async () => {
       const name = 'TestName';
@@ -102,6 +106,7 @@ describe('FilterService', () => {
     });
   });
 
+  // Filter by title
   describe('filterByTitle', () => {
     it('should call the model with the correct filter for title', async () => {
       const title = 'TestTitle';
@@ -110,6 +115,7 @@ describe('FilterService', () => {
     });
   });
 
+  // Filter by address
   describe('filterByAddress', () => {
     it('should call the model with the correct filter for address', async () => {
       const address = '123 Main St';
@@ -118,6 +124,7 @@ describe('FilterService', () => {
     });
   });
 
+  // Filter by city
   describe('filterByCity', () => {
     it('should call the model with the correct filter for city', async () => {
       const city = 'Paris';
@@ -126,6 +133,7 @@ describe('FilterService', () => {
     });
   });
 
+  // Filter by country
   describe('filterByCountry', () => {
     it('should call the model with the correct filter for country', async () => {
       const country = 'France';
@@ -134,6 +142,7 @@ describe('FilterService', () => {
     });
   });
 
+  // Filter by rooms
   describe('filterByRooms', () => {
     it('should call the model with the correct filter for minRooms', async () => {
       const minRooms = 2;
@@ -155,6 +164,7 @@ describe('FilterService', () => {
     });
   });
 
+  // Filter by bedrooms
   describe('filterByBedrooms', () => {
     it('should call the model with the correct filter for minBedrooms', async () => {
       const minBedrooms = 1;
@@ -176,6 +186,7 @@ describe('FilterService', () => {
     });
   });
 
+   // Filter by area
   describe('filterByArea', () => {
     it('should call the model with the correct filter for minArea', async () => {
       const minArea = 20;
@@ -194,6 +205,80 @@ describe('FilterService', () => {
       const maxArea = 100;
       await service.filterByArea(minArea, maxArea);
       expect(mockItemModel.find).toHaveBeenCalledWith({ area: { $gte: minArea, $lte: maxArea } });
+    });
+  });
+
+  // Filter by furnished
+  describe('filterByFurnished', () => {
+    it('should call the model with the correct filter for furnished', async () => {
+      const furnished = true;
+      await service.filterByFurnished(furnished);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ furnished });
+    });
+
+    it('should call the model with the correct filter for unfurnished', async () => {
+      const furnished = false;
+      await service.filterByFurnished(furnished);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ furnished });
+    });
+  });
+
+  // Filter by accessibility
+  describe('filterByAccessibility', () => {
+    it('should call the model with the correct filter for accessibility', async () => {
+      const accessibility = true;
+      await service.filterByAccessibility(accessibility);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ accessibility });
+    });
+
+    it('should call the model with the correct filter for no accessibility', async () => {
+      const accessibility = false;
+      await service.filterByAccessibility(accessibility);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ accessibility });
+    });
+  });
+
+  // Filter by floor
+  describe('filterByFloor', () => {
+    it('should call the model with the correct filter for minFloor', async () => {
+      const minFloor = 1;
+      await service.filterByFloor(minFloor);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ floor: { $gte: minFloor } });
+    });
+
+    it('should call the model with the correct filter for maxFloor', async () => {
+      const maxFloor = 10;
+      await service.filterByFloor(undefined, maxFloor);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ floor: { $lte: maxFloor } });
+    });
+
+    it('should call the model with the correct filter for both minFloor and maxFloor', async () => {
+      const minFloor = 1;
+      const maxFloor = 10;
+      await service.filterByFloor(minFloor, maxFloor);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ floor: { $gte: minFloor, $lte: maxFloor } });
+    });
+  });
+
+  // Filter by annex area
+  describe('filterByAnnexArea', () => {
+    it('should call the model with the correct filter for minAnnexArea', async () => {
+      const minAnnexArea = 5;
+      await service.filterByAnnexArea(minAnnexArea);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ annexArea: { $gte: minAnnexArea } });
+    });
+
+    it('should call the model with the correct filter for maxAnnexArea', async () => {
+      const maxAnnexArea = 50;
+      await service.filterByAnnexArea(undefined, maxAnnexArea);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ annexArea: { $lte: maxAnnexArea } });
+    });
+
+    it('should call the model with the correct filter for both minAnnexArea and maxAnnexArea', async () => {
+      const minAnnexArea = 5;
+      const maxAnnexArea = 50;
+      await service.filterByAnnexArea(minAnnexArea, maxAnnexArea);
+      expect(mockItemModel.find).toHaveBeenCalledWith({ annexArea: { $gte: minAnnexArea, $lte: maxAnnexArea } });
     });
   });
 });

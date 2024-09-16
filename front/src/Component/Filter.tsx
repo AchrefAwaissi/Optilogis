@@ -227,13 +227,6 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
           </div>
           <p className="mt-1 text-xs text-gray-500">Mètres carrés</p>
         </div>
-
-        <div className="p-4">
-          <button className="w-full flex items-center justify-center px-4 py-2 bg-[#006845] text-white rounded-md hover:bg-[#005536]">
-            <FontAwesomeIcon icon={faBuilding} className="mr-2" />
-            Appliquer les filtres
-          </button>
-        </div>
       </div>
     </>
   );

@@ -15,6 +15,11 @@ const truncateAddress = (address: string, maxLength: number) => {
 const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, onClick }) => {
   const truncatedAddress = truncateAddress(house.address, 30);
 
+  // Use the first image from the array, or a placeholder if the array is empty
+  const imageUrl = house.images && house.images.length > 0
+    ? `http://localhost:5000/uploads/${house.images[0]}`
+    : 'https://via.placeholder.com/165x155';
+
   return (
     <div
       className="w-full max-w-2xl bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer transition-shadow duration-300 ease-in-out hover:shadow-lg flex flex-col sm:flex-row"
@@ -22,9 +27,7 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
     >
       <div
         className="w-full h-48 sm:w-40 sm:h-40 m-2 rounded-xl bg-center bg-cover bg-no-repeat"
-        style={{
-          backgroundImage: `url(${house.image ? `http://localhost:5000/uploads/${house.image}` : 'https://via.placeholder.com/165x155'})`
-        }}
+        style={{ backgroundImage: `url(${imageUrl})` }}
       />
       <div className="flex-1 p-4 flex flex-col justify-between">
         <div>

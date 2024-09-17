@@ -3,7 +3,7 @@ export interface House {
   name?: string;
   description?: string;
   price: number;
-  image?: string;
+  images?: string[];
   title?: string;
   address: string;
   city: string;

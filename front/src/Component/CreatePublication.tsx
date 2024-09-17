@@ -3,8 +3,6 @@ import axios, { AxiosError } from 'axios';
 
 interface Suggestion {
   display_name: string;
-  lat: string;
-  lon: string;
 }
 
 const CreatePublication: React.FC = () => {
@@ -15,11 +13,23 @@ const CreatePublication: React.FC = () => {
     title: '',
     address: '',
     city: '',
-    country: '', 
+    country: '',
     typeOfHousing: '',
     rooms: '',
     bedrooms: '',
-    area: ''
+    area: '',
+    exposure: '',
+    furnished: false,
+    notFurnished: false,
+    accessibility: '',
+    floor: '',
+    annexArea: '',
+    parking: false,
+    garage: false,
+    basement: false,
+    storageUnit: false,
+    cellar: false,
+    exterior: false
   });
   const [image, setImage] = useState<File | null>(null);
   const [message, setMessage] = useState('');
@@ -27,11 +37,21 @@ const CreatePublication: React.FC = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+    }));
 
     if (name === 'address') {
       handleAddressChange(value);
+    }
+
+    // Gestion de l'exclusivité entre meublé et non meublé
+    if (name === 'furnished' && (e.target as HTMLInputElement).checked) {
+      setFormData(prev => ({ ...prev, notFurnished: false }));
+    } else if (name === 'notFurnished' && (e.target as HTMLInputElement).checked) {
+      setFormData(prev => ({ ...prev, furnished: false }));
     }
   };
 
@@ -59,7 +79,7 @@ const CreatePublication: React.FC = () => {
       ...prev,
       address: suggestion.display_name,
       city,
-      country // Mettre à jour automatiquement le champ country
+      country
     }));
     setSuggestions([]);
     setShowSuggestions(false);
@@ -77,7 +97,7 @@ const CreatePublication: React.FC = () => {
 
     const submitData = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      submitData.append(key, value);
+      submitData.append(key, value.toString());
     });
     if (image) {
       submitData.append('image', image);
@@ -105,7 +125,6 @@ const CreatePublication: React.FC = () => {
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
-
   return (
     <div className="max-w-md mx-auto h-screen flex flex-col">
       <h2 className="text-2xl font-bold mb-6 text-center p-4">Créer une publication</h2>
@@ -118,7 +137,6 @@ const CreatePublication: React.FC = () => {
                 id="name"
                 name="name"
                 type="text"
-                required
                 value={formData.name}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
@@ -215,6 +233,21 @@ const CreatePublication: React.FC = () => {
               />
             </div>
             <div>
+              <label htmlFor="typeOfHousing" className="block text-sm font-medium text-gray-700">Type de logement</label>
+              <select
+                id="typeOfHousing"
+                name="typeOfHousing"
+                value={formData.typeOfHousing}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+              >
+                <option value="">Sélectionnez un type de logement</option>
+                <option value="maison">Maison</option>
+                <option value="appartement">Appartement</option>
+                <option value="studio">Studio</option>
+              </select>
+            </div>
+            <div>
               <label htmlFor="rooms" className="block text-sm font-medium text-gray-700">Nombre de pièces</label>
               <input
                 id="rooms"
@@ -251,19 +284,108 @@ const CreatePublication: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="typeOfHousing" className="block text-sm font-medium text-gray-700">Type de logement</label>
+              <label htmlFor="exposure" className="block text-sm font-medium text-gray-700">Exposition</label>
               <select
-                id="typeOfHousing"
-                name="typeOfHousing"
-                value={formData.typeOfHousing}
+                id="exposure"
+                name="exposure"
+                value={formData.exposure}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
               >
-                <option value="">Sélectionnez un type de logement</option>
-                <option value="maison">Maison</option>
-                <option value="appartement">Appartement</option>
-                <option value="studio">Studio</option>
+                <option value="">Sélectionnez l'exposition</option>
+                <option value="nord">Nord</option>
+                <option value="sud">Sud</option>
+                <option value="est">Est</option>
+                <option value="ouest">Ouest</option>
               </select>
+            </div>
+            <div className="flex space-x-4">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="furnished"
+                  checked={formData.furnished}
+                  onChange={handleChange}
+                  className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+                <span className="ml-2 text-sm text-gray-700">Meublé</span>
+              </label>
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  name="notFurnished"
+                  checked={formData.notFurnished}
+                  onChange={handleChange}
+                  className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+                <span className="ml-2 text-sm text-gray-700">Non meublé</span>
+              </label>
+            </div>
+            <div>
+              <label htmlFor="accessibility" className="block text-sm font-medium text-gray-700">Accessibilité</label>
+              <input
+                id="accessibility"
+                name="accessibility"
+                type="text"
+                value={formData.accessibility}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                placeholder="Accessibilité"
+              />
+            </div>
+            <div>
+              <label htmlFor="floor" className="block text-sm font-medium text-gray-700">Étage</label>
+              <input
+                id="floor"
+                name="floor"
+                type="number"
+                value={formData.floor}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                placeholder="Étage"
+              />
+            </div>
+            <div>
+              <label htmlFor="annexArea" className="block text-sm font-medium text-gray-700">Surface annexe (m²)</label>
+              <input
+                id="annexArea"
+                name="annexArea"
+                type="number"
+                value={formData.annexArea}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                placeholder="Surface annexe en m²"
+              />
+            </div>
+            <div className="space-y-2">
+              <p className="block text-sm font-medium text-gray-700">Options annexes</p>
+              {['parking', 'garage', 'basement', 'storageUnit', 'cellar'].map((option) => (
+                <label key={option} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name={option}
+                    checked={formData[option as keyof typeof formData] as boolean}
+                    onChange={handleChange}
+                    className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                  />
+                  <span className="ml-2 text-sm text-gray-700">
+                    {option === 'storageUnit' ? 'Box' : option.charAt(0).toUpperCase() + option.slice(1)}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <div>
+              <label htmlFor="exterior" className="flex items-center">
+                <input
+                  id="exterior"
+                  name="exterior"
+                  type="checkbox"
+                  checked={formData.exterior}
+                  onChange={handleChange}
+                  className="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+                <span className="ml-2 text-sm text-gray-700">Extérieur</span>
+              </label>
             </div>
             <div>
               <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image</label>
@@ -296,6 +418,5 @@ const CreatePublication: React.FC = () => {
       </div>
     </div>
   );
-};
-
+}
 export default CreatePublication;

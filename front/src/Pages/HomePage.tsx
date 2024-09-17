@@ -22,6 +22,7 @@ const HomePage: React.FC = () => {
     typeOfHousing: "",
   });
   const [showMap, setShowMap] = useState(false);
+  const [currentCity, setCurrentCity] = useState<string>("");
 
   const navigate = useNavigate();
 
@@ -91,7 +92,14 @@ const HomePage: React.FC = () => {
   };
 
   const handleFilterChange = (newCriteria: Partial<FilterCriteria>) => {
-    setFilterCriteria((prevCriteria) => ({ ...prevCriteria, ...newCriteria }));
+    setFilterCriteria((prevCriteria) => {
+      const updatedCriteria = { ...prevCriteria, ...newCriteria };
+      console.log("Filter criteria updated:", updatedCriteria);
+      if (updatedCriteria.location !== prevCriteria.location) {
+        setCurrentCity(updatedCriteria.location);
+      }
+      return updatedCriteria;
+    });
   };
 
   const handleLocationSelect = (location: Location) => {
@@ -101,6 +109,7 @@ const HomePage: React.FC = () => {
       ...prevCriteria,
       location: location.location,
     }));
+    setCurrentCity(location.location);
   };
 
   const handleHouseSelect = (house: House) => {
@@ -109,7 +118,6 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen overflow-hidden relative">
-      {/* Filter component */}
       <div className="w-full md:w-[250px] bg-white overflow-y-auto">
         <div className="m-4">
           <Filter
@@ -120,14 +128,8 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Main content area */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-        {/* House listings */}
         <div className={`w-full md:w-[500px] overflow-y-auto p-4 ${showMap ? 'hidden' : 'block'} md:block`}>
-          <h2 className="text-2xl font-bold mb-4">
-            {filteredHouses.length} Results in{" "}
-            {filterCriteria.location || "All Locations"}
-          </h2>
           {loading ? (
             <p>Loading houses...</p>
           ) : error ? (
@@ -136,11 +138,11 @@ const HomePage: React.FC = () => {
             <HouseListings
               houses={filteredHouses}
               onHouseSelect={handleHouseSelect}
+              city={currentCity}
             />
           )}
         </div>
 
-        {/* Map component */}
         <div className={`flex-1 bg-gray-100 ${showMap ? 'block' : 'hidden'} md:block h-[calc(100vh-64px)] md:h-auto`}>
           <MapComponent
             houses={filteredHouses}
@@ -150,7 +152,6 @@ const HomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Map toggle button */}
       <button
         className="md:hidden fixed bottom-4 left-4 z-10 bg-blue-500 text-white p-3 rounded-full shadow-lg"
         onClick={toggleMap}

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';  
+import { useItems } from '../contexts/ItemContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Suggestion {
   display_name: string;
@@ -33,6 +35,8 @@ const CreatePublication: React.FC = () => {
   });
   const [images, setImages] = useState<File[]>([]);
   const [message, setMessage] = useState('');
+  const { user } = useAuth();
+  const { createItem } = useItems();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
@@ -104,18 +108,12 @@ const CreatePublication: React.FC = () => {
     });
 
     try {
-      const response = await axios.post('http://localhost:5000/item', submitData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const newItem = await createItem(submitData);
       setMessage('Publication créée avec succès!');
-      console.log('Réponse du serveur:', response.data);
+      console.log('Nouvel item créé:', newItem);
       // Réinitialiser le formulaire ici si nécessaire
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        setMessage(`Erreur: ${error.response?.data.message || error.message || 'Une erreur est survenue'}`);
-      } else {
-        setMessage('Une erreur inattendue est survenue');
-      }
+    } catch (error) {
+      setMessage('Erreur lors de la création de la publication');
       console.error('Erreur lors de l\'envoi:', error);
     }
   };

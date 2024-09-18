@@ -1,7 +1,8 @@
 import { Document } from 'mongoose';
+import { Types } from 'mongoose';
 
 export interface Item extends Document {
-  userId: string;
+  userId: Types.ObjectId;
   name?: string;
   description?: string;
   price: number;

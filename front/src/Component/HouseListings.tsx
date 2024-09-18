@@ -36,13 +36,13 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
           <div className="flex flex-wrap gap-2 mb-2">
             <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">= {house.rooms || 'N/A'}</span>
             <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">= {house.bedrooms || 'N/A'}</span>
-            <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">{house.area || 'N/A'} sqft</span>
+            <span className="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1">{house.area || 'N/A'} m²</span>
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <p className="text-sm font-medium text-teal-700">${house.price.toLocaleString()}/ month</p>
+          <p className="text-sm font-medium text-teal-700">${house.price.toLocaleString()}/ mois</p>
           <button className="px-3 py-2 bg-blue-600 text-white text-sm font-normal rounded-lg hover:bg-blue-700 transition-colors duration-200">
-            View details
+            Voir les détails
           </button>
         </div>
       </div>
@@ -56,7 +56,7 @@ const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect, ci
   return (
     <div className="flex flex-col items-center space-y-4 p-4">
       <h2 className="text-2xl font-bold mb-4 self-start w-full">
-        {houses.length} Results in {city || "All Locations"}
+        {houses.length} Résultats sur {city || "All Locations"}
       </h2>
       {houses.map((house) => (
         <PropertyCard

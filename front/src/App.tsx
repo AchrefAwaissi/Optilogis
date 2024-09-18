@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ItemProvider } from './contexts/ItemContext';
 import CombinedNavbar from './Component/VerticalIconNavbar';
 import HorizontalNavbar from './Component/HorizontalNavbar';
 import HomePage from './Pages/HomePage';
@@ -42,47 +43,49 @@ const App: React.FC = () => {
 
   return (
     <AuthProvider>
-    <Router>
-      <div className="flex h-screen overflow-hidden">
-        <CombinedNavbar onAuthClick={() => handleAuthClick(false)} />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <HorizontalNavbar
-            user={user}
-            onLogout={handleLogout}
-            onSignInClick={() => handleAuthClick(false)}
-            onSignUpClick={() => handleAuthClick(true)}
-          />
+      <ItemProvider>
+        <Router>
+          <div className="flex h-screen overflow-hidden">
+            <CombinedNavbar onAuthClick={() => handleAuthClick(false)} />
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <HorizontalNavbar
+                user={user}
+                onLogout={handleLogout}
+                onSignInClick={() => handleAuthClick(false)}
+                onSignUpClick={() => handleAuthClick(true)}
+              />
 
-          <main className="flex-1 overflow-hidden">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/publish" element={<PublishPropertyPage />} />
-              <Route path="/search" element={<SearchPage />} />
-              <Route path="/matching" element={<MatchingProfilePage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/property-details" element={<PropertyDetails />} />
-            </Routes>
-          </main>
-        </div>
-      </div>
-      {showAuthModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
-          {isSignUp ? (
-            <SignUp
-              onClose={() => setShowAuthModal(false)}
-              onToggleForm={toggleAuthMode}
-              onSuccess={handleAuthSuccess}
-            />
-          ) : (
-            <SignIn
-              onClose={() => setShowAuthModal(false)}
-              onToggleForm={toggleAuthMode}
-              onSuccess={handleAuthSuccess}
-            />
+              <main className="flex-1 overflow-hidden">
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/publish" element={<PublishPropertyPage />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/matching" element={<MatchingProfilePage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="/property-details" element={<PropertyDetails />} />
+                </Routes>
+              </main>
+            </div>
+          </div>
+          {showAuthModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
+              {isSignUp ? (
+                <SignUp
+                  onClose={() => setShowAuthModal(false)}
+                  onToggleForm={toggleAuthMode}
+                  onSuccess={handleAuthSuccess}
+                />
+              ) : (
+                <SignIn
+                  onClose={() => setShowAuthModal(false)}
+                  onToggleForm={toggleAuthMode}
+                  onSuccess={handleAuthSuccess}
+                />
+              )}
+            </div>
           )}
-        </div>
-      )}
-    </Router>
+        </Router>
+      </ItemProvider>
     </AuthProvider>
   );
 };

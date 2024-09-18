@@ -9,7 +9,10 @@ import {
   UploadedFiles,
   UseInterceptors,
   NotFoundException,
+  UnauthorizedException,
+  ForbiddenException,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ItemService } from './item.service';
@@ -19,10 +22,12 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { Request } from 'express';
 import { Types } from 'mongoose';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 // Interface pour l'utilisateur MongoDB
 interface User {
-  _id: Types.ObjectId;
+    userId: Types.ObjectId;
+    username: string;
   // Ajoutez d'autres propriétés de l'utilisateur si nécessaire
 }
 
@@ -39,6 +44,7 @@ export class ItemController {
   ) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FilesInterceptor('images', 10, {
       storage: diskStorage({
@@ -57,15 +63,19 @@ export class ItemController {
     @Body() item: Item,
     @Req() req: AuthenticatedRequest,
   ): Promise<Item> {
+    console.log('Received request:', req.user);
+
+    if (!req.user || !req.user.userId) {
+      throw new UnauthorizedException('User not authenticated');
+    }
+
     if (files && files.length > 0) {
       item.images = files.map((file) => file.filename);
     }
     console.log('Received item with images:', item);
 
-    // Ajout de l'userId à l'item
-    item.userId = req.user._id.toString();
+    item.userId = req.user.userId;
 
-    // Géocodage de l'adresse
     const coordinates = await this.geocodingService.getCoordinates(
       item.address,
       item.city,
@@ -94,13 +104,13 @@ export class ItemController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FilesInterceptor('images', 10, {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
           const ext = extname(file.originalname);
           cb(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
         },
@@ -108,27 +118,44 @@ export class ItemController {
     }),
   )
   async update(
-    @Param('id') id: string,
-    @UploadedFiles() files: Express.Multer.File[],
-    @Body() item: Item,
-    @Req() req: AuthenticatedRequest,
-  ): Promise<Item> {
+  @Param('id') id: string,
+  @UploadedFiles() files: Express.Multer.File[],
+  @Body() item: Partial<Item>,
+  @Req() req: AuthenticatedRequest,
+): Promise<Item> {
+
+  const userId = req.user.userId;
+  console.log('User ID from request:', userId);
+
+  try {
+    // Vérifier si l'item existe
+    const existingItem = await this.itemService.findOne(id);
+    if (!existingItem) {
+      throw new NotFoundException(`Item with ID ${id} not found`);
+    }
+
+    console.log('Existing item:', JSON.stringify(existingItem, null, 2));
+
+    // Vérifier si l'item a un userId
+    if (!existingItem.userId) {
+      console.log('Item does not have a userId, assigning current user as owner');
+      existingItem.userId = userId;
+      await this.itemService.update(id, { userId: userId }, userId.toString());
+    } else if (existingItem.userId.toString() !== userId.toString()) {
+      throw new ForbiddenException(`You don't have permission to update this item`);
+    }
+
+    // Mise à jour des images si de nouveaux fichiers sont téléchargés
     if (files && files.length > 0) {
       item.images = files.map((file) => file.filename);
     }
 
-    // Vérification que l'utilisateur actuel est le propriétaire de l'item
-    const existingItem = await this.itemService.findOne(id);
-    if (!existingItem || existingItem.userId.toString() !== req.user._id.toString()) {
-      throw new NotFoundException(`Item with ID ${id} not found or you don't have permission to update it`);
-    }
-
-    // Géocodage de l'adresse si elle a été modifiée
+    // Géocodage si l'adresse est modifiée
     if (item.address || item.city || item.country) {
       const coordinates = await this.geocodingService.getCoordinates(
-        item.address,
-        item.city,
-        item.country,
+        item.address || existingItem.address,
+        item.city || existingItem.city,
+        item.country || existingItem.country,
       );
       if (coordinates) {
         item.latitude = coordinates.lat;
@@ -136,25 +163,31 @@ export class ItemController {
       }
     }
 
-    const updatedItem = await this.itemService.update(id, item);
-    if (!updatedItem) {
-      throw new NotFoundException(`Item with ID ${id} not found`);
-    }
+    // Mise à jour de l'item
+    const updatedItem = await this.itemService.update(id, item, userId.toString());
+    console.log('Item updated successfully:', updatedItem);
     return updatedItem;
+  } catch (error) {
+    console.error('Error updating item:', error);
+    throw error;
   }
+}
 
-  @Delete(':id')
-  async delete(@Param('id') id: string, @Req() req: AuthenticatedRequest): Promise<Item> {
-    // Vérification que l'utilisateur actuel est le propriétaire de l'item
-    const existingItem = await this.itemService.findOne(id);
-    if (!existingItem || existingItem.userId.toString() !== req.user._id.toString()) {
+@Delete(':id')
+@UseGuards(JwtAuthGuard)
+async deleteItem(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+  const userId = req.user.userId;
+  console.log('User ID from request:', userId);
+
+  try {
+    const deletedItem = await this.itemService.deleteById(id, userId.toString());
+    if (!deletedItem) {
       throw new NotFoundException(`Item with ID ${id} not found or you don't have permission to delete it`);
     }
-
-    const deletedItem = await this.itemService.deleteById(id);
-    if (!deletedItem) {
-      throw new NotFoundException(`Item with ID ${id} not found`);
-    }
-    return deletedItem;
+    return { message: 'Item deleted successfully' };
+  } catch (error) {
+    console.error('Error deleting item:', error);
+    throw error;
   }
+}
 }

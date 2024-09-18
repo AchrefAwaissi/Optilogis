@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { faHome, faCar, faPaintBrush, faTshirt, faDog, faDollarSign } from '@fortawesome/free-solid-svg-icons';
@@ -49,6 +49,7 @@ const IconCard: React.FC<IconCardProps> = ({ icon }) => (
 const PropertyDetails: React.FC = () => {
   const location = useLocation();
   const house: House = location.state?.house;
+  const [show3DView, setShow3DView] = useState(false);
 
   if (!house) {
     return <div className="p-4">No property details available.</div>;
@@ -75,7 +76,7 @@ const PropertyDetails: React.FC = () => {
           ))}
         </div>
         <div className="mt-4 h-64 md:h-80">
-          <StyledGoogleMap lat={44.8378} lng={-0.5792} />
+          <StyledGoogleMap lat={44.8378} lng={-0.5792} show3D={show3DView} />
         </div>
       </div>
       <div className="w-full md:w-[40%] mt-4 md:mt-0">
@@ -104,7 +105,12 @@ const PropertyDetails: React.FC = () => {
           <div className="text-2xl font-bold mb-2 md:mb-0">${house.price.toLocaleString()}/ month</div>
           <div className="flex flex-row space-x-2">
             <button className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap">Rent now</button>
-            <button className="w-28 md:w-auto h-10 bg-gray-200 text-gray-700 px-4 rounded-md text-xs md:text-sm whitespace-nowrap">View 3D tour</button>
+            <button 
+              className="w-28 md:w-auto h-10 bg-gray-200 text-gray-700 px-4 rounded-md text-xs md:text-sm whitespace-nowrap"
+              onClick={() => setShow3DView(!show3DView)}
+            >
+              {show3DView ? "View 2D map" : "View 3D tour"}
+            </button>
           </div>
         </div>
         <h2 className="text-xl font-medium mt-6 mb-2">Overview</h2>

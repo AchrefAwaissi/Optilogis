@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useItems } from '../contexts/ItemContext';
+import { useAuth } from '../contexts/AuthContext';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { 
   faHome, faMapMarkerAlt, faCity, faGlobe, faBed, 
@@ -11,7 +13,112 @@ interface Suggestion {
   display_name: string;
 }
 
-const CreatePublication: React.FC = () => {
+const styles = {
+  pageContainer: {
+    minHeight: '100vh',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    backgroundColor: '#f0f2f5',
+    padding: '20px 0',
+  },
+  formContainer: {
+    width: '100%',
+    maxWidth: '600px',
+    backgroundColor: 'white',
+    borderRadius: '20px',
+    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+    padding: '20px',
+    paddingBottom: '70px',
+    overflowY: 'auto',
+    maxHeight: 'calc(100vh - 40px)', // Subtract padding from viewport height
+  },
+  title: {
+    color: '#5c5c5c',
+    fontSize: '28px',
+    fontWeight: 700,
+    marginBottom: '20px',
+    textAlign: 'center',
+  },
+  form: {
+    width: '100%',
+  },
+  inputContainer: {
+    position: 'relative',
+    marginBottom: '15px',
+  },
+  input: {
+    width: '100%',
+    height: '50px',
+    backgroundColor: '#ffffff',
+    borderRadius: '25px',
+    border: '1px solid #c0c0c0',
+    padding: '0 15px 0 40px',
+    fontSize: '16px',
+    outline: 'none',
+  },
+  textarea: {
+    width: '100%',
+    height: '100px',
+    backgroundColor: '#ffffff',
+    borderRadius: '15px',
+    border: '1px solid #c0c0c0',
+    padding: '10px 15px 10px 40px',
+    fontSize: '16px',
+    outline: 'none',
+    resize: 'vertical',
+  },
+  icon: {
+    position: 'absolute',
+    top: '50%',
+    left: '15px',
+    transform: 'translateY(-50%)',
+    color: '#6b4db3',
+    fontSize: '18px',
+  },
+  select: {
+    width: '100%',
+    height: '50px',
+    backgroundColor: '#ffffff',
+    borderRadius: '25px',
+    border: '1px solid #c0c0c0',
+    padding: '0 15px 0 40px',
+    fontSize: '16px',
+    outline: 'none',
+    appearance: 'none',
+    backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 15px top 50%',
+    backgroundSize: '12px auto',
+  },
+  button: {
+    cursor: 'pointer',
+    width: '100%',
+    height: '50px',
+    border: '0',
+    borderRadius: '25px',
+    backgroundColor: '#6b4db3',
+    color: '#ffffff',
+    fontSize: '18px',
+    fontWeight: 600,
+    marginTop: '20px',
+    transition: 'background-color 0.3s ease',
+  },
+  error: {
+    color: '#e74c3c',
+    marginTop: '15px',
+    textAlign: 'center',
+    fontSize: '14px',
+  },
+  success: {
+    color: '#2ecc71',
+    marginTop: '15px',
+    textAlign: 'center',
+    fontSize: '14px',
+  },
+};
+
+const CreatePublication = () => {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -37,30 +144,32 @@ const CreatePublication: React.FC = () => {
     cellar: false,
     exterior: false
   });
-  const [image, setImage] = useState<File | null>(null);
+  const [images, setImages] = useState([]);
   const [message, setMessage] = useState('');
-  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const { user } = useAuth();
+  const { createItem } = useItems();
+  const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target;
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      [name]: type === 'checkbox' ? checked : value
     }));
 
     if (name === 'address') {
       handleAddressChange(value);
     }
 
-    if (name === 'furnished' && (e.target as HTMLInputElement).checked) {
+    if (name === 'furnished' && checked) {
       setFormData(prev => ({ ...prev, notFurnished: false }));
-    } else if (name === 'notFurnished' && (e.target as HTMLInputElement).checked) {
+    } else if (name === 'notFurnished' && checked) {
       setFormData(prev => ({ ...prev, furnished: false }));
     }
   };
 
-  const handleAddressChange = async (value: string) => {
+  const handleAddressChange = async (value) => {
     if (value.length > 2) {
       try {
         const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}`);
@@ -75,7 +184,7 @@ const CreatePublication: React.FC = () => {
     }
   };
 
-  const handleSuggestionClick = (suggestion: Suggestion) => {
+  const handleSuggestionClick = (suggestion) => {
     const addressParts = suggestion.display_name.split(',');
     const city = addressParts.slice(-2, -1)[0].trim();
     const country = addressParts.slice(-1)[0].trim();
@@ -90,13 +199,13 @@ const CreatePublication: React.FC = () => {
     setShowSuggestions(false);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e) => {
     if (e.target.files) {
-      setImage(e.target.files[0]);
+      setImages(Array.from(e.target.files));
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
 
@@ -104,22 +213,17 @@ const CreatePublication: React.FC = () => {
     Object.entries(formData).forEach(([key, value]) => {
       submitData.append(key, value.toString());
     });
-    if (image) {
-      submitData.append('image', image);
-    }
+    images.forEach(image => {
+      submitData.append('images', image);
+    });
 
     try {
-      const response = await axios.post('http://localhost:5000/item', submitData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const newItem = await createItem(submitData);
       setMessage('Publication créée avec succès!');
-      console.log('Réponse du serveur:', response.data);
+      console.log('Nouvel item créé:', newItem);
+      // Reset form here if needed
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setMessage(`Erreur: ${error.response?.data.message || error.message || 'Une erreur est survenue'}`);
-      } else {
-        setMessage('Une erreur inattendue est survenue');
-      }
+      setMessage('Erreur lors de la création de la publication');
       console.error('Erreur lors de l\'envoi:', error);
     }
   };
@@ -145,110 +249,11 @@ const CreatePublication: React.FC = () => {
     };
   }, []);
 
-  const styles = {
-    container: {
-      display: 'flex',
-      flexDirection: 'column' as const,
-      alignItems: 'center',
-      padding: '40px',
-      fontFamily: 'Montserrat, sans-serif',
-      backgroundColor: 'white',
-      borderRadius: '20px',
-      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
-      position: 'relative' as const,
-      width: '600px',
-      margin: '20px auto',
-    },
-    title: {
-      color: '#5c5c5c',
-      fontSize: '36px',
-      fontWeight: 700,
-      marginBottom: '30px',
-    },
-    form: {
-      width: '100%',
-    },
-    inputContainer: {
-      position: 'relative' as const,
-      marginBottom: '20px',
-    },
-    input: {
-      width: '100%',
-      height: '60px',
-      backgroundColor: '#ffffff',
-      borderRadius: '30px',
-      border: '1px solid #c0c0c0',
-      padding: '0 20px 0 50px',
-      fontSize: '18px',
-      outline: 'none',
-    },
-    textarea: {
-      width: '100%',
-      height: '120px',
-      backgroundColor: '#ffffff',
-      borderRadius: '20px',
-      border: '1px solid #c0c0c0',
-      padding: '15px 20px 15px 50px',
-      fontSize: '18px',
-      outline: 'none',
-      resize: 'vertical' as const,
-    },
-    icon: {
-      position: 'absolute' as const,
-      top: '50%',
-      left: '20px',
-      transform: 'translateY(-50%)',
-      color: '#6b4db3',
-      fontSize: '20px',
-    },
-    select: {
-      width: '100%',
-      height: '60px',
-      backgroundColor: '#ffffff',
-      borderRadius: '30px',
-      border: '1px solid #c0c0c0',
-      padding: '0 20px 0 50px',
-      fontSize: '18px',
-      outline: 'none',
-      backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'right 20px top 50%',
-      backgroundSize: '12px auto',
-    },
-    checkbox: {
-      marginRight: '10px',
-    },
-    button: {
-      cursor: 'pointer',
-      width: '100%',
-      height: '60px',
-      border: '0',
-      borderRadius: '30px',
-      backgroundColor: '#6b4db3',
-      color: '#ffffff',
-      fontSize: '18px',
-      fontWeight: 600,
-      marginTop: '20px',
-      transition: 'background-color 0.3s ease',
-    },
-    error: {
-      color: '#e74c3c',
-      marginBottom: '15px',
-      textAlign: 'center' as const,
-      fontSize: '14px',
-    },
-    success: {
-      color: '#2ecc71',
-      marginBottom: '15px',
-      textAlign: 'center' as const,
-      fontSize: '14px',
-    },
-  };
-
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Créer une publication</h1>
-      <form onSubmit={handleSubmit} style={styles.form}>
+    <div style={styles.pageContainer}>
+      <div style={styles.formContainer}>
+        <h1 style={styles.title}>Créer une publication</h1>
+        <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faHome} style={styles.icon} />
           <input
@@ -261,8 +266,9 @@ const CreatePublication: React.FC = () => {
             required
           />
         </div>
+        
         <div style={styles.inputContainer}>
-          <FontAwesomeIcon icon={faHome} style={{...styles.icon, top: '30px'}} />
+          <FontAwesomeIcon icon={faHome} style={{...styles.icon, top: '25px'}} />
           <textarea
             name="description"
             placeholder="Description de la propriété"
@@ -272,6 +278,7 @@ const CreatePublication: React.FC = () => {
             rows={3}
           />
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faDollarSign} style={styles.icon} />
           <input
@@ -284,6 +291,7 @@ const CreatePublication: React.FC = () => {
             required
           />
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faHome} style={styles.icon} />
           <input
@@ -295,6 +303,7 @@ const CreatePublication: React.FC = () => {
             style={styles.input}
           />
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faMapMarkerAlt} style={styles.icon} />
           <input
@@ -335,6 +344,7 @@ const CreatePublication: React.FC = () => {
             </ul>
           )}
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faCity} style={styles.icon} />
           <input
@@ -347,6 +357,7 @@ const CreatePublication: React.FC = () => {
             required
           />
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faGlobe} style={styles.icon} />
           <input
@@ -359,6 +370,7 @@ const CreatePublication: React.FC = () => {
             required
           />
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faHome} style={styles.icon} />
           <select
@@ -366,7 +378,6 @@ const CreatePublication: React.FC = () => {
             value={formData.typeOfHousing}
             onChange={handleChange}
             style={styles.select}
-            className="custom-select"
           >
             <option value="">Sélectionnez un type de logement</option>
             <option value="maison">Maison</option>
@@ -374,6 +385,7 @@ const CreatePublication: React.FC = () => {
             <option value="studio">Studio</option>
           </select>
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faHome} style={styles.icon} />
           <input
@@ -385,6 +397,7 @@ const CreatePublication: React.FC = () => {
             style={styles.input}
           />
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faBed} style={styles.icon} />
           <input
@@ -396,6 +409,7 @@ const CreatePublication: React.FC = () => {
             style={styles.input}
           />
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faRulerCombined} style={styles.icon} />
           <input
@@ -407,6 +421,7 @@ const CreatePublication: React.FC = () => {
             style={styles.input}
           />
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faCompass} style={styles.icon} />
           <select
@@ -414,7 +429,6 @@ const CreatePublication: React.FC = () => {
             value={formData.exposure}
             onChange={handleChange}
             style={styles.select}
-            className="custom-select"
           >
             <option value="">Sélectionnez l'exposition</option>
             <option value="nord">Nord</option>
@@ -423,28 +437,30 @@ const CreatePublication: React.FC = () => {
             <option value="ouest">Ouest</option>
           </select>
         </div>
-        <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '20px'}}>
-          <label style={{display: 'flex', alignItems: 'center', fontSize: '16px', color: '#5c5c5c'}}>
+        
+        <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: '15px'}}>
+          <label style={{display: 'flex', alignItems: 'center', fontSize: '14px', color: '#5c5c5c', marginBottom: '10px', width: '48%'}}>
             <input
               type="checkbox"
               name="furnished"
               checked={formData.furnished}
               onChange={handleChange}
-              style={{marginRight: '10px', width: '20px', height: '20px'}}
+              style={{marginRight: '10px', width: '18px', height: '18px'}}
             />
             Meublé
           </label>
-          <label style={{display: 'flex', alignItems: 'center', fontSize: '16px', color: '#5c5c5c'}}>
+          <label style={{display: 'flex', alignItems: 'center', fontSize: '14px', color: '#5c5c5c', marginBottom: '10px', width: '48%'}}>
             <input
               type="checkbox"
               name="notFurnished"
               checked={formData.notFurnished}
               onChange={handleChange}
-              style={{marginRight: '10px', width: '20px', height: '20px'}}
+              style={{marginRight: '10px', width: '18px', height: '18px'}}
             />
             Non meublé
           </label>
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faWheelchair} style={styles.icon} />
           <input
@@ -456,6 +472,7 @@ const CreatePublication: React.FC = () => {
             style={styles.input}
           />
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faBuilding} style={styles.icon} />
           <input
@@ -467,6 +484,7 @@ const CreatePublication: React.FC = () => {
             style={styles.input}
           />
         </div>
+        
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faWarehouse} style={styles.icon} />
           <input
@@ -478,57 +496,65 @@ const CreatePublication: React.FC = () => {
             style={styles.input}
           />
         </div>
-        <div style={{marginBottom: '20px'}}>
+        
+        <div style={{marginBottom: '15px'}}>
           <p style={{fontSize: '16px', color: '#5c5c5c', marginBottom: '10px'}}>Options annexes</p>
-          {[
-            { name: 'parking', icon: faCar, label: 'Parking' },
-            { name: 'garage', icon: faCar, label: 'Garage' },
-            { name: 'basement', icon: faWarehouse, label: 'Sous-sol' },
-            { name: 'storageUnit', icon: faBox, label: 'Box' },
-            { name: 'cellar', icon: faWineBottle, label: 'Cave' }
-          ].map((option) => (
-            <label key={option.name} style={{display: 'flex', alignItems: 'center', marginBottom: '10px', fontSize: '16px', color: '#5c5c5c'}}>
-              <input
-                type="checkbox"
-                name={option.name}
-                checked={formData[option.name as keyof typeof formData] as boolean}
-                onChange={handleChange}
-                style={{marginRight: '10px', width: '20px', height: '20px'}}
-              />
-              <FontAwesomeIcon icon={option.icon} style={{marginRight: '10px', fontSize: '20px', color: '#6b4db3'}} />
-              {option.label}
-            </label>
-          ))}
+          <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between'}}>
+            {[
+              { name: 'parking', icon: faCar, label: 'Parking' },
+              { name: 'garage', icon: faCar, label: 'Garage' },
+              { name: 'basement', icon: faWarehouse, label: 'Sous-sol' },
+              { name: 'storageUnit', icon: faBox, label: 'Box' },
+              { name: 'cellar', icon: faWineBottle, label: 'Cave' }
+            ].map((option) => (
+              <label key={option.name} style={{display: 'flex', alignItems: 'center', marginBottom: '10px', fontSize: '14px', color: '#5c5c5c', width: '48%'}}>
+                <input
+                  type="checkbox"
+                  name={option.name}
+                  checked={formData[option.name]}
+                  onChange={handleChange}
+                  style={{marginRight: '10px', width: '18px', height: '18px'}}
+                />
+                <FontAwesomeIcon icon={option.icon} style={{marginRight: '10px', fontSize: '18px', color: '#6b4db3'}} />
+                {option.label}
+              </label>
+            ))}
+          </div>
         </div>
-        <label style={{display: 'flex', alignItems: 'center', marginBottom: '20px', fontSize: '16px', color: '#5c5c5c'}}>
+        
+        <label style={{display: 'flex', alignItems: 'center', marginBottom: '15px', fontSize: '14px', color: '#5c5c5c'}}>
           <input
             type="checkbox"
             name="exterior"
             checked={formData.exterior}
             onChange={handleChange}
-            style={{marginRight: '10px', width: '20px', height: '20px'}}
+            style={{marginRight: '10px', width: '18px', height: '18px'}}
           />
-          <FontAwesomeIcon icon={faTree} style={{marginRight: '10px', fontSize: '20px', color: '#6b4db3'}} />
+          <FontAwesomeIcon icon={faTree} style={{marginRight: '10px', fontSize: '18px', color: '#6b4db3'}} />
           Extérieur
         </label>
+        
         <div style={styles.inputContainer}>
-          <FontAwesomeIcon icon={faImage} style={{...styles.icon, top: '30px'}} />
+          <FontAwesomeIcon icon={faImage} style={{...styles.icon, top: '25px'}} />
           <input
             type="file"
-            name="image"
+            name="images"
             onChange={handleImageChange}
-            style={{...styles.input, paddingTop: '15px', paddingBottom: '15px', height: 'auto'}}
+            style={{...styles.input, paddingTop: '12px', paddingBottom: '12px', height: 'auto'}}
+            multiple
           />
         </div>
+        
         <button type="submit" style={styles.button}>
-          Créer la publication
-        </button>
-      </form>
-      {message && (
-        <div style={message.includes('Erreur') ? styles.error : styles.success}>
-          {message}
-        </div>
-      )}
+            Créer la publication
+          </button>
+        </form>
+        {message && (
+          <div style={message.includes('Erreur') ? styles.error : styles.success}>
+            {message}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

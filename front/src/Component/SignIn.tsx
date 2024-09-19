@@ -1,19 +1,16 @@
 import React, { useState } from "react";
-import axios from 'axios';
+import { useAuth } from '../contexts/AuthContext';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faUser, faLock } from "@fortawesome/free-solid-svg-icons";
-
-interface User {
-  username: string;
-}
 
 interface SignInProps {
   onClose: () => void;
   onToggleForm: () => void;
-  onSuccess: (user: User) => void;
+  onSuccess: (user: { username: string }) => void;
 }
 
 const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => {
+  const { signin } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -30,15 +27,11 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
     setError(null);
 
     try {
-      const response = await axios.post('http://localhost:5000/auth/signin', formData);
-      console.log('Sign in successful', response.data);
+      await signin(formData.username, formData.password);
+      console.log('Sign in successful');
       onSuccess({ username: formData.username });
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response) {
-        setError(err.response.data.message || "An error occurred during sign in");
-      } else {
-        setError("An unexpected error occurred");
-      }
+      setError("An error occurred during sign in");
     }
   };
 
@@ -200,5 +193,6 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
     </div>
   );
 };
+
 
 export default SignIn;

@@ -102,7 +102,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
         <div className="md:hidden">
           <button 
             onClick={toggleFilter}
-            className="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg z-50"
+            className="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg z-10"
           >
             <FontAwesomeIcon icon={isFilterOpen ? faTimes : faFilter} />
           </button>
@@ -181,7 +181,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
           <input
             type="range"
             min="100"
-            max="10000"
+            max="1000000"
             value={filterCriteria.maxPrice}
             onChange={handlePriceChange}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"

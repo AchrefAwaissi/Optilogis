@@ -1,10 +1,11 @@
 import { Schema } from 'mongoose';
 
 export const ItemSchema = new Schema({
+  userId: { type: Schema.Types.ObjectId, ref: 'users', required: true },
   name: { type: String, required: false },
   description: { type: String, required: false },
   price: { type: Number, required: true },
-  image: { type: String, required: false },
+  images: [{ type: String, required: false }],
   title: { type: String, required: false },
   address: { type: String, required: true },
   city: { type: String, required: true },

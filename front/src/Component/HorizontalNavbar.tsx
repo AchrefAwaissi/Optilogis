@@ -37,9 +37,18 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
         Matching
       </Link>
       {user && (
-        <Link to="/settings" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-          Settings
-        </Link>
+        <>
+          <Link to="/settings" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
+            Settings
+          </Link>
+          <button
+            onClick={onLogout}
+            className="block mt-4 w-full text-left text-gray-800 hover:text-blue-600 mr-4"
+          >
+            <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+            Logout
+          </button>
+        </>
       )}
     </>
   );
@@ -49,22 +58,22 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-          <img src={logo} alt="Logo" className="w-12 h-12 object-contain transition-all duration-300" />
-          </div>
-          <div className="hidden lg:block">
+            {/* Logo for mobile, Welcome message for desktop */}
+            <div className="lg:hidden">
+              <img src={logo} alt="Logo" className="w-12 h-12 object-contain transition-all duration-300" />
+            </div>
             {user && (
-              <div className="ml-10 flex items-baseline space-x-4">
-                <NavLinks />
+              <div className="hidden lg:block text-xl font-semibold text-gray-800">
+                Bienvenue, {user.username}
               </div>
             )}
           </div>
           <div className="hidden lg:block">
             {user && (
               <div className="ml-4 flex items-center md:ml-6">
-                <span className="text-gray-800 mr-2">Welcome, {user.username}</span>
                 <button
                   onClick={onLogout}
-                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded flex items-center"
+                  className="bg-black-500 hover:text-blue-600 text-black py-2 px-4 rounded flex items-center"
                 >
                   <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
                   Logout
@@ -85,41 +94,28 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
 
       {/* Mobile menu */}
       <div className={`lg:hidden ${isOpen ? 'block' : 'hidden'}`}>
-  <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-    <NavLinks />
-  </div>
-  <div className="pt-4 pb-3 border-t border-gray-200">
-    {user ? (
-      <div className="flex items-center px-5">
-        <div className="ml-3">
-          <div className="text-base font-medium leading-none text-gray-800">Welcome, {user.username}</div>
+        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <NavLinks />
         </div>
-        <button
-          onClick={onLogout}
-          className="ml-auto bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded flex items-center"
-        >
-          <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-          Logout
-        </button>
+        {!user && (
+          <div className="pt-4 pb-3 border-t border-gray-200">
+            <div className="mt-3 px-2 space-y-2">
+              <button
+                onClick={onSignInClick}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={onSignUpClick}
+                className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+              >
+                Sign Up
+              </button>
+            </div>
+          </div>
+        )}
       </div>
-    ) : (
-      <div className="mt-3 px-2 space-y-2">
-        <button
-          onClick={onSignInClick}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-        >
-          Sign In
-        </button>
-        <button
-          onClick={onSignUpClick}
-          className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-        >
-          Sign Up
-        </button>
-      </div>
-    )}
-  </div>
-</div>
     </nav>
   );
 };

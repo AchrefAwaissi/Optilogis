@@ -6,8 +6,10 @@ import HouseListings from "../Component/HouseListings";
 import Filter from "../Component/Filter";
 import MapComponent from "../Component/Map";
 import { FilterCriteria, Location, House } from "../types";
+import { useItems } from "../contexts/ItemContext";
 
 const HomePage: React.FC = () => {
+  const { getUserItems } = useItems();
   const [houses, setHouses] = useState<House[]>([]);
   const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,9 +18,9 @@ const HomePage: React.FC = () => {
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
     location: "",
     minPrice: 0,
-    maxPrice: 10000,
+    maxPrice: Number.MAX_SAFE_INTEGER, // Utilisez une valeur très élevée
     minSize: 0,
-    maxSize: 1000,
+    maxSize: Number.MAX_SAFE_INTEGER,
     typeOfHousing: "",
   });
   const [showMap, setShowMap] = useState(false);
@@ -41,13 +43,10 @@ const HomePage: React.FC = () => {
   const fetchHouses = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/item");
-      if (!response.ok) {
-        throw new Error("Failed to fetch houses");
-      }
-      const data: House[] = await response.json();
+      const data = await getUserItems();
+      console.log("Fetched houses in HomePage:", data.length); // Ajoutez ce log
       setHouses(data);
-      setFilteredHouses(data);
+      setFilteredHouses(data); // Assurez-vous que ceci est bien appelé
       setError(null);
     } catch (error) {
       console.error("Error fetching houses:", error);

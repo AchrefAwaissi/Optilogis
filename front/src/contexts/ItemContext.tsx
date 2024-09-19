@@ -39,10 +39,10 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
           'Authorization': `Bearer ${token}`,
         },
       });
-      setItems(response.data);
-      return response.data;
+      console.log("Fetched items:", response.data.length); // Ajoutez ce log
+      return response.data; // Retournez toutes les données sans filtrage
     } catch (error) {
-      console.error('Error fetching user items:', error);
+      console.error('Error fetching items:', error);
       throw error;
     }
   };
@@ -79,7 +79,6 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
     }
   };
 
-  // Nouvelle méthode pour créer un item
   const createItem = async (formData: FormData): Promise<Item> => {
     const token = localStorage.getItem('token');
     try {

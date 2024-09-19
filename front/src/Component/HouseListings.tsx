@@ -51,7 +51,7 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
 };
 
 const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect, city }) => {
-  console.log("HouseListings rendered with:", { housesCount: houses.length, city });
+  console.log("HouseListings received houses:", houses.length);
 
   return (
     <div className="flex flex-col items-center space-y-4 p-4">

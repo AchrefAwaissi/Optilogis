@@ -181,7 +181,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
           <input
             type="range"
             min="100"
-            max="10000"
+            max="1000000"
             value={filterCriteria.maxPrice}
             onChange={handlePriceChange}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"

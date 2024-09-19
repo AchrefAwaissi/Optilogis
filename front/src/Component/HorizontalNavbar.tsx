@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faTimes, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faTimes, faSignOutAlt, faHeart } from "@fortawesome/free-solid-svg-icons";
 import logo from "../image/logoa.png";
 
 interface User {
@@ -20,6 +20,10 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleFavoritesClick = () => {
+    console.log("Afficher les annonces favorites");
   };
 
   const NavLinks = () => (
@@ -41,6 +45,13 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
           <Link to="/settings" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
             Settings
           </Link>
+          <button
+            onClick={handleFavoritesClick}
+            className="text-grey-500 hover:text-red-500 font-bold p-2 rounded flex items-center justify-center mr-5"
+            aria-label="Favorites"
+          >
+            <FontAwesomeIcon icon={faHeart} />
+          </button>
           <button
             onClick={onLogout}
             className="block mt-4 w-full text-left text-gray-800 hover:text-blue-600 mr-4"
@@ -71,6 +82,13 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
           <div className="hidden lg:block">
             {user && (
               <div className="ml-4 flex items-center md:ml-6">
+                <button
+                  onClick={handleFavoritesClick}
+                  className="text-grey-500 hover:text-red-500 font-bold p-2 rounded flex items-center justify-center mr-4"
+                  aria-label="Favorites"
+                >
+                  <FontAwesomeIcon icon={faHeart} />
+                </button>
                 <button
                   onClick={onLogout}
                   className="bg-black-500 hover:text-blue-600 text-black py-2 px-4 rounded flex items-center"

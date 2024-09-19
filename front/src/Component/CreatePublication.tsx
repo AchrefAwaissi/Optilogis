@@ -275,19 +275,7 @@ const CreatePublication = () => {
             style={styles.input}
             required
           />
-        </div>
-        
-        <div style={styles.inputContainer}>
-          <FontAwesomeIcon icon={faHome} style={styles.icon} />
-          <input
-            type="text"
-            name="title"
-            placeholder="Titre de l'annonce"
-            value={formData.title}
-            onChange={handleChange}
-            style={styles.input}
-          />
-        </div>
+        </div>      
         
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faMapMarkerAlt} style={styles.icon} />

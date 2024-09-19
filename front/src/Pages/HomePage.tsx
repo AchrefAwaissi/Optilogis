@@ -18,10 +18,22 @@ const HomePage: React.FC = () => {
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
     location: "",
     minPrice: 0,
-    maxPrice: Number.MAX_SAFE_INTEGER, // Utilisez une valeur très élevée
+    maxPrice: Number.MAX_SAFE_INTEGER,
     minSize: 0,
     maxSize: Number.MAX_SAFE_INTEGER,
     typeOfHousing: "",
+    minRooms: undefined,
+    maxRooms: undefined,
+    minBedrooms: undefined,
+    maxBedrooms: undefined,
+    minArea: undefined,
+    maxArea: undefined,
+    furnished: undefined,
+    accessibility: undefined,
+    minFloor: undefined,
+    maxFloor: undefined,
+    minAnnexArea: undefined,
+    maxAnnexArea: undefined,
   });
   const [showMap, setShowMap] = useState(false);
   const [currentCity, setCurrentCity] = useState<string>("");
@@ -44,9 +56,9 @@ const HomePage: React.FC = () => {
     try {
       setLoading(true);
       const data = await getUserItems();
-      console.log("Fetched houses in HomePage:", data.length); // Ajoutez ce log
+      console.log("Fetched houses in HomePage:", data.length);
       setHouses(data);
-      setFilteredHouses(data); // Assurez-vous que ceci est bien appelé
+      setFilteredHouses(data);
       setError(null);
     } catch (error) {
       console.error("Error fetching houses:", error);
@@ -61,13 +73,9 @@ const HomePage: React.FC = () => {
       const matchesLocation =
         !filterCriteria.location ||
         (house.city &&
-          house.city
-            .toLowerCase()
-            .includes(filterCriteria.location.toLowerCase())) ||
+          house.city.toLowerCase().includes(filterCriteria.location.toLowerCase())) ||
         (house.address &&
-          house.address
-            .toLowerCase()
-            .includes(filterCriteria.location.toLowerCase()));
+          house.address.toLowerCase().includes(filterCriteria.location.toLowerCase()));
 
       const matchesPrice =
         house.price >= filterCriteria.minPrice &&
@@ -81,11 +89,42 @@ const HomePage: React.FC = () => {
       const matchesType =
         !filterCriteria.typeOfHousing ||
         (house.typeOfHousing &&
-          house.typeOfHousing
-            .toLowerCase()
-            .includes(filterCriteria.typeOfHousing.toLowerCase()));
+          house.typeOfHousing.toLowerCase().includes(filterCriteria.typeOfHousing.toLowerCase()));
 
-      return matchesLocation && matchesPrice && matchesSize && matchesType;
+          const matchesRooms =
+          (filterCriteria.minRooms === undefined || (house.rooms ?? 0) >= filterCriteria.minRooms) &&
+          (filterCriteria.maxRooms === undefined || (house.rooms ?? 0) <= filterCriteria.maxRooms);
+    
+        const matchesBedrooms =
+          (filterCriteria.minBedrooms === undefined || (house.bedrooms ?? 0) >= filterCriteria.minBedrooms) &&
+          (filterCriteria.maxBedrooms === undefined || (house.bedrooms ?? 0) <= filterCriteria.maxBedrooms);
+    
+        const matchesFloor =
+          (filterCriteria.minFloor === undefined || (house.floor ?? 0) >= filterCriteria.minFloor) &&
+          (filterCriteria.maxFloor === undefined || (house.floor ?? 0) <= filterCriteria.maxFloor);
+    
+        const matchesAnnexArea =
+          (filterCriteria.minAnnexArea === undefined || (house.annexArea ?? 0) >= filterCriteria.minAnnexArea) &&
+          (filterCriteria.maxAnnexArea === undefined || (house.annexArea ?? 0) <= filterCriteria.maxAnnexArea);
+    
+        const matchesFurnished =
+          filterCriteria.furnished === undefined || house.furnished === filterCriteria.furnished;
+    
+        const matchesAccessibility =
+          filterCriteria.accessibility === undefined || house.accessibility === filterCriteria.accessibility;
+
+      return (
+        matchesLocation &&
+        matchesPrice &&
+        matchesSize &&
+        matchesType &&
+        matchesRooms &&
+        matchesBedrooms &&
+        matchesFloor &&
+        matchesAnnexArea &&
+        matchesFurnished &&
+        matchesAccessibility
+      );
     });
     setFilteredHouses(filtered);
   };

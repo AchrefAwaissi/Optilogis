@@ -71,7 +71,7 @@ const SettingsPage: React.FC = () => {
               onClick={() => setActiveTab('profile')}
               className={`mr-4 px-3 py-2 rounded-md ${activeTab === 'profile' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
             >
-              Profile Settings
+              Mon Compte
             </button>
             <button
               onClick={() => setActiveTab('items')}

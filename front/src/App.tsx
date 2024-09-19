@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ItemProvider } from './contexts/ItemContext';
 import CombinedNavbar from './Component/VerticalIconNavbar';
 import HorizontalNavbar from './Component/HorizontalNavbar';
@@ -18,18 +18,29 @@ interface User {
   // Ajoutez d'autres propriétés utilisateur si nécessaire
 }
 
+// ProtectedRoute component
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
+  
+  if (!user) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 const App: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
+  const { user, signout } = useAuth();
 
   const handleAuthSuccess = (userData: User) => {
-    setUser(userData);
+    // This might not be necessary if your AuthContext handles user state
     setShowAuthModal(false);
   };
 
   const handleLogout = () => {
-    setUser(null);
+    signout();
   };
 
   const handleAuthClick = (signup: boolean = false) => {
@@ -42,52 +53,70 @@ const App: React.FC = () => {
   };
 
   return (
-    <AuthProvider>
+    <Router>
       <ItemProvider>
-        <Router>
-          <div className="flex h-screen overflow-hidden">
-            <CombinedNavbar onAuthClick={() => handleAuthClick(false)} />
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <HorizontalNavbar
-                user={user}
-                onLogout={handleLogout}
-                onSignInClick={() => handleAuthClick(false)}
-                onSignUpClick={() => handleAuthClick(true)}
-              />
+        <div className="flex h-screen overflow-hidden">
+          <CombinedNavbar onAuthClick={() => handleAuthClick(false)} />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <HorizontalNavbar
+              user={user}
+              onLogout={handleLogout}
+              onSignInClick={() => handleAuthClick(false)}
+              onSignUpClick={() => handleAuthClick(true)}
+            />
 
-              <main className="flex-1 overflow-hidden">
-                <Routes>
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/publish" element={<PublishPropertyPage />} />
-                  <Route path="/search" element={<SearchPage />} />
-                  <Route path="/matching" element={<MatchingProfilePage />} />
-                  <Route path="/settings" element={<SettingsPage />} />
-                  <Route path="/property-details" element={<PropertyDetails />} />
-                </Routes>
-              </main>
-            </div>
+            <main className="flex-1 overflow-hidden">
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/property-details" element={<PropertyDetails />} />
+                
+                {/* Protected Routes */}
+                <Route path="/publish" element={
+                  <ProtectedRoute>
+                    <PublishPropertyPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/matching" element={
+                  <ProtectedRoute>
+                    <MatchingProfilePage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/settings" element={
+                  <ProtectedRoute>
+                    <SettingsPage />
+                  </ProtectedRoute>
+                } />
+              </Routes>
+            </main>
           </div>
-          {showAuthModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
-              {isSignUp ? (
-                <SignUp
-                  onClose={() => setShowAuthModal(false)}
-                  onToggleForm={toggleAuthMode}
-                  onSuccess={handleAuthSuccess}
-                />
-              ) : (
-                <SignIn
-                  onClose={() => setShowAuthModal(false)}
-                  onToggleForm={toggleAuthMode}
-                  onSuccess={handleAuthSuccess}
-                />
-              )}
-            </div>
-          )}
-        </Router>
+        </div>
+        {showAuthModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
+            {isSignUp ? (
+              <SignUp
+                onClose={() => setShowAuthModal(false)}
+                onToggleForm={toggleAuthMode}
+                onSuccess={handleAuthSuccess}
+              />
+            ) : (
+              <SignIn
+                onClose={() => setShowAuthModal(false)}
+                onToggleForm={toggleAuthMode}
+                onSuccess={handleAuthSuccess}
+              />
+            )}
+          </div>
+        )}
       </ItemProvider>
-    </AuthProvider>
+    </Router>
   );
 };
 
-export default App;
+const AppWithAuth: React.FC = () => (
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+);
+
+export default AppWithAuth;

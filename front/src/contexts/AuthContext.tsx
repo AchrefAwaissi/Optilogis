@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
 interface User {
+  id: string;
   username: string;
   email: string;
 }
@@ -27,26 +28,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const fetchUser = async (token: string) => {
-    try {
-      const response = await axios.get('http://localhost:5000/auth/user', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUser(response.data);
-    } catch (error) {
-      console.error('Failed to fetch user', error);
-      localStorage.removeItem('token');
-    }
-  };
+  try {
+    const response = await axios.get('http://localhost:5000/auth/me', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setUser({
+      id: response.data._id,
+      username: response.data.username,
+      email: response.data.email
+    });
+  } catch (error) {
+    console.error('Failed to fetch user', error);
+    localStorage.removeItem('token');
+  }
+};
 
   const signin = async (username: string, password: string) => {
-    try {
-      const response = await axios.post('http://localhost:5000/auth/signin', { username, password });
-      localStorage.setItem('token', response.data.access_token);
-      setUser({ username: response.data.username, email: response.data.email });
-    } catch (error) {
-      throw error;
-    }
-  };
+  try {
+    const response = await axios.post('http://localhost:5000/auth/signin', { username, password });
+    localStorage.setItem('token', response.data.access_token);
+    // Après la connexion réussie, récupérez immédiatement les informations de l'utilisateur
+    await fetchUser(response.data.access_token);
+  } catch (error) {
+    throw error;
+  }
+};
 
   const signout = () => {
     localStorage.removeItem('token');

@@ -43,6 +43,12 @@ export class AuthController {
     return this.authService.update(req.user.userId, updateUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getCurrentUser(@Request() req) {
+    return this.authService.findOne(req.user.userId);
+  }
+
   // Autres routes CRUD existantes
 
   @Get('users')

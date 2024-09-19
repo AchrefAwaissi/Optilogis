@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useItems } from '../contexts/ItemContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Item {
   _id: string;
@@ -22,6 +23,7 @@ interface ItemFormData extends Omit<Item, 'images' | '_id'> {
 const ManageItems: React.FC = () => {
     const { getUserItems, updateItem, deleteItem } = useItems();
     const [userItems, setUserItems] = useState<Item[]>([]);
+    const { user } = useAuth();
     const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
     const [itemData, setItemData] = useState<ItemFormData>({
       name: '',
@@ -39,16 +41,17 @@ const ManageItems: React.FC = () => {
 
   useEffect(() => {
     loadUserItems();
-  }, []);
+  }, [user]);
 
   const loadUserItems = async () => {
     try {
-      const items = await getUserItems();
-      setUserItems(items);
+        const allItems = await getUserItems();
+        const filteredItems = allItems.filter(item => item.userId === user?.id);
+        setUserItems(filteredItems);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to load user items' });
+        setMessage({ type: 'error', text: 'Failed to load user items' });
     }
-  };
+};
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

@@ -30,22 +30,24 @@ export class AuthService {
   async signIn(
     username: string,
     password: string,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ access_token: string; userId: string }> {
     const user = await this.userModel.findOne({ username }).exec();
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
+  
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
-
+  
     const payload = { username: user.username, sub: user._id };
     return {
       access_token: this.jwtService.sign(payload),
+      userId: user._id.toString(),
     };
   }
+  
 
   // Nouvelles méthodes CRUD
 

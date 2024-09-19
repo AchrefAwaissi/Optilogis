@@ -20,21 +20,21 @@ interface ItemFormData extends Omit<Item, 'images' | '_id'> {
 }
 
 const ManageItems: React.FC = () => {
-  const { getUserItems, updateItem } = useItems();
-  const [userItems, setUserItems] = useState<Item[]>([]);
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-  const [itemData, setItemData] = useState<ItemFormData>({
-    name: '',
-    description: '',
-    price: 0,
-    address: '',
-    city: '',
-    country: '',
-    images: [],
-    rooms: 0,
-    bedrooms: 0,
-    area: 0,
-  });
+    const { getUserItems, updateItem, deleteItem } = useItems();
+    const [userItems, setUserItems] = useState<Item[]>([]);
+    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+    const [itemData, setItemData] = useState<ItemFormData>({
+      name: '',
+      description: '',
+      price: 0,
+      address: '',
+      city: '',
+      country: '',
+      images: [],
+      rooms: 0,
+      bedrooms: 0,
+      area: 0,
+    });
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
@@ -63,6 +63,33 @@ const ManageItems: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setItemData(prev => ({ ...prev, images: Array.from(e.target.files) }));
+    }
+  };
+
+  const handleDeleteItem = async (itemId: string) => {
+    if (window.confirm('Are you sure you want to delete this item?')) {
+      try {
+        await deleteItem(itemId);
+        setMessage({ type: 'success', text: 'Item deleted successfully' });
+        loadUserItems();
+        if (selectedItemId === itemId) {
+          setSelectedItemId(null);
+          setItemData({
+            name: '',
+            description: '',
+            price: 0,
+            address: '',
+            city: '',
+            country: '',
+            images: [],
+            rooms: 0,
+            bedrooms: 0,
+            area: 0,
+          });
+        }
+      } catch (error) {
+        setMessage({ type: 'error', text: 'Failed to delete item' });
+      }
     }
   };
 
@@ -140,7 +167,7 @@ const ManageItems: React.FC = () => {
       : 'https://via.placeholder.com/100x100';
 
     return (
-      <div className="w-full bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transition-shadow duration-300 ease-in-out hover:shadow-lg flex flex-col sm:flex-row mb-4">
+        <div className="w-full bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transition-shadow duration-300 ease-in-out hover:shadow-lg flex flex-col sm:flex-row mb-4">
         <div
           className="w-full h-24 sm:w-24 sm:h-24 bg-center bg-cover bg-no-repeat"
           style={{ backgroundImage: `url(${imageUrl})` }}
@@ -157,12 +184,20 @@ const ManageItems: React.FC = () => {
           </div>
           <div className="flex justify-between items-center">
             <p className="text-sm font-medium text-teal-700">${item.price.toLocaleString()}/ month</p>
-            <button 
-              onClick={() => selectItem(item)}
-              className="px-3 py-1 bg-blue-600 text-white text-xs font-normal rounded-lg hover:bg-blue-700 transition-colors duration-200"
-            >
-              Edit
-            </button>
+            <div>
+              <button 
+                onClick={() => selectItem(item)}
+                className="px-3 py-1 bg-blue-600 text-white text-xs font-normal rounded-lg hover:bg-blue-700 transition-colors duration-200 mr-2"
+              >
+                Edit
+              </button>
+              <button 
+                onClick={() => handleDeleteItem(item._id)}
+                className="px-3 py-1 bg-red-600 text-white text-xs font-normal rounded-lg hover:bg-red-700 transition-colors duration-200"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       </div>

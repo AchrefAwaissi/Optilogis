@@ -17,7 +17,7 @@ export interface House {
   floor?: number;
   annexArea?: number;
   furnished?: boolean;
-  accessibility?: boolean;
+  accessibility?: string;
 }
 
 export interface FilterCriteria {
@@ -34,7 +34,7 @@ export interface FilterCriteria {
   minArea?: number;
   maxArea?: number;
   furnished?: boolean;
-  accessibility?: boolean;
+  accessibility?: string;
   minFloor?: number;
   maxFloor?: number;
   minAnnexArea?: number;

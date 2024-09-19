@@ -99,6 +99,10 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
     onFilterChange({ [field]: !filterCriteria[field] });
   };
 
+  const handleAccessibilityChange = () => {
+    onFilterChange({ accessibility: filterCriteria.accessibility ? '' : 'true' });
+  };
+
   const toggleFilter = () => {
     if (onToggle) {
       onToggle();
@@ -320,13 +324,13 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
             <FontAwesomeIcon icon={faCouch} className="ml-2 text-gray-400" />
           </label>
           <label className="flex items-center py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={filterCriteria.accessibility}
-              onChange={() => handleCheckboxChange('accessibility')}
-              className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]"
-              style={{ accentColor: '#095550' }}
-            />
+          <input
+            type="checkbox"
+            checked={filterCriteria.accessibility !== ''}
+            onChange={handleAccessibilityChange}
+            className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]"
+            style={{ accentColor: '#095550' }}
+          />
             <span className="ml-3">Accessible PMR</span>
             <FontAwesomeIcon icon={faWheelchair} className="ml-2 text-gray-400" />
           </label>

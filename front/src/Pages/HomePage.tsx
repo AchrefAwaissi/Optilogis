@@ -111,7 +111,7 @@ const HomePage: React.FC = () => {
           filterCriteria.furnished === undefined || house.furnished === filterCriteria.furnished;
     
         const matchesAccessibility =
-          filterCriteria.accessibility === undefined || house.accessibility === filterCriteria.accessibility;
+          !filterCriteria.accessibility || (house.accessibility !== '');
 
       return (
         matchesLocation &&

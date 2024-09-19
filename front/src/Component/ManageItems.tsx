@@ -186,19 +186,19 @@ const ManageItems: React.FC = () => {
             </div>
           </div>
           <div className="flex justify-between items-center">
-            <p className="text-sm font-medium text-teal-700">${item.price.toLocaleString()}/ month</p>
+            <p className="text-sm font-medium text-teal-700">${item.price.toLocaleString()}/ mois</p>
             <div>
               <button 
                 onClick={() => selectItem(item)}
                 className="px-3 py-1 bg-blue-600 text-white text-xs font-normal rounded-lg hover:bg-blue-700 transition-colors duration-200 mr-2"
               >
-                Edit
+                Modifier
               </button>
               <button 
                 onClick={() => handleDeleteItem(item._id)}
                 className="px-3 py-1 bg-red-600 text-white text-xs font-normal rounded-lg hover:bg-red-700 transition-colors duration-200"
               >
-                Delete
+                Supprimer
               </button>
             </div>
           </div>
@@ -247,7 +247,7 @@ const ManageItems: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price (per month)</label>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700">Prix (par mois)</label>
               <input
                 id="price"
                 name="price"
@@ -260,7 +260,7 @@ const ManageItems: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700">Addresse</label>
               <input
                 id="address"
                 name="address"
@@ -272,7 +272,7 @@ const ManageItems: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
+              <label htmlFor="city" className="block text-sm font-medium text-gray-700">Ville</label>
               <input
                 id="city"
                 name="city"
@@ -284,7 +284,7 @@ const ManageItems: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="country" className="block text-sm font-medium text-gray-700">Country</label>
+              <label htmlFor="country" className="block text-sm font-medium text-gray-700">Pays</label>
               <input
                 id="country"
                 name="country"
@@ -296,7 +296,7 @@ const ManageItems: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="rooms" className="block text-sm font-medium text-gray-700">Number of Rooms</label>
+              <label htmlFor="rooms" className="block text-sm font-medium text-gray-700">Nombre de Pièces</label>
               <input
                 id="rooms"
                 name="rooms"
@@ -308,7 +308,7 @@ const ManageItems: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="bedrooms" className="block text-sm font-medium text-gray-700">Number of Bedrooms</label>
+              <label htmlFor="bedrooms" className="block text-sm font-medium text-gray-700">Nombre de Chambre</label>
               <input
                 id="bedrooms"
                 name="bedrooms"
@@ -320,7 +320,7 @@ const ManageItems: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="area" className="block text-sm font-medium text-gray-700">Area (m²)</label>
+              <label htmlFor="area" className="block text-sm font-medium text-gray-700">Surface (m²)</label>
               <input
                 id="area"
                 name="area"

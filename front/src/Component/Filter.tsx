@@ -91,8 +91,13 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
     onFilterChange({ maxPrice: parseInt(e.target.value) });
   };
 
-  const handleRangeChange = (field: keyof FilterCriteria, value: number, isMin: boolean) => {
-    onFilterChange({ [isMin ? `min${field.charAt(0).toUpperCase() + field.slice(1)}` : `max${field.charAt(0).toUpperCase() + field.slice(1)}`]: value });
+  const handleRangeChange = (
+    field: 'Size' | 'Rooms' | 'Bedrooms' | 'Floor' | 'AnnexArea',
+    value: number,
+    isMin: boolean
+  ) => {
+    const fieldName = isMin ? `min${field}` : `max${field}`;
+    onFilterChange({ [fieldName]: value });
   };
 
   const handleCheckboxChange = (field: keyof FilterCriteria) => {

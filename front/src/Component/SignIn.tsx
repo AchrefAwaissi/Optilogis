@@ -86,7 +86,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
       top: '50%',
       left: '20px',
       transform: 'translateY(-50%)',
-      color: '#6b4db3',
+      color: '#095550',
       fontSize: '20px',
     },
     forgotPassword: {
@@ -113,7 +113,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
       height: '60px',
       border: '0',
       borderRadius: '30px',
-      backgroundColor: '#6b4db3',
+      backgroundColor: '#095550',
       color: '#ffffff',
       fontSize: '18px',
       fontWeight: 600,
@@ -125,7 +125,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
       fontSize: '14px',
     },
     link: {
-      color: '#6b4db3',
+      color: '#095550',
       textDecoration: 'none',
       fontWeight: 'bold',
       cursor: 'pointer',

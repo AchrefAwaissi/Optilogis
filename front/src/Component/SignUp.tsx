@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from 'axios';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faUser, faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
+import { faTimes, faUser, faEnvelope, faLock, faImage } from "@fortawesome/free-solid-svg-icons";
 
 interface User {
   username: string;
@@ -20,10 +20,18 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
     password: '',
     confirmPassword: ''
   });
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === 'profilePhoto') {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        setProfilePhoto(files[0]);
+      }
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -36,10 +44,18 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/auth/signup', {
-        username: formData.username,
-        email: formData.email,
-        password: formData.password
+      const formDataToSend = new FormData();
+      formDataToSend.append('username', formData.username);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('password', formData.password);
+      if (profilePhoto) {
+        formDataToSend.append('profilePhoto', profilePhoto);
+      }
+
+      const response = await axios.post('http://localhost:5000/auth/signup', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
       console.log('Signup successful', response.data);
       onSuccess({ username: formData.username });
@@ -103,7 +119,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
       top: '50%',
       left: '20px',
       transform: 'translateY(-50%)',
-      color: '#6b4db3',
+      color: '#095550',
       fontSize: '20px',
     },
     button: {
@@ -112,7 +128,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
       height: '60px',
       border: '0',
       borderRadius: '30px',
-      backgroundColor: '#6b4db3',
+      backgroundColor: '#095550',
       color: '#ffffff',
       fontSize: '18px',
       fontWeight: 600,
@@ -124,7 +140,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
       fontSize: '14px',
     },
     link: {
-      color: '#6b4db3',
+      color: '#095550',
       textDecoration: 'none',
       fontWeight: 'bold',
       cursor: 'pointer',
@@ -193,6 +209,16 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
             required
           />
         </div>
+        <div style={styles.inputContainer}>
+          <FontAwesomeIcon icon={faImage} style={styles.icon} />
+          <input
+            type="file"
+            name="profilePhoto"
+            onChange={handleChange}
+            style={styles.input}
+            accept="image/*"
+          />
+        </div>
         <button type="submit" style={styles.button}>
           Sign Up
         </button>
@@ -206,5 +232,6 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
     </div>
   );
 };
+
 
 export default SignUp;

@@ -7,6 +7,7 @@ interface FormData {
   email: string;
   password: string;
   confirmPassword: string;
+  profilePhoto: File | null;
 }
 
 const SettingsPage: React.FC = () => {
@@ -16,7 +17,9 @@ const SettingsPage: React.FC = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    profilePhoto: null,
   });
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [activeTab, setActiveTab] = useState<'profile' | 'items'>('profile');
 
@@ -27,12 +30,20 @@ const SettingsPage: React.FC = () => {
         username: user.username || '',
         email: user.email || '',
       }));
+      if (user.profilePhotoPath) {
+        setPreviewUrl(user.profilePhotoPath);
+      }
     }
   }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, files } = e.target;
+    if (name === 'profilePhoto' && files && files[0]) {
+      setFormData(prev => ({ ...prev, profilePhotoPath: files[0] }));
+      setPreviewUrl(URL.createObjectURL(files[0]));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleProfileSubmit = async (e: React.FormEvent) => {
@@ -45,17 +56,27 @@ const SettingsPage: React.FC = () => {
     }
 
     try {
-      const updateData = {
-        username: formData.username,
-        email: formData.email,
-        ...(formData.password && { password: formData.password }),
-      };
-      await updateUser(updateData);
+      const formDataToSend = new FormData();
+      formDataToSend.append('username', formData.username);
+      formDataToSend.append('email', formData.email);
+      if (formData.password) {
+        formDataToSend.append('password', formData.password);
+      }
+      if (formData.profilePhoto) {
+        formDataToSend.append('profilePhotoPath', formData.profilePhoto);
+        console.log('Profile photo added to FormData:', formData.profilePhoto);
+      } else {
+        console.log('No profile photo to upload');
+      }
+
+      
+      await updateUser(formDataToSend);
       setMessage({ type: 'success', text: 'Profile updated successfully' });
       setFormData(prevState => ({
         ...prevState,
         password: '',
         confirmPassword: '',
+        profilePhoto: null,
       }));
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to update profile' });
@@ -90,6 +111,22 @@ const SettingsPage: React.FC = () => {
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
             {activeTab === 'profile' && (
               <form onSubmit={handleProfileSubmit} className="space-y-4">
+                <div className="flex justify-center mb-4">
+                  <div className="relative w-32 h-32 rounded-full overflow-hidden">
+                    <img src={previewUrl || '/default-avatar.png'} alt="Profile" className="w-full h-full object-cover" />
+                    <label htmlFor="profilePhoto" className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-center py-1 cursor-pointer">
+                      Change
+                    </label>
+                    <input
+                      id="profilePhoto"
+                      name="profilePhoto"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleChange}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
                 <div>
                   <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
                   <input

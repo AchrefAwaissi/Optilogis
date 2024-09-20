@@ -5,7 +5,14 @@ import {
   faChevronDown,
   faBuilding,
   faTimes,
-  faFilter
+  faFilter,
+  faBed,
+  faDoorOpen,
+  faRulerCombined,
+  faCouch,
+  faWheelchair,
+  faLayerGroup,
+  faWarehouse
 } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { FilterCriteria, Location } from '../types';
@@ -75,17 +82,25 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
   };
 
   const handleTypeOfPlaceChange = (type: FilterCriteria['typeOfHousing']) => {
-    if (type === '') {
-      onFilterChange({ typeOfHousing: '' });
-    } else {
-      onFilterChange({ 
-        typeOfHousing: filterCriteria.typeOfHousing === type ? '' : type 
-      });
-    }
+    onFilterChange({ 
+      typeOfHousing: filterCriteria.typeOfHousing === type ? '' : type 
+    });
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFilterChange({ maxPrice: parseInt(e.target.value) });
+  };
+
+  const handleRangeChange = (field: keyof FilterCriteria, value: number, isMin: boolean) => {
+    onFilterChange({ [isMin ? `min${field.charAt(0).toUpperCase() + field.slice(1)}` : `max${field.charAt(0).toUpperCase() + field.slice(1)}`]: value });
+  };
+
+  const handleCheckboxChange = (field: keyof FilterCriteria) => {
+    onFilterChange({ [field]: !filterCriteria[field] });
+  };
+
+  const handleAccessibilityChange = () => {
+    onFilterChange({ accessibility: filterCriteria.accessibility ? '' : 'true' });
   };
 
   const toggleFilter = () => {
@@ -167,7 +182,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
                     type="checkbox"
                     checked={type.value === '' ? filterCriteria.typeOfHousing === '' : filterCriteria.typeOfHousing === type.value}
                     onChange={() => handleTypeOfPlaceChange(type.value as FilterCriteria['typeOfHousing'])}
-                    className="form-checkbox h-5 w-5 text-[#006845] rounded focus:ring-[#006845]"
+                    className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]" style={{ accentColor: '#095550' }}
                   />
                   <span className="ml-3">{type.label}</span>
                 </label>
@@ -181,10 +196,13 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
           <input
             type="range"
             min="100"
-            max="1000000"
+            max="200000"
             value={filterCriteria.maxPrice}
             onChange={handlePriceChange}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            style={{
+              accentColor: '#095550',
+            }}
           />
           <div className="flex justify-between mt-2 text-sm text-gray-600">
             <span>100€</span>
@@ -193,39 +211,129 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
         </div>
 
         <div className="p-4">
-          <h3 className="text-sm font-semibold text-gray-500 mb-2">Superficie</h3>
+          <h3 className="text-sm font-semibold text-gray-500 mb-2">Surface habitable (m²)</h3>
           <div className="flex space-x-2">
-            <div className="flex-1">
-              <input
-                type="number"
-                value={filterCriteria.minSize || ''}
-                onChange={(e) => {
-                  const value = Math.max(0, parseInt(e.target.value) || 0);
-                  onFilterChange({ minSize: value });
-                  if (filterCriteria.maxSize && value > filterCriteria.maxSize) {
-                    onFilterChange({ maxSize: value });
-                  }
-                }}
-                min="0"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
-                placeholder="Min"
-              />
-            </div>
-            <div className="flex-1">
-              <input
-                type="number"
-                value={filterCriteria.maxSize || ''}
-                onChange={(e) => {
-                  const value = Math.max(filterCriteria.minSize || 0, parseInt(e.target.value) || 0);
-                  onFilterChange({ maxSize: value });
-                }}
-                min={filterCriteria.minSize || 0}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
-                placeholder="Max"
-              />
-            </div>
+            <input
+              type="number"
+              value={filterCriteria.minSize}
+              onChange={(e) => handleRangeChange('Size', parseInt(e.target.value) || 0, true)}
+              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+              placeholder="Min"
+            />
+            <input
+              type="number"
+              value={filterCriteria.maxSize}
+              onChange={(e) => handleRangeChange('Size', parseInt(e.target.value) || 0, false)}
+              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+              placeholder="Max"
+            />
           </div>
-          <p className="mt-1 text-xs text-gray-500">Mètres carrés</p>
+        </div>
+
+        <div className="p-4">
+          <h3 className="text-sm font-semibold text-gray-500 mb-2">Nombre de pièces</h3>
+          <div className="flex space-x-2">
+            <input
+              type="number"
+              value={filterCriteria.minRooms}
+              onChange={(e) => handleRangeChange('Rooms', parseInt(e.target.value) || 0, true)}
+              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+              placeholder="Min"
+            />
+            <input
+              type="number"
+              value={filterCriteria.maxRooms}
+              onChange={(e) => handleRangeChange('Rooms', parseInt(e.target.value) || 0, false)}
+              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+              placeholder="Max"
+            />
+          </div>
+        </div>
+
+        <div className="p-4">
+          <h3 className="text-sm font-semibold text-gray-500 mb-2">Nombre de chambres</h3>
+          <div className="flex space-x-2">
+            <input
+              type="number"
+              value={filterCriteria.minBedrooms}
+              onChange={(e) => handleRangeChange('Bedrooms', parseInt(e.target.value) || 0, true)}
+              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+              placeholder="Min"
+            />
+            <input
+              type="number"
+              value={filterCriteria.maxBedrooms}
+              onChange={(e) => handleRangeChange('Bedrooms', parseInt(e.target.value) || 0, false)}
+              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+              placeholder="Max"
+            />
+          </div>
+        </div>
+
+        <div className="p-4">
+          <h3 className="text-sm font-semibold text-gray-500 mb-2">Étage</h3>
+          <div className="flex space-x-2">
+            <input
+              type="number"
+              value={filterCriteria.minFloor}
+              onChange={(e) => handleRangeChange('Floor', parseInt(e.target.value) || 0, true)}
+              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+              placeholder="Min"
+            />
+            <input
+              type="number"
+              value={filterCriteria.maxFloor}
+              onChange={(e) => handleRangeChange('Floor', parseInt(e.target.value) || 0, false)}
+              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+              placeholder="Max"
+            />
+          </div>
+        </div>
+
+        <div className="p-4">
+          <h3 className="text-sm font-semibold text-gray-500 mb-2">Surface annexe (m²)</h3>
+          <div className="flex space-x-2">
+            <input
+              type="number"
+              value={filterCriteria.minAnnexArea}
+              onChange={(e) => handleRangeChange('AnnexArea', parseInt(e.target.value) || 0, true)}
+              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+              placeholder="Min"
+            />
+            <input
+              type="number"
+              value={filterCriteria.maxAnnexArea}
+              onChange={(e) => handleRangeChange('AnnexArea', parseInt(e.target.value) || 0, false)}
+              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+              placeholder="Max"
+            />
+          </div>
+        </div>
+
+        <div className="p-4">
+          <h3 className="text-sm font-semibold text-gray-500 mb-2">Options</h3>
+          <label className="flex items-center py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={filterCriteria.furnished}
+              onChange={() => handleCheckboxChange('furnished')}
+              className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]"
+              style={{ accentColor: '#095550' }}
+            />
+            <span className="ml-3">Meublé</span>
+            <FontAwesomeIcon icon={faCouch} className="ml-2 text-gray-400" />
+          </label>
+          <label className="flex items-center py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={filterCriteria.accessibility !== ''}
+            onChange={handleAccessibilityChange}
+            className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]"
+            style={{ accentColor: '#095550' }}
+          />
+            <span className="ml-3">Accessible PMR</span>
+            <FontAwesomeIcon icon={faWheelchair} className="ml-2 text-gray-400" />
+          </label>
         </div>
       </div>
     </>

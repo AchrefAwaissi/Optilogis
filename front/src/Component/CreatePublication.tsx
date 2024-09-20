@@ -252,7 +252,7 @@ const CreatePublication = () => {
   return (
     <div style={styles.pageContainer}>
       <div style={styles.formContainer}>
-        <h1 style={styles.title}>Créer une publication</h1>
+        <h1 style={styles.title}>Publier une annonce</h1>
         <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faHome} style={styles.icon} />
@@ -290,19 +290,7 @@ const CreatePublication = () => {
             style={styles.input}
             required
           />
-        </div>
-        
-        <div style={styles.inputContainer}>
-          <FontAwesomeIcon icon={faHome} style={styles.icon} />
-          <input
-            type="text"
-            name="title"
-            placeholder="Titre de l'annonce"
-            value={formData.title}
-            onChange={handleChange}
-            style={styles.input}
-          />
-        </div>
+        </div>      
         
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faMapMarkerAlt} style={styles.icon} />

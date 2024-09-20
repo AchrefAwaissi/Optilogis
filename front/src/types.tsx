@@ -14,7 +14,12 @@ export interface House {
   area?: number;
   latitude?: number;
   longitude?: number;
+  floor?: number;
+  annexArea?: number;
+  furnished?: boolean;
+  accessibility?: string;
 }
+
 export interface FilterCriteria {
   location: string;
   minPrice: number;
@@ -22,6 +27,18 @@ export interface FilterCriteria {
   minSize: number;
   maxSize: number;
   typeOfHousing: '' | 'studio' | 'appartement' | 'maison';
+  minRooms?: number;
+  maxRooms?: number;
+  minBedrooms?: number;
+  maxBedrooms?: number;
+  minArea?: number;
+  maxArea?: number;
+  furnished?: boolean;
+  accessibility?: string;
+  minFloor?: number;
+  maxFloor?: number;
+  minAnnexArea?: number;
+  maxAnnexArea?: number;
 }
 
 export interface Location {

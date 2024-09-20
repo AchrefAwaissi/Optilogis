@@ -346,7 +346,7 @@ const PropertyDetails: React.FC = () => {
           <SmallInfoCard icon={faRulerCombined} value={`${house.area} m²`} label="Surface" />
         </div>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <div className="text-[25px] font-bold text-[#095550] mb-2 md:mb-0">${house.price.toLocaleString()}/ mois</div>
+          <div className="text-[25px] font-bold text-[#095550] mb-2 md:mb-0">€{house.price.toLocaleString()}/ mois</div>
           <div className="flex flex-row space-x-2">
             <button className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap">Louer</button>
           </div>

@@ -5,13 +5,14 @@ interface User {
   id: string;
   username: string;
   email: string;
+  profilePhotoPath: string;
 }
 
 interface AuthContextType {
   user: User | null;
   signin: (username: string, password: string) => Promise<void>;
   signout: () => void;
-  updateUser: (userData: Partial<User>) => Promise<void>;
+  updateUser: (userData: Partial<User> | FormData) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,7 +21,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est déjà connecté au chargement de l'application
     const token = localStorage.getItem('token');
     if (token) {
       fetchUser(token);
@@ -28,44 +28,70 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const fetchUser = async (token: string) => {
-  try {
-    const response = await axios.get('http://localhost:5000/auth/me', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setUser({
-      id: response.data._id,
-      username: response.data.username,
-      email: response.data.email
-    });
-  } catch (error) {
-    console.error('Failed to fetch user', error);
-    localStorage.removeItem('token');
-  }
-};
+    try {
+      const response = await axios.get('http://localhost:5000/auth/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUser({
+        id: response.data._id,
+        username: response.data.username,
+        email: response.data.email,
+        profilePhotoPath: response.data.profilePhotoPath
+      });
+    } catch (error) {
+      console.error('Failed to fetch user', error);
+      localStorage.removeItem('token');
+    }
+  };
 
   const signin = async (username: string, password: string) => {
-  try {
-    const response = await axios.post('http://localhost:5000/auth/signin', { username, password });
-    localStorage.setItem('token', response.data.access_token);
-    // Après la connexion réussie, récupérez immédiatement les informations de l'utilisateur
-    await fetchUser(response.data.access_token);
-  } catch (error) {
-    throw error;
-  }
-};
+    try {
+      const response = await axios.post('http://localhost:5000/auth/signin', { username, password });
+      localStorage.setItem('token', response.data.access_token);
+      await fetchUser(response.data.access_token);
+    } catch (error) {
+      throw error;
+    }
+  };
 
   const signout = () => {
     localStorage.removeItem('token');
     setUser(null);
   };
 
-  const updateUser = async (userData: Partial<User>) => {
+  const updateUser = async (userData: Partial<User> | FormData) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put('http://localhost:5000/auth/update', userData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUser(response.data);
+      let response;
+      if (userData instanceof FormData) {
+        response = await axios.put('http://localhost:5000/auth/update', userData, {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        console.log('Server response:', response.data);
+      } else {
+        response = await axios.put('http://localhost:5000/auth/update', userData, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      }
+
+      const updatedUser = {
+        id: response.data._id,
+        username: response.data.username,
+        email: response.data.email,
+        profilePhotoPath: response.data.profilePhotoPath
+      };
+  
+      // Ajouter un timestamp à l'URL de la photo pour forcer le rechargement
+      if (updatedUser.profilePhotoPath) {
+        updatedUser.profilePhotoPath = `${updatedUser.profilePhotoPath}?t=${new Date().getTime()}`;
+      }
+
+      setUser(updatedUser);
+      
     } catch (error) {
       console.error('Failed to update user', error);
       throw error;

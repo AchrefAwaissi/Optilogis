@@ -62,7 +62,7 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <p className="text-sm font-medium text-teal-700">${house.price.toLocaleString()}/ mois</p>
+          <p className="text-sm font-medium text-teal-700">€{house.price.toLocaleString()}/ mois</p>
           <button className="px-3 py-2 bg-[#095550] text-white text-sm font-normal rounded-lg hover:bg-[#074440] transition-colors duration-200">
             Voir les détails
           </button>
@@ -76,13 +76,13 @@ const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect, ci
   console.log("HouseListings received houses:", houses.length);
 
   return (
-    <div className="flex flex-col items-center space-y-4 p-4">
+    <div className="flex flex-col items-center space-y-4 p-4 pb-20">
       <h2 className="text-2xl font-bold mb-4 self-start w-full">
         {houses.length} Résultats {city || "toutes les villes"}
       </h2>
       {houses.map((house) => (
         <PropertyCard
-          key={house._id}
+          key={house._id} 
           house={house}
           onClick={() => onHouseSelect(house)}
         />

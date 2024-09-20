@@ -129,6 +129,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
         overflow-y-auto transition-transform duration-300 ease-in-out
         md:relative md:inset-auto md:block md:bg-transparent
         ${onToggle ? '' : isFilterOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        pb-20
       `}>
         {!onToggle && (
           <div className="p-4 md:sticky md:top-0 bg-white">

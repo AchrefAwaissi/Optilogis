@@ -1,7 +1,7 @@
 import React from "react";
 import { House } from "../types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBed, faBath, faRulerCombined } from '@fortawesome/free-solid-svg-icons';
+import { faBed, faBath, faRulerCombined, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 interface HouseListingsProps {
   houses: House[];
@@ -21,16 +21,30 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
     ? `http://localhost:5000/uploads/${house.images[0]}`
     : 'https://via.placeholder.com/165x155';
 
+  const handleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Implement favorite functionality here
+    console.log('Favorite clicked for:', house.title);
+  };
+
   return (
     <div
       className="w-full max-w-2xl bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer transition-shadow duration-300 ease-in-out hover:shadow-lg flex flex-col sm:flex-row"
       onClick={onClick}
       style={{ maxHeight: '300px' }}
     >
-      <div
-        className="w-full h-48 sm:w-40 sm:h-40 m-2 rounded-xl bg-center bg-cover bg-no-repeat"
-        style={{ backgroundImage: `url(${imageUrl})` }}
-      />
+      <div className="relative w-full h-48 sm:w-40 sm:h-40 m-2">
+        <div
+          className="w-full h-full rounded-xl bg-center bg-cover bg-no-repeat"
+          style={{ backgroundImage: `url(${imageUrl})` }}
+        />
+        <button
+          onClick={handleFavorite}
+          className="absolute top-2 right-2 text-white hover:text-red-500 transition-colors duration-200"
+        >
+          <FontAwesomeIcon icon={faHeart} className="text-2xl" />
+        </button>
+      </div>
       <div className="flex-1 p-4 flex flex-col justify-between">
         <div>
           <h3 className="text-lg font-medium text-gray-800 mb-1">{house.title}</h3>

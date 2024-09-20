@@ -62,7 +62,7 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <p className="text-sm font-medium text-teal-700">${house.price.toLocaleString()}/ mois</p>
+          <p className="text-sm font-medium text-teal-700">€{house.price.toLocaleString()}/ mois</p>
           <button className="px-3 py-2 bg-[#095550] text-white text-sm font-normal rounded-lg hover:bg-[#074440] transition-colors duration-200">
             Voir les détails
           </button>

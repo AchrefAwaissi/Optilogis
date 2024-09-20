@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDoorOpen, faBed, faHouse, faCouch,
   faRulerCombined, faCompass, faWheelchair, faBuilding,
   faWarehouse, faCar, faBox, faWineBottle, faTree, faDollarSign,
-  faShare, faBookmark
+  faShare, faBookmark, faTimes, faExpand
 } from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useLocation } from 'react-router-dom';
-import StyledGoogleMap from './StyledGoogleMap';
+import { Loader } from '@googlemaps/js-api-loader';
+import * as THREE from 'three';
 
 interface House {
   _id: string;
@@ -36,6 +37,8 @@ interface House {
   cellar: boolean;
   exterior: boolean;
   images: string[];
+  latitude: number;
+  longitude: number;
 }
 
 interface InfoCardProps {
@@ -91,12 +94,163 @@ const PropertyDetails: React.FC = () => {
   const house: House = location.state?.house;
   const [show3DView, setShow3DView] = useState(false);
   const [activeTab, setActiveTab] = useState('3D');
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [webGLOverlayView, setWebGLOverlayView] = useState<google.maps.WebGLOverlayView | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
+  const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [neighborhoodBoundary, setNeighborhoodBoundary] = useState<google.maps.Polygon | null>(null);
 
   const [selectedImage, setSelectedImage] = useState<string>(
     house.images.length > 0
       ? `http://localhost:5000/uploads/${house.images[0]}`
       : 'https://via.placeholder.com/800x400'
   );
+
+  const addNeighborhoodBoundary = (map: google.maps.Map) => {
+    const neighborhoodCoords = [
+      { lat: house.latitude + 0.001, lng: house.longitude - 0.001 },
+      { lat: house.latitude + 0.001, lng: house.longitude + 0.001 },
+      { lat: house.latitude - 0.001, lng: house.longitude + 0.001 },
+      { lat: house.latitude - 0.001, lng: house.longitude - 0.001 },
+    ];
+
+    const boundary = new google.maps.Polygon({
+      paths: neighborhoodCoords,
+      strokeColor: "#FF0000",
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: "#FF0000",
+      fillOpacity: 0.35,
+    });
+
+    setNeighborhoodBoundary(boundary);
+  };
+
+  useEffect(() => {
+    const loader = new Loader({
+      apiKey: "YOUR_GOOGLE_MAPS_API_KEY", // Remplacez par votre véritable clé API
+      version: "beta",
+      libraries: ["maps"]
+    });
+
+    loader.load().then(() => {
+      if (mapRef.current && !map) {
+        const mapOptions: google.maps.MapOptions = {
+          center: { lat: house.latitude, lng: house.longitude },
+          zoom: 18,
+          tilt: 45,
+          heading: 0,
+          mapId: 'YOUR_MAP_ID', // Remplacez par votre véritable Map ID
+          mapTypeId: 'hybrid',
+          disableDefaultUI: false,
+          zoomControl: true,
+          mapTypeControl: false,
+          streetViewControl: false,
+        };
+
+        const newMap = new google.maps.Map(mapRef.current, mapOptions);
+        setMap(newMap);
+
+        addNeighborhoodBoundary(newMap);
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+        sceneRef.current = scene;
+        cameraRef.current = camera;
+        rendererRef.current = renderer;
+
+        const markerGeometry = new THREE.ConeGeometry(5, 20, 32);
+        const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const markerMesh = new THREE.Mesh(markerGeometry, markerMaterial);
+        scene.add(markerMesh);
+
+        const overlay = new google.maps.WebGLOverlayView();
+
+        overlay.onAdd = () => {
+          // Pas besoin d'initialisation supplémentaire ici
+        };
+
+        overlay.onContextRestored = ({ gl }) => {
+          renderer.setSize(gl.drawingBufferWidth, gl.drawingBufferHeight);
+          renderer.setPixelRatio(window.devicePixelRatio);
+        };
+
+        overlay.onDraw = ({ gl, transformer }) => {
+          const latLngAltitudeLiteral = {
+            lat: house.latitude,
+            lng: house.longitude,
+            altitude: 100,
+          };
+
+          const matrix = transformer.fromLatLngAltitude(latLngAltitudeLiteral);
+          camera.projectionMatrix = new THREE.Matrix4().fromArray(matrix);
+
+          renderer.resetState();
+          renderer.render(scene, camera);
+          gl.flush();
+
+          overlay.requestRedraw();
+        };
+
+        overlay.setMap(newMap);
+        setWebGLOverlayView(overlay);
+
+        setIsMapLoaded(true);
+      }
+    }).catch((e) => {
+      console.error('Error loading Google Maps library: ', e);
+    });
+  }, [house.latitude, house.longitude]);
+
+  useEffect(() => {
+    if (map && isMapLoaded) {
+      if (activeTab === 'quartier') {
+        map.setTilt(0);
+        map.setMapTypeId('roadmap');
+        if (neighborhoodBoundary) {
+          neighborhoodBoundary.setMap(map);
+        }
+      } else if (activeTab === '3D') {
+        map.setTilt(show3DView ? 45 : 0);
+        map.setMapTypeId(show3DView ? 'hybrid' : 'roadmap');
+        if (neighborhoodBoundary) {
+          neighborhoodBoundary.setMap(null);
+        }
+      }
+    }
+  }, [activeTab, show3DView, map, isMapLoaded, neighborhoodBoundary]);
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    if (tab === '3D') {
+      setShow3DView(!show3DView);
+    }
+  };
+
+  const handleMapInteraction = () => {
+    if (map && sceneRef.current && cameraRef.current) {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      const tilt = map.getTilt();
+      const heading = map.getHeading();
+
+      // Update 3D scene based on map state
+      // This is where you would update your 3D objects' positions, rotations, etc.
+    }
+  };
+
+  useEffect(() => {
+    if (map && isMapLoaded) {
+      ['center_changed', 'zoom_changed', 'tilt_changed', 'heading_changed'].forEach(eventName => {
+        map.addListener(eventName, handleMapInteraction);
+      });
+    }
+  }, [map, isMapLoaded]);
 
   if (!house) {
     return <div className="p-4">No property details available.</div>;
@@ -113,6 +267,12 @@ const PropertyDetails: React.FC = () => {
             alt={house.title}
             className="w-full h-48 md:h-80 object-cover rounded-lg"
           />
+          <button
+            className="absolute top-2 right-2 bg-white rounded-full p-2"
+            onClick={() => {/* Open fullscreen gallery */ }}
+          >
+            <FontAwesomeIcon icon={faExpand} />
+          </button>
         </div>
         {house.images.length > 1 && (
           <div className="flex mt-4 space-x-2 md:space-x-4 overflow-x-auto pb-2">
@@ -131,28 +291,41 @@ const PropertyDetails: React.FC = () => {
           <div className="flex space-x-2 mb-4">
             <button
               className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === '3D' ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-700'}`}
-              onClick={() => {
-                setActiveTab('3D');
-                setShow3DView(!show3DView);
-              }}
+              onClick={() => handleTabChange('3D')}
             >
               {show3DView ? "Vue 2D" : "Vue 3D"}
             </button>
             <button
               className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === 'quartier' ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-700'}`}
-              onClick={() => setActiveTab('quartier')}
+              onClick={() => handleTabChange('quartier')}
             >
               Voir quartier
             </button>
             <button
               className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === 'infos' ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-700'}`}
-              onClick={() => setActiveTab('infos')}
+              onClick={() => handleTabChange('infos')}
             >
               Informations
             </button>
           </div>
-          <div className="h-64 md:h-80">
-            <StyledGoogleMap lat={44.8378} lng={-0.5792} show3D={show3DView} />
+          <div className="h-64 md:h-80 relative">
+            {activeTab === 'quartier' || activeTab === '3D' ? (
+              <>
+                <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+                {activeTab === 'quartier' && (
+                  <div className="absolute top-4 right-4 z-10 bg-white p-2 rounded shadow">
+                    <h3 className="text-sm font-semibold mb-2">Temps de trajet entre ce bien et d'autres adresses (travail, école...)</h3>
+                    <button className="bg-red-500 text-white px-4 py-2 rounded text-sm">
+                      Calculer un temps de trajet
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                <p>Additional Information Placeholder</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

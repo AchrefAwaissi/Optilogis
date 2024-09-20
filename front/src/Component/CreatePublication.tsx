@@ -3,10 +3,10 @@ import axios from 'axios';
 import { useItems } from '../contexts/ItemContext';
 import { useAuth } from '../contexts/AuthContext';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { 
-  faHome, faMapMarkerAlt, faCity, faGlobe, faBed, 
-  faRulerCombined, faCompass, faWheelchair, faBuilding, 
-  faWarehouse, faCar, faBox, faWineBottle, faTree, faDollarSign, faImage 
+import {
+  faHome, faMapMarkerAlt, faCity, faGlobe, faBed,
+  faRulerCombined, faCompass, faWheelchair, faBuilding,
+  faWarehouse, faCar, faBox, faWineBottle, faTree, faDollarSign, faImage
 } from "@fortawesome/free-solid-svg-icons";
 
 interface Suggestion {
@@ -297,9 +297,9 @@ const CreatePublication: React.FC = () => {
               required
             />
           </div>
-          
+
           <div style={styles.inputContainer}>
-            <FontAwesomeIcon icon={faHome} style={{...styles.icon, top: '25px'}} />
+            <FontAwesomeIcon icon={faHome} style={{ ...styles.icon, top: '25px' }} />
             <textarea
               name="description"
               placeholder="Description de la propriété"
@@ -308,7 +308,7 @@ const CreatePublication: React.FC = () => {
               style={styles.textarea}
             />
           </div>
-          
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faDollarSign} style={styles.icon} />
             <input
@@ -320,8 +320,8 @@ const CreatePublication: React.FC = () => {
               style={styles.input}
               required
             />
-          </div>      
-          
+          </div>
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faMapMarkerAlt} style={styles.icon} />
             <input
@@ -348,8 +348,8 @@ const CreatePublication: React.FC = () => {
                 padding: 0,
               }}>
                 {suggestions.map((suggestion, index) => (
-                  <li 
-                    key={index} 
+                  <li
+                    key={index}
                     style={{
                       padding: '10px',
                       cursor: 'pointer',
@@ -362,7 +362,7 @@ const CreatePublication: React.FC = () => {
               </ul>
             )}
           </div>
-          
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faCity} style={styles.icon} />
             <input
@@ -375,7 +375,7 @@ const CreatePublication: React.FC = () => {
               required
             />
           </div>
-          
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faGlobe} style={styles.icon} />
             <input
@@ -388,7 +388,7 @@ const CreatePublication: React.FC = () => {
               required
             />
           </div>
-          
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faHome} style={styles.icon} />
             <select
@@ -403,7 +403,7 @@ const CreatePublication: React.FC = () => {
               <option value="studio">Studio</option>
             </select>
           </div>
-          
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faHome} style={styles.icon} />
             <input
@@ -415,7 +415,7 @@ const CreatePublication: React.FC = () => {
               style={styles.input}
             />
           </div>
-          
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faBed} style={styles.icon} />
             <input
@@ -427,7 +427,7 @@ const CreatePublication: React.FC = () => {
               style={styles.input}
             />
           </div>
-          
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faRulerCombined} style={styles.icon} />
             <input
@@ -439,7 +439,7 @@ const CreatePublication: React.FC = () => {
               style={styles.input}
             />
           </div>
-          
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faCompass} style={styles.icon} />
             <select
@@ -455,30 +455,30 @@ const CreatePublication: React.FC = () => {
               <option value="ouest">Ouest</option>
             </select>
           </div>
-          
-          <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: '15px'}}>
-            <label style={{display: 'flex', alignItems: 'center', fontSize: '14px', color: '#5c5c5c', marginBottom: '10px', width: '48%'}}>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: '15px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: '#5c5c5c', marginBottom: '10px', width: '48%' }}>
               <input
                 type="checkbox"
                 name="furnished"
                 checked={formData.furnished}
                 onChange={handleChange}
-                style={{marginRight: '10px', width: '18px', height: '18px'}}
+                style={{ marginRight: '10px', width: '18px', height: '18px' }}
               />
               Meublé
             </label>
-            <label style={{display: 'flex', alignItems: 'center', fontSize: '14px', color: '#5c5c5c', marginBottom: '10px', width: '48%'}}>
+            <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: '#5c5c5c', marginBottom: '10px', width: '48%' }}>
               <input
                 type="checkbox"
                 name="notFurnished"
                 checked={formData.notFurnished}
                 onChange={handleChange}
-                style={{marginRight: '10px', width: '18px', height: '18px'}}
+                style={{ marginRight: '10px', width: '18px', height: '18px' }}
               />
               Non meublé
             </label>
           </div>
-          
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faWheelchair} style={styles.icon} />
             <input
@@ -490,7 +490,7 @@ const CreatePublication: React.FC = () => {
               style={styles.input}
             />
           </div>
-          
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faBuilding} style={styles.icon} />
             <input
@@ -502,7 +502,7 @@ const CreatePublication: React.FC = () => {
               style={styles.input}
             />
           </div>
-          
+
           <div style={styles.inputContainer}>
             <FontAwesomeIcon icon={faWarehouse} style={styles.icon} />
             <input
@@ -514,10 +514,10 @@ const CreatePublication: React.FC = () => {
               style={styles.input}
             />
           </div>
-          
-          <div style={{marginBottom: '15px'}}>
-            <p style={{fontSize: '16px', color: '#5c5c5c', marginBottom: '10px'}}>Options annexes</p>
-            <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between'}}>
+
+          <div style={{ marginBottom: '15px' }}>
+            <p style={{ fontSize: '16px', color: '#5c5c5c', marginBottom: '10px' }}>Options annexes</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
               {[
                 { name: 'parking', icon: faCar, label: 'Parking' },
                 { name: 'garage', icon: faCar, label: 'Garage' },
@@ -525,44 +525,44 @@ const CreatePublication: React.FC = () => {
                 { name: 'storageUnit', icon: faBox, label: 'Box' },
                 { name: 'cellar', icon: faWineBottle, label: 'Cave' }
               ].map((option) => (
-                <label key={option.name} style={{display: 'flex', alignItems: 'center', marginBottom: '10px', fontSize: '14px', color: '#5c5c5c', width: '48%'}}>
+                <label key={option.name} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', fontSize: '14px', color: '#5c5c5c', width: '48%' }}>
                   <input
                     type="checkbox"
                     name={option.name}
                     checked={formData[option.name as BooleanKeys<FormData>]}
                     onChange={handleChange}
-                    style={{marginRight: '10px', width: '18px', height: '18px'}}
+                    style={{ marginRight: '10px', width: '18px', height: '18px' }}
                   />
-                  <FontAwesomeIcon icon={option.icon} style={{marginRight: '10px', fontSize: '18px', color: '#095550'}} />
+                  <FontAwesomeIcon icon={option.icon} style={{ marginRight: '10px', fontSize: '18px', color: '#095550' }} />
                   {option.label}
                 </label>
               ))}
             </div>
           </div>
-          
-          <label style={{display: 'flex', alignItems: 'center', marginBottom: '15px', fontSize: '14px', color: '#5c5c5c'}}>
+
+          <label style={{ display: 'flex', alignItems: 'center', marginBottom: '15px', fontSize: '14px', color: '#5c5c5c' }}>
             <input
               type="checkbox"
               name="exterior"
               checked={formData.exterior}
               onChange={handleChange}
-              style={{marginRight: '10px', width: '18px', height: '18px'}}
+              style={{ marginRight: '10px', width: '18px', height: '18px' }}
             />
-            <FontAwesomeIcon icon={faTree} style={{marginRight: '10px', fontSize: '18px', color: '#095550'}} />
+            <FontAwesomeIcon icon={faTree} style={{ marginRight: '10px', fontSize: '18px', color: '#095550' }} />
             Extérieur
           </label>
-          
+
           <div style={styles.inputContainer}>
-            <FontAwesomeIcon icon={faImage} style={{...styles.icon, top: '25px'}} />
+            <FontAwesomeIcon icon={faImage} style={{ ...styles.icon, top: '25px' }} />
             <input
               type="file"
               name="images"
               onChange={handleImageChange}
-              style={{...styles.input, paddingTop: '12px', paddingBottom: '12px', height: 'auto'}}
+              style={{ ...styles.input, paddingTop: '12px', paddingBottom: '12px', height: 'auto' }}
               multiple
             />
           </div>
-          
+
           <button type="submit" style={styles.button}>
             Créer la publication
           </button>

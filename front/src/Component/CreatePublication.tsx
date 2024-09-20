@@ -73,7 +73,7 @@ const styles = {
     top: '50%',
     left: '15px',
     transform: 'translateY(-50%)',
-    color: '#6b4db3',
+    color: '#095550',
     fontSize: '18px',
   },
   select: {
@@ -97,7 +97,7 @@ const styles = {
     height: '50px',
     border: '0',
     borderRadius: '25px',
-    backgroundColor: '#6b4db3',
+    backgroundColor: '#095550',
     color: '#ffffff',
     fontSize: '18px',
     fontWeight: 600,
@@ -488,7 +488,7 @@ const CreatePublication = () => {
                   onChange={handleChange}
                   style={{marginRight: '10px', width: '18px', height: '18px'}}
                 />
-                <FontAwesomeIcon icon={option.icon} style={{marginRight: '10px', fontSize: '18px', color: '#6b4db3'}} />
+                <FontAwesomeIcon icon={option.icon} style={{marginRight: '10px', fontSize: '18px', color: '#095550'}} />
                 {option.label}
               </label>
             ))}
@@ -503,7 +503,7 @@ const CreatePublication = () => {
             onChange={handleChange}
             style={{marginRight: '10px', width: '18px', height: '18px'}}
           />
-          <FontAwesomeIcon icon={faTree} style={{marginRight: '10px', fontSize: '18px', color: '#6b4db3'}} />
+          <FontAwesomeIcon icon={faTree} style={{marginRight: '10px', fontSize: '18px', color: '#095550'}} />
           Extérieur
         </label>
         

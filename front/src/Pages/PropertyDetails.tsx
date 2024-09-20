@@ -101,7 +101,7 @@ const PropertyDetails: React.FC = () => {
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [neighborhoodBoundary, setNeighborhoodBoundary] = useState<google.maps.Polygon | null>(null);
+  const [neighborhoodBoundary, setNeighborhoodBoundary] = useState<google.maps.Circle | null>(null);
 
   const [selectedImage, setSelectedImage] = useState<string>(
     house.images.length > 0
@@ -110,23 +110,21 @@ const PropertyDetails: React.FC = () => {
   );
 
   const addNeighborhoodBoundary = (map: google.maps.Map) => {
-    const neighborhoodCoords = [
-      { lat: house.latitude + 0.001, lng: house.longitude - 0.001 },
-      { lat: house.latitude + 0.001, lng: house.longitude + 0.001 },
-      { lat: house.latitude - 0.001, lng: house.longitude + 0.001 },
-      { lat: house.latitude - 0.001, lng: house.longitude - 0.001 },
-    ];
-
-    const boundary = new google.maps.Polygon({
-      paths: neighborhoodCoords,
-      strokeColor: "#FF0000",
+    const center = new google.maps.LatLng(house.latitude, house.longitude);
+    const radius = 200; // Rayon en mètres, à ajuster selon vos besoins
+  
+    const circle = new google.maps.Circle({
+      strokeColor: "#0f766e",
       strokeOpacity: 0.8,
       strokeWeight: 2,
-      fillColor: "#FF0000",
+      fillColor: "#0f766e",
       fillOpacity: 0.35,
+      map: map,
+      center: center,
+      radius: radius
     });
-
-    setNeighborhoodBoundary(boundary);
+  
+    setNeighborhoodBoundary(circle);
   };
 
   useEffect(() => {

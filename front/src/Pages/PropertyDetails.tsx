@@ -136,11 +136,7 @@ const PropertyDetails: React.FC = () => {
                 setShow3DView(!show3DView);
               }}
             >
-<<<<<<< HEAD
-              {show3DView ? "Vue 2D" : "Visite 3D"}
-=======
               {show3DView ? "Vue 2D" : "Vue 3D"}
->>>>>>> origin/jk
             </button>
             <button
               className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === 'quartier' ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-700'}`}
@@ -179,11 +175,7 @@ const PropertyDetails: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div className="text-[25px] font-bold text-[#095550] mb-2 md:mb-0">${house.price.toLocaleString()}/ mois</div>
           <div className="flex flex-row space-x-2">
-<<<<<<< HEAD
-            <button className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap">Louer maintenant</button>
-=======
             <button className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap">Louer</button>
->>>>>>> origin/jk
           </div>
         </div>
         <h2 className="text-[23px] font-medium text-[#2c2c2c] mb-4">Description</h2>

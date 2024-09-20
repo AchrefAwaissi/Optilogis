@@ -3,8 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDoorOpen, faBed, faHouse, faCouch,
   faRulerCombined, faCompass, faWheelchair, faBuilding,
-  faWarehouse, faCar, faBox, faWineBottle, faTree, faDollarSign
+  faWarehouse, faCar, faBox, faWineBottle, faTree, faDollarSign,
+  faShare, faBookmark
 } from "@fortawesome/free-solid-svg-icons";
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useLocation } from 'react-router-dom';
 import StyledGoogleMap from './StyledGoogleMap';
 
@@ -37,15 +39,26 @@ interface House {
 }
 
 interface InfoCardProps {
-  icon: any;
+  icon: IconDefinition;
   value: string | number;
   label: string;
 }
 
-const InfoCard: React.FC<InfoCardProps> = ({ icon, value, label }) => (
+const SmallInfoCard: React.FC<InfoCardProps> = ({ icon, value, label }) => (
+  <div className="flex items-center space-x-2">
+    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+      <FontAwesomeIcon icon={icon} className="text-gray-600 text-xs" />
+    </div>
+    <div className="text-sm">
+      <span className="font-semibold">{value}</span> {label}
+    </div>
+  </div>
+);
+
+const LargeInfoCard: React.FC<InfoCardProps> = ({ icon, value, label }) => (
   <div className="flex items-center space-x-2">
     <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-      <FontAwesomeIcon icon={icon} className="text-gray-600" />
+      <FontAwesomeIcon icon={icon} className="text-gray-600 text-sm" />
     </div>
     <div>
       <div className="font-semibold">{value}</div>
@@ -53,6 +66,25 @@ const InfoCard: React.FC<InfoCardProps> = ({ icon, value, label }) => (
     </div>
   </div>
 );
+
+interface IconButtonProps {
+  icon: IconDefinition;
+  onClick?: () => void;
+}
+
+const IconButton: React.FC<IconButtonProps> = ({ icon, onClick }) => (
+  <button
+    className="w-[46px] h-[46px] bg-gray-100 rounded-full flex items-center justify-center"
+    onClick={onClick}
+  >
+    <FontAwesomeIcon icon={icon} className="text-gray-600" />
+  </button>
+);
+
+const truncateAddress = (address: string, maxLength: number = 50): string => {
+  if (address.length <= maxLength) return address;
+  return address.substr(0, maxLength) + '...';
+};
 
 const PropertyDetails: React.FC = () => {
   const location = useLocation();
@@ -68,6 +100,8 @@ const PropertyDetails: React.FC = () => {
   if (!house) {
     return <div className="p-4">No property details available.</div>;
   }
+
+  const truncatedAddress = truncateAddress(`${house.address}, ${house.city}, ${house.country}`);
 
   return (
     <div className="flex flex-col md:flex-row p-4 max-w-7xl mx-auto h-screen overflow-y-auto">
@@ -97,17 +131,23 @@ const PropertyDetails: React.FC = () => {
         </div>
       </div>
       <div className="w-full md:w-[40%] mt-4 md:mt-0">
-        <div className="flex justify-between items-center mb-2">
-          <h1 className="text-2xl md:text-3xl font-medium">{house.name}</h1>
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-medium text-[#2c2c2c] mb-2">{house.name}</h1>
+            <p className="text-sm text-[#3e3e3e]">{truncatedAddress}</p>
+          </div>
+          <div className="flex space-x-2">
+            <IconButton icon={faShare} onClick={() => console.log('Share clicked')} />
+            <IconButton icon={faBookmark} onClick={() => console.log('Save clicked')} />
+          </div>
         </div>
-        <p className="text-sm text-gray-600 mb-4">{`${house.address}, ${house.city}, ${house.country}`}</p>
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <InfoCard icon={faDoorOpen} value={house.rooms} label="Pièces" />
-          <InfoCard icon={faBed} value={house.bedrooms} label="Chambres" />
-          <InfoCard icon={faRulerCombined} value={`${house.area} m²`} label="Surface" />
+        <div className="flex space-x-4 mb-6">
+          <SmallInfoCard icon={faDoorOpen} value={house.rooms} label="Pièces" />
+          <SmallInfoCard icon={faBed} value={house.bedrooms} label="Chambres" />
+          <SmallInfoCard icon={faRulerCombined} value={`${house.area} m²`} label="Surface" />
         </div>
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-          <div className="text-2xl font-bold mb-2 md:mb-0">${house.price.toLocaleString()}/ mois</div>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+          <div className="text-[25px] font-bold text-[#095550] mb-2 md:mb-0">${house.price.toLocaleString()}/ mois</div>
           <div className="flex flex-row space-x-2">
             <button className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap">Louer maintenant</button>
             <button
@@ -118,27 +158,27 @@ const PropertyDetails: React.FC = () => {
             </button>
           </div>
         </div>
-        <h2 className="text-xl font-medium mt-6 mb-2">Description</h2>
-        <p className="text-sm text-gray-600">
+        <h2 className="text-[23px] font-medium text-[#2c2c2c] mb-4">Description</h2>
+        <p className="text-[15px] text-[#575757] leading-[23px] mb-8">
           {house.description || "Aucune description disponible."}
         </p>
-        <h2 className="text-xl font-medium mt-6 mb-2">Informations et caractéristiques</h2>
-        <div className="grid grid-cols-2 gap-4">
-          <InfoCard icon={faHouse} value={house.typeOfHousing} label="Type de logement" />
-          <InfoCard icon={faCompass} value={house.exposure} label="Exposition" />
-          <InfoCard icon={faBuilding} value={house.floor} label="Étage" />
-          <InfoCard icon={faRulerCombined} value={`${house.annexArea} m²`} label="Surface annexe" />
-          <InfoCard icon={faWheelchair} value={house.accessibility} label="Accessibilité" />
-          <InfoCard icon={faCouch} value={house.furnished ? "Meublé" : "Non meublé"} label="Ameublement" />
+        <h2 className="text-[23px] font-medium text-[#2c2c2c] mb-4">Informations et caractéristiques</h2>
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <LargeInfoCard icon={faHouse} value={house.typeOfHousing} label="Type de logement" />
+          <LargeInfoCard icon={faCompass} value={house.exposure} label="Exposition" />
+          <LargeInfoCard icon={faBuilding} value={house.floor} label="Étage" />
+          <LargeInfoCard icon={faRulerCombined} value={`${house.annexArea} m²`} label="Surface annexe" />
+          <LargeInfoCard icon={faWheelchair} value={house.accessibility} label="Accessibilité" />
+          <LargeInfoCard icon={faCouch} value={house.furnished ? "Meublé" : "Non meublé"} label="Ameublement" />
         </div>
-        <h2 className="text-xl font-medium mt-6 mb-2">Options annexes</h2>
+        <h2 className="text-[23px] font-medium text-[#2c2c2c] mb-4">Options annexes</h2>
         <div className="grid grid-cols-3 gap-4">
-          {house.parking && <InfoCard icon={faCar} value="Oui" label="Parking" />}
-          {house.garage && <InfoCard icon={faCar} value="Oui" label="Garage" />}
-          {house.basement && <InfoCard icon={faWarehouse} value="Oui" label="Sous-sol" />}
-          {house.storageUnit && <InfoCard icon={faBox} value="Oui" label="Box" />}
-          {house.cellar && <InfoCard icon={faWineBottle} value="Oui" label="Cave" />}
-          {house.exterior && <InfoCard icon={faTree} value="Oui" label="Extérieur" />}
+          {house.parking && <LargeInfoCard icon={faCar} value="Oui" label="Parking" />}
+          {house.garage && <LargeInfoCard icon={faCar} value="Oui" label="Garage" />}
+          {house.basement && <LargeInfoCard icon={faWarehouse} value="Oui" label="Sous-sol" />}
+          {house.storageUnit && <LargeInfoCard icon={faBox} value="Oui" label="Box" />}
+          {house.cellar && <LargeInfoCard icon={faWineBottle} value="Oui" label="Cave" />}
+          {house.exterior && <LargeInfoCard icon={faTree} value="Oui" label="Extérieur" />}
         </div>
       </div>
     </div>

@@ -45,13 +45,21 @@ const ManageItems: React.FC = () => {
 
   const loadUserItems = async () => {
     try {
-        const allItems = await getUserItems();
-        const filteredItems = allItems.filter(item => item.userId === user?.id);
-        setUserItems(filteredItems);
+      const allItems = await getUserItems();
+      const filteredItems = allItems
+        .filter((item: any) => item.userId === user?.id)
+        .map((item: any) => ({
+          ...item,
+          rooms: item.rooms || 0,
+          bedrooms: item.bedrooms || 0,
+          area: item.area || 0,
+        }));
+      setUserItems(filteredItems);
     } catch (error) {
-        setMessage({ type: 'error', text: 'Failed to load user items' });
+      setMessage({ type: 'error', text: 'Failed to load user items' });
     }
-};
+  };
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -65,9 +73,9 @@ const ManageItems: React.FC = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setItemData(prev => ({ ...prev, images: Array.from(e.target.files) }));
+      setItemData(prev => ({ ...prev, images: Array.from(e.target.files || []) }));
     }
-  };
+  };  
 
   const handleDeleteItem = async (itemId: string) => {
     if (window.confirm('Are you sure you want to delete this item?')) {

@@ -1,11 +1,9 @@
-// auth/auth.service.ts
 import { Injectable, UnauthorizedException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from './user.schema';
-import { UserInterface } from './user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -17,12 +15,13 @@ export class AuthService {
   ) {}
 
   async signUp(createUserDto: CreateUserDto): Promise<User> {
-    const { username, email, password } = createUserDto;
+    const { username, email, password, profilePhotoPath } = createUserDto;
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await this.userModel.create({
       username,
       email,
       password: hashedPassword,
+      profilePhotoPath,
     });
     return newUser;
   }
@@ -47,9 +46,6 @@ export class AuthService {
       userId: user._id.toString(),
     };
   }
-  
-
-  // Nouvelles méthodes CRUD
 
   async findAll(): Promise<User[]> {
     return this.userModel.find().select('-password').exec();

@@ -1,5 +1,3 @@
-// auth.controller.spec.ts
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -46,9 +44,26 @@ describe('AuthController', () => {
         email: 'test@example.com',
         password: 'password123',
       };
+      const mockFile = {
+        path: 'path/to/photo.jpg',
+      } as Express.Multer.File;
+      
+      mockAuthService.signUp.mockResolvedValue({...createUserDto, profilePhotoPath: 'path/to/photo.jpg'});
+
+      expect(await controller.signUp(createUserDto, mockFile)).toEqual({...createUserDto, profilePhotoPath: 'path/to/photo.jpg'});
+      expect(mockAuthService.signUp).toHaveBeenCalledWith({...createUserDto, profilePhotoPath: 'path/to/photo.jpg'});
+    });
+
+    it('should create a new user without profile photo', async () => {
+      const createUserDto: CreateUserDto = {
+        username: 'testuser',
+        email: 'test@example.com',
+        password: 'password123',
+      };
+      
       mockAuthService.signUp.mockResolvedValue(createUserDto);
 
-      expect(await controller.signUp(createUserDto)).toEqual(createUserDto);
+      expect(await controller.signUp(createUserDto, undefined)).toEqual(createUserDto);
       expect(mockAuthService.signUp).toHaveBeenCalledWith(createUserDto);
     });
   });
@@ -59,7 +74,7 @@ describe('AuthController', () => {
         username: 'testuser',
         password: 'password123',
       };
-      const result = { access_token: 'test_token' };
+      const result = { access_token: 'test_token', userId: '1' };
       mockAuthService.signIn.mockResolvedValue(result);
 
       expect(await controller.signIn(loginUserDto)).toEqual(result);
@@ -90,9 +105,23 @@ describe('AuthController', () => {
     it('should update a user', async () => {
       const updateUserDto: UpdateUserDto = { username: 'updateduser' };
       const result = { id: '1', username: 'updateduser' };
+      const mockFile = {
+        path: 'path/to/new_photo.jpg',
+      } as Express.Multer.File;
+
       mockAuthService.update.mockResolvedValue(result);
 
-      expect(await controller.update('1', updateUserDto)).toEqual(result);
+      expect(await controller.update('1', updateUserDto, mockFile)).toEqual(result);
+      expect(mockAuthService.update).toHaveBeenCalledWith('1', {...updateUserDto, profilePhotoPath: 'path/to/new_photo.jpg'});
+    });
+
+    it('should update a user without changing profile photo', async () => {
+      const updateUserDto: UpdateUserDto = { username: 'updateduser' };
+      const result = { id: '1', username: 'updateduser' };
+
+      mockAuthService.update.mockResolvedValue(result);
+
+      expect(await controller.update('1', updateUserDto, undefined)).toEqual(result);
       expect(mockAuthService.update).toHaveBeenCalledWith('1', updateUserDto);
     });
   });
@@ -104,6 +133,33 @@ describe('AuthController', () => {
 
       expect(await controller.remove('1')).toEqual(result);
       expect(mockAuthService.remove).toHaveBeenCalledWith('1');
+    });
+  });
+
+  describe('updateCurrentUser', () => {
+    it('should update the current user', async () => {
+      const updateUserDto: UpdateUserDto = { username: 'updateduser' };
+      const result = { id: '1', username: 'updateduser' };
+      const mockFile = {
+        path: 'path/to/new_photo.jpg',
+      } as Express.Multer.File;
+      const mockRequest = { user: { userId: '1' } };
+
+      mockAuthService.update.mockResolvedValue(result);
+
+      expect(await controller.updateCurrentUser(mockRequest, updateUserDto, mockFile)).toEqual(result);
+      expect(mockAuthService.update).toHaveBeenCalledWith('1', {...updateUserDto, profilePhotoPath: 'path/to/new_photo.jpg'});
+    });
+  });
+
+  describe('getCurrentUser', () => {
+    it('should get the current user', async () => {
+      const result = { id: '1', username: 'testuser' };
+      const mockRequest = { user: { userId: '1' } };
+      mockAuthService.findOne.mockResolvedValue(result);
+
+      expect(await controller.getCurrentUser(mockRequest)).toEqual(result);
+      expect(mockAuthService.findOne).toHaveBeenCalledWith('1');
     });
   });
 });

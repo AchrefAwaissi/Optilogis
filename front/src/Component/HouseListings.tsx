@@ -76,13 +76,13 @@ const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect, ci
   console.log("HouseListings received houses:", houses.length);
 
   return (
-    <div className="flex flex-col items-center space-y-4 p-4">
+    <div className="flex flex-col items-center space-y-4 p-4 pb-20">
       <h2 className="text-2xl font-bold mb-4 self-start w-full">
         {houses.length} Résultats {city || "toutes les villes"}
       </h2>
       {houses.map((house) => (
         <PropertyCard
-          key={house._id}
+          key={house._id} 
           house={house}
           onClick={() => onHouseSelect(house)}
         />

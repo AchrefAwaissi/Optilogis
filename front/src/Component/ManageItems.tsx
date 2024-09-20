@@ -21,22 +21,22 @@ interface ItemFormData extends Omit<Item, 'images' | '_id'> {
 }
 
 const ManageItems: React.FC = () => {
-    const { getUserItems, updateItem, deleteItem } = useItems();
-    const [userItems, setUserItems] = useState<Item[]>([]);
-    const { user } = useAuth();
-    const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-    const [itemData, setItemData] = useState<ItemFormData>({
-      name: '',
-      description: '',
-      price: 0,
-      address: '',
-      city: '',
-      country: '',
-      images: [],
-      rooms: 0,
-      bedrooms: 0,
-      area: 0,
-    });
+  const { getUserItems, updateItem, deleteItem } = useItems();
+  const [userItems, setUserItems] = useState<Item[]>([]);
+  const { user } = useAuth();
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [itemData, setItemData] = useState<ItemFormData>({
+    name: '',
+    description: '',
+    price: 0,
+    address: '',
+    city: '',
+    country: '',
+    images: [],
+    rooms: 0,
+    bedrooms: 0,
+    area: 0,
+  });
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ const ManageItems: React.FC = () => {
       setMessage({ type: 'error', text: 'Failed to load user items' });
     }
   };
-  
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -120,7 +120,7 @@ const ManageItems: React.FC = () => {
           formData.append(key, value?.toString() || '');
         }
       });
-      
+
       if (itemData.images) {
         itemData.images.forEach((image) => {
           if (image instanceof File) {
@@ -178,7 +178,7 @@ const ManageItems: React.FC = () => {
       : 'https://via.placeholder.com/100x100';
 
     return (
-        <div className="w-full bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transition-shadow duration-300 ease-in-out hover:shadow-lg flex flex-col sm:flex-row mb-4">
+      <div className="w-full bg-white rounded-lg shadow-md overflow-hidden cursor-pointer transition-shadow duration-300 ease-in-out hover:shadow-lg flex flex-col sm:flex-row mb-4">
         <div
           className="w-full h-24 sm:w-24 sm:h-24 bg-center bg-cover bg-no-repeat"
           style={{ backgroundImage: `url(${imageUrl})` }}
@@ -196,13 +196,13 @@ const ManageItems: React.FC = () => {
           <div className="flex justify-between items-center">
             <p className="text-sm font-medium text-teal-700">${item.price.toLocaleString()}/ mois</p>
             <div>
-              <button 
+              <button
                 onClick={() => selectItem(item)}
                 className="px-3 py-1 bg-blue-600 text-white text-xs font-normal rounded-lg hover:bg-blue-700 transition-colors duration-200 mr-2"
               >
                 Modifier
               </button>
-              <button 
+              <button
                 onClick={() => handleDeleteItem(item._id)}
                 className="px-3 py-1 bg-red-600 text-white text-xs font-normal rounded-lg hover:bg-red-700 transition-colors duration-200"
               >
@@ -351,8 +351,8 @@ const ManageItems: React.FC = () => {
                 className="mt-1 block w-full"
               />
             </div>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Update Item

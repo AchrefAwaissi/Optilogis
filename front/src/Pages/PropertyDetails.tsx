@@ -112,7 +112,7 @@ const PropertyDetails: React.FC = () => {
   const addNeighborhoodBoundary = (map: google.maps.Map) => {
     const center = new google.maps.LatLng(house.latitude, house.longitude);
     const radius = 100; // Rayon en mètres, à ajuster selon vos besoins
-  
+
     const circle = new google.maps.Circle({
       strokeColor: "#0f766e",
       strokeOpacity: 0.8,
@@ -123,7 +123,7 @@ const PropertyDetails: React.FC = () => {
       center: center,
       radius: radius
     });
-  
+
     setNeighborhoodBoundary(circle);
   };
 

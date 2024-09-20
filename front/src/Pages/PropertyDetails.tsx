@@ -90,6 +90,7 @@ const PropertyDetails: React.FC = () => {
   const location = useLocation();
   const house: House = location.state?.house;
   const [show3DView, setShow3DView] = useState(false);
+  const [activeTab, setActiveTab] = useState('3D');
 
   const [selectedImage, setSelectedImage] = useState<string>(
     house.images.length > 0
@@ -126,8 +127,33 @@ const PropertyDetails: React.FC = () => {
             ))}
           </div>
         )}
-        <div className="mt-4 h-64 md:h-80">
-          <StyledGoogleMap lat={44.8378} lng={-0.5792} show3D={show3DView} />
+        <div className="mt-4">
+          <div className="flex space-x-2 mb-4">
+            <button
+              className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === '3D' ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-700'}`}
+              onClick={() => {
+                setActiveTab('3D');
+                setShow3DView(!show3DView);
+              }}
+            >
+              {show3DView ? "Vue 2D" : "Visite 3D"}
+            </button>
+            <button
+              className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === 'quartier' ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-700'}`}
+              onClick={() => setActiveTab('quartier')}
+            >
+              Voir quartier
+            </button>
+            <button
+              className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === 'infos' ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-700'}`}
+              onClick={() => setActiveTab('infos')}
+            >
+              Informations
+            </button>
+          </div>
+          <div className="h-64 md:h-80">
+            <StyledGoogleMap lat={44.8378} lng={-0.5792} show3D={show3DView} />
+          </div>
         </div>
       </div>
       <div className="w-full md:w-[40%] mt-4 md:mt-0">
@@ -150,12 +176,6 @@ const PropertyDetails: React.FC = () => {
           <div className="text-[25px] font-bold text-[#095550] mb-2 md:mb-0">${house.price.toLocaleString()}/ mois</div>
           <div className="flex flex-row space-x-2">
             <button className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap">Louer maintenant</button>
-            <button
-              className="w-28 md:w-auto h-10 bg-gray-200 text-gray-700 px-4 rounded-md text-xs md:text-sm whitespace-nowrap"
-              onClick={() => setShow3DView(!show3DView)}
-            >
-              {show3DView ? "Vue 2D" : "Visite 3D"}
-            </button>
           </div>
         </div>
         <h2 className="text-[23px] font-medium text-[#2c2c2c] mb-4">Description</h2>

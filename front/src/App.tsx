@@ -57,7 +57,11 @@ const App: React.FC = () => {
     <Router>
       <ItemProvider>
         <div className="flex h-screen overflow-hidden">
-          <CombinedNavbar onAuthClick={() => handleAuthClick(false)} />
+          {/* Passez isAuthenticated à CombinedNavbar */}
+          <CombinedNavbar
+            onAuthClick={() => handleAuthClick(false)}
+            isAuthenticated={!!user}  // Utilise la vérification de l'utilisateur connecté
+          />
           <div className="flex-1 flex flex-col overflow-hidden">
             <HorizontalNavbar
               user={user}

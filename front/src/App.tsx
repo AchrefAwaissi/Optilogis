@@ -88,7 +88,7 @@ const App: React.FC = () => {
                     <SettingsPage />
                   </ProtectedRoute>
                 } />
-                <Route path="/candidature" element={
+                <Route path="/candidature/:itemId" element={
                   <ProtectedRoute>
                     <Candidature />
                   </ProtectedRoute>

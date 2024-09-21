@@ -350,7 +350,7 @@ const PropertyDetails: React.FC = () => {
 
   const handleCandidatureSuccess = () => {
     setShowCandidaturePopup(false);
-    navigate('/candidature', { state: { isPremium: true } });
+    navigate(`/candidature/${house._id}`, { state: { isPremium: true } });
   };
 
   if (!house) {

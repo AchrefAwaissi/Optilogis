@@ -3,13 +3,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faDoorOpen, faBed, faHouse, faCouch,
   faRulerCombined, faCompass, faWheelchair, faBuilding,
-  faWarehouse, faCar, faBox, faWineBottle, faTree, faDollarSign,
-  faShare, faBookmark, faTimes, faExpand
+  faWarehouse, faCar, faBox, faWineBottle, faTree,
+  faShare, faBookmark, faExpand, faDollarSign
 } from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
 import * as THREE from 'three';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+
+const stripePromise = loadStripe('pk_live_cI4tcOUyxlMYq9uSo8ZAKFfv00gI78MHLK');
 
 interface House {
   _id: string;
@@ -89,8 +93,99 @@ const truncateAddress = (address: string, maxLength: number = 50): string => {
   return address.substr(0, maxLength) + '...';
 };
 
+interface PaymentFormProps {
+  onSuccess: () => void;
+}
+
+const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [processing, setProcessing] = useState(false);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setProcessing(true);
+
+    if (!stripe || !elements) {
+      setError("Stripe n'est pas chargé correctement. Veuillez réessayer.");
+      setProcessing(false);
+      return;
+    }
+
+    const cardElement = elements.getElement(CardElement);
+
+    if (cardElement) {
+      const { error, paymentMethod } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+        billing_details: {
+          name: `${firstName} ${lastName}`,
+        },
+      });
+
+      if (error) {
+        setError(error.message || "Une erreur est survenue lors du traitement de votre carte.");
+        setProcessing(false);
+      } else {
+        setTimeout(() => {
+          setProcessing(false);
+          onSuccess();
+        }, 1000);
+      }
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div className="mb-4">
+        <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">Prénom</label>
+        <input
+          type="text"
+          id="firstName"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+      <div className="mb-4">
+        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Nom</label>
+        <input
+          type="text"
+          id="lastName"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        />
+      </div>
+      <div className="mb-4">
+        <label htmlFor="card-element" className="block text-sm font-medium text-gray-700">Carte de crédit</label>
+        <div className="mt-1 p-3 border border-gray-300 rounded-md shadow-sm">
+          <CardElement id="card-element" />
+        </div>
+      </div>
+      <p className="text-sm text-gray-600 mb-4">
+        Aucun frais ne sera prélevé. Votre carte est requise pour validation uniquement.
+      </p>
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+      <button
+        type="submit"
+        disabled={!stripe || processing}
+        className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+      >
+        {processing ? 'Traitement...' : 'Déposer ma candidature'}
+      </button>
+    </form>
+  );
+};
+
 const PropertyDetails: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const house: House = location.state?.house;
   const [show3DView, setShow3DView] = useState(false);
   const [activeTab, setActiveTab] = useState('3D');
@@ -102,16 +197,17 @@ const PropertyDetails: React.FC = () => {
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [neighborhoodBoundary, setNeighborhoodBoundary] = useState<google.maps.Circle | null>(null);
+  const [showCandidaturePopup, setShowCandidaturePopup] = useState(false);
 
   const [selectedImage, setSelectedImage] = useState<string>(
-    house.images.length > 0
+    house?.images.length > 0
       ? `http://localhost:5000/uploads/${house.images[0]}`
       : 'https://via.placeholder.com/800x400'
   );
 
   const addNeighborhoodBoundary = (map: google.maps.Map) => {
     const center = new google.maps.LatLng(house.latitude, house.longitude);
-    const radius = 100; // Rayon en mètres, à ajuster selon vos besoins
+    const radius = 100;
 
     const circle = new google.maps.Circle({
       strokeColor: "#0f766e",
@@ -128,8 +224,10 @@ const PropertyDetails: React.FC = () => {
   };
 
   useEffect(() => {
+    if (!house) return;
+
     const loader = new Loader({
-      apiKey: "YOUR_GOOGLE_MAPS_API_KEY", // Remplacez par votre véritable clé API
+      apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || "",
       version: "beta",
       libraries: ["maps"]
     });
@@ -141,7 +239,7 @@ const PropertyDetails: React.FC = () => {
           zoom: 18,
           tilt: 45,
           heading: 0,
-          mapId: 'YOUR_MAP_ID', // Remplacez par votre véritable Map ID
+          mapId: process.env.REACT_APP_GOOGLE_MAPS_MAP_ID,
           mapTypeId: 'hybrid',
           disableDefaultUI: false,
           zoomControl: true,
@@ -203,7 +301,7 @@ const PropertyDetails: React.FC = () => {
     }).catch((e) => {
       console.error('Error loading Google Maps library: ', e);
     });
-  }, [house.latitude, house.longitude]);
+  }, [house]);
 
   useEffect(() => {
     if (map && isMapLoaded) {
@@ -250,6 +348,11 @@ const PropertyDetails: React.FC = () => {
     }
   }, [map, isMapLoaded]);
 
+  const handleCandidatureSuccess = () => {
+    setShowCandidaturePopup(false);
+    navigate('/candidature', { state: { isPremium: true } });
+  };
+
   if (!house) {
     return <div className="p-4">No property details available.</div>;
   }
@@ -267,11 +370,11 @@ const PropertyDetails: React.FC = () => {
           />
           <button
             className="absolute top-2 right-2 bg-white rounded-full p-2"
-            onClick={() => {/* Open fullscreen gallery */ }}
+            onClick={() => {/* Open fullscreen gallery */}}
           >
             <FontAwesomeIcon icon={faExpand} />
           </button>
-        </div>
+          </div>
         {house.images.length > 1 && (
           <div className="flex mt-4 space-x-2 md:space-x-4 overflow-x-auto pb-2">
             {house.images.map((image, index) => (
@@ -346,7 +449,12 @@ const PropertyDetails: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div className="text-[25px] font-bold text-[#095550] mb-2 md:mb-0">€{house.price.toLocaleString()}/ mois</div>
           <div className="flex flex-row space-x-2">
-            <button className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap">Louer</button>
+            <button
+              onClick={() => setShowCandidaturePopup(true)}
+              className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap"
+            >
+              Déposer une candidature
+            </button>
           </div>
         </div>
         <h2 className="text-[23px] font-medium text-[#2c2c2c] mb-4">Description</h2>
@@ -372,6 +480,22 @@ const PropertyDetails: React.FC = () => {
           {house.exterior && <LargeInfoCard icon={faTree} value="Oui" label="Extérieur" />}
         </div>
       </div>
+      {showCandidaturePopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg max-w-md w-full">
+            <h2 className="text-2xl font-bold mb-4">Déposer une candidature</h2>
+            <Elements stripe={stripePromise}>
+              <PaymentForm onSuccess={handleCandidatureSuccess} />
+            </Elements>
+            <button
+              onClick={() => setShowCandidaturePopup(false)}
+              className="mt-4 text-gray-500 hover:text-gray-700"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -12,6 +12,7 @@ import SettingsPage from './Pages/SettingsPage';
 import PropertyDetails from './Pages/PropertyDetails';
 import SignIn from './Component/SignIn';
 import SignUp from './Component/SignUp';
+import Candidature from './Pages/candidature';
 
 interface User {
   username: string;
@@ -85,6 +86,11 @@ const App: React.FC = () => {
                 <Route path="/settings" element={
                   <ProtectedRoute>
                     <SettingsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/candidature" element={
+                  <ProtectedRoute>
+                    <Candidature />
                   </ProtectedRoute>
                 } />
               </Routes>

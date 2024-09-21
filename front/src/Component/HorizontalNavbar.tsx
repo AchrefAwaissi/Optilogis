@@ -151,9 +151,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes, faSignOutAlt, faHeart, faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
+import logo from "../image/logoa.png";
 
 interface User {
   username: string;
+  profilePhotoPath: string;
 }
 
 interface HorizontalNavbarProps {
@@ -219,7 +221,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
               <div className="flex items-center">
                 {/* Logo for mobile, Welcome message for desktop */}
                 <div className="lg:hidden">
-                  <img src="/path/to/logo.png" alt="Logo" className="w-12 h-12 object-contain" />
+                  <img src={logo} alt="Logo" className="w-12 h-12 object-contain" />
                 </div>
                 {user && (
                   <div className="hidden lg:block text-xl font-semibold text-gray-800">
@@ -260,13 +262,9 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
 
                 {/* Profile and notifications */}
                 <FontAwesomeIcon icon={faBell} className="text-gray-500 text-xl cursor-pointer" />
-                <div
-                  className="w-12 h-12 rounded-full bg-cover bg-center"
-                  style={{
-                    backgroundImage: `url('https://assets.api.uizard.io/api/cdn/stream/eedc21f8-a614-412e-973d-407f24243a96.png')`,
-                  }}
-                />
-              </div>
+                <div/>
+                <img src={user.profilePhotoPath || '/default-avatar.png'} alt="Profile" className="w-12 h-12 rounded-full bg-cover bg-center" />  
+                </div>
 
               {/* Mobile menu button */}
               <div className="lg:hidden">

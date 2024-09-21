@@ -82,8 +82,8 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
   };
 
   const handleTypeOfPlaceChange = (type: FilterCriteria['typeOfHousing']) => {
-    onFilterChange({ 
-      typeOfHousing: filterCriteria.typeOfHousing === type ? '' : type 
+    onFilterChange({
+      typeOfHousing: filterCriteria.typeOfHousing === type ? '' : type
     });
   };
 
@@ -91,8 +91,13 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
     onFilterChange({ maxPrice: parseInt(e.target.value) });
   };
 
-  const handleRangeChange = (field: keyof FilterCriteria, value: number, isMin: boolean) => {
-    onFilterChange({ [isMin ? `min${field.charAt(0).toUpperCase() + field.slice(1)}` : `max${field.charAt(0).toUpperCase() + field.slice(1)}`]: value });
+  const handleRangeChange = (
+    field: 'Size' | 'Rooms' | 'Bedrooms' | 'Floor' | 'AnnexArea',
+    value: number,
+    isMin: boolean
+  ) => {
+    const fieldName = isMin ? `min${field}` : `max${field}`;
+    onFilterChange({ [fieldName]: value });
   };
 
   const handleCheckboxChange = (field: keyof FilterCriteria) => {
@@ -115,7 +120,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
     <>
       {!onToggle && (
         <div className="md:hidden">
-          <button 
+          <button
             onClick={toggleFilter}
             className="fixed bottom-4 right-4 bg-blue-500 text-white p-3 rounded-full shadow-lg z-10"
           >
@@ -325,13 +330,13 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
             <FontAwesomeIcon icon={faCouch} className="ml-2 text-gray-400" />
           </label>
           <label className="flex items-center py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={filterCriteria.accessibility !== ''}
-            onChange={handleAccessibilityChange}
-            className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]"
-            style={{ accentColor: '#095550' }}
-          />
+            <input
+              type="checkbox"
+              checked={filterCriteria.accessibility !== ''}
+              onChange={handleAccessibilityChange}
+              className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]"
+              style={{ accentColor: '#095550' }}
+            />
             <span className="ml-3">Accessible PMR</span>
             <FontAwesomeIcon icon={faWheelchair} className="ml-2 text-gray-400" />
           </label>

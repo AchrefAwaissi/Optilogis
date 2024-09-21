@@ -152,8 +152,9 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
               type="text"
               value={filterCriteria.location}
               onChange={handleLocationChange}
-              className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#006845]"
-              placeholder="Entrez une ville ou une adresse"
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#006845]"
+              placeholder="ville ou adresse"
+              style={{ borderRadius: '7px' }}
             />
             <FontAwesomeIcon icon={faMapMarkerAlt} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <FontAwesomeIcon icon={faChevronDown} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -188,7 +189,7 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
                     type="checkbox"
                     checked={type.value === '' ? filterCriteria.typeOfHousing === '' : filterCriteria.typeOfHousing === type.value}
                     onChange={() => handleTypeOfPlaceChange(type.value as FilterCriteria['typeOfHousing'])}
-                    className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]" style={{ accentColor: '#095550' }}
+                    className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]" style={{ accentColor: '#095550', borderRadius: '7px' }}
                   />
                   <span className="ml-3">{type.label}</span>
                 </label>

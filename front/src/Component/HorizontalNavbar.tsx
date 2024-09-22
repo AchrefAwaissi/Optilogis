@@ -35,6 +35,9 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
       <Link to="/publish" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
         Publish
       </Link>
+      <Link to="/manage-items" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
+        My items
+      </Link>
       <Link to="/search" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
         Search
       </Link>

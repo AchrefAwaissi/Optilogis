@@ -79,12 +79,12 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   input: {
     width: '100%',
-    height: '50px',
+    height: '60px',
     backgroundColor: '#ffffff',
-    borderRadius: '25px',
+    borderRadius: '7px',
     border: '1px solid #c0c0c0',
-    padding: '0 15px 0 40px',
-    fontSize: '16px',
+    padding: '0 20px 0 50px',
+    fontSize: '18px',
     outline: 'none',
   },
   textarea: {

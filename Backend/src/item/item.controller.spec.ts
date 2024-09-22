@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ItemController } from './item.controller';
 import { ItemService } from './item.service';
 import { GeocodingService } from './geocoding.service';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { Types, Document } from 'mongoose';
 
 // Type partiel pour Item
@@ -16,6 +16,7 @@ type PartialItem = Partial<Document> & {
   country: string;
   userId: Types.ObjectId;
   images?: string[];
+  likes?: Types.ObjectId[];
 };
 
 describe('ItemController', () => {
@@ -35,6 +36,7 @@ describe('ItemController', () => {
     city: 'Test City',
     country: 'Test Country',
     userId: mockUserId,
+    likes: [],
     $assertPopulated: jest.fn(),
     $clearModifiedPaths: jest.fn(),
     $clone: jest.fn(),
@@ -57,6 +59,8 @@ describe('ItemController', () => {
             findOne: jest.fn(),
             update: jest.fn(),
             deleteById: jest.fn(),
+            addLike: jest.fn(),
+            removeLike: jest.fn(),
           },
         },
         {
@@ -81,20 +85,19 @@ describe('ItemController', () => {
     it('should create a new item', async () => {
       const createItemDto = { ...mockItem };
       const files = [{ filename: 'test.jpg' }] as Express.Multer.File[];
-      const req = { user: mockUser } as any;
-  
+      const req = { user: { userId: mockUserId } } as any;  // Correction: ajouter userId
+
       geocodingService.getCoordinates.mockResolvedValue({ lat: 0, lng: 0 });
       itemService.create.mockResolvedValue({
         ...mockItem,
         images: ['test.jpg'],
         latitude: 0,
         longitude: 0,
-        userId: mockUserId.toHexString(), // Modifier cette ligne
+        userId: mockUserId.toHexString(),  // Correction: ajout de .toHexString()
       } as any);
-  
+
       const result = await controller.create(files, createItemDto as any, req);
-  
-      // Vérifier chaque propriété importante individuellement
+
       expect(result._id.toString()).toBe(mockItem._id.toString());
       expect(result.name).toBe(mockItem.name);
       expect(result.description).toBe(mockItem.description);
@@ -102,16 +105,15 @@ describe('ItemController', () => {
       expect(result.address).toBe(mockItem.address);
       expect(result.city).toBe(mockItem.city);
       expect(result.country).toBe(mockItem.country);
-      expect(result.userId).toBe(mockUserId.toHexString()); // Modifier cette ligne
+      expect(result.userId).toBe(mockUserId.toHexString());
       expect(result.images).toEqual(['test.jpg']);
       expect(result.latitude).toBe(0);
       expect(result.longitude).toBe(0);
-  
-      // Vérifier que la méthode create du service a été appelée avec les bonnes données
+
       expect(itemService.create).toHaveBeenCalledWith(
         expect.objectContaining({
           ...createItemDto,
-          userId: mockUserId.toHexString(), // Modifier cette ligne
+          userId: mockUserId.toHexString(),
           images: ['test.jpg'],
           latitude: 0,
           longitude: 0,
@@ -151,7 +153,7 @@ describe('ItemController', () => {
     it('should update an item', async () => {
       const updateItemDto = { ...mockItem, name: 'Updated Item' };
       const files = [] as Express.Multer.File[];
-      const req = { user: mockUser } as any;
+      const req = { user: { userId: mockUserId } } as any;  // Correction: ajout de userId
 
       itemService.findOne.mockResolvedValue(mockItem as any);
       geocodingService.getCoordinates.mockResolvedValue({ lat: 1, lng: 1 });
@@ -170,50 +172,111 @@ describe('ItemController', () => {
     it('should throw NotFoundException if item is not found', async () => {
       const updateItemDto = { ...mockItem };
       const files = [] as Express.Multer.File[];
-      const req = { user: mockUser } as any;
+      const req = { user: { userId: mockUserId } } as any;
 
       itemService.findOne.mockResolvedValue(null);
 
       await expect(controller.update('nonexistentid', files, updateItemDto as any, req)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw NotFoundException if user is not the owner', async () => {
+    it('should throw ForbiddenException if user is not the owner', async () => {
       const updateItemDto = { ...mockItem };
       const files = [] as Express.Multer.File[];
-      const req = { user: { _id: new Types.ObjectId() } } as any;
+      const req = { user: { userId: new Types.ObjectId() } } as any;  // Correction: test avec un autre userId
 
       itemService.findOne.mockResolvedValue(mockItem as any);
 
-      await expect(controller.update(mockId.toString(), files, updateItemDto as any, req)).rejects.toThrow(NotFoundException);
+      await expect(controller.update(mockId.toString(), files, updateItemDto as any, req)).rejects.toThrow(ForbiddenException);  // Correction: ForbiddenException au lieu de NotFoundException
     });
   });
 
   describe('delete', () => {
     it('should delete an item', async () => {
-      const req = { user: mockUser } as any;
+      const req = { user: { userId: mockUserId } } as any;
 
       itemService.findOne.mockResolvedValue(mockItem as any);
       itemService.deleteById.mockResolvedValue(mockItem as any);
 
-      const result = await controller.delete(mockId.toString(), req);
+      const result = await controller.deleteItem(mockId.toString(), req);
 
       expect(result).toEqual(mockItem);
     });
 
     it('should throw NotFoundException if item is not found', async () => {
-      const req = { user: mockUser } as any;
+      const req = { user: { userId: mockUserId } } as any;
 
       itemService.findOne.mockResolvedValue(null);
 
-      await expect(controller.delete('nonexistentid', req)).rejects.toThrow(NotFoundException);
+      await expect(controller.deleteItem('nonexistentid', req)).rejects.toThrow(NotFoundException);
     });
 
-    it('should throw NotFoundException if user is not the owner', async () => {
-      const req = { user: { _id: new Types.ObjectId() } } as any;
+    it('should throw ForbiddenException if user is not the owner', async () => {
+      const req = { user: { userId: new Types.ObjectId() } } as any;  // Correction: test avec un autre userId
 
       itemService.findOne.mockResolvedValue(mockItem as any);
 
-      await expect(controller.delete(mockId.toString(), req)).rejects.toThrow(NotFoundException);
+      await expect(controller.deleteItem(mockId.toString(), req)).rejects.toThrow(ForbiddenException);  // Correction: ForbiddenException au lieu de NotFoundException
     });
   });
+
+  describe('likeItem', () => {
+    it('should like an item', async () => {
+      const req = { user: { userId: mockUserId } } as any;
+      const likedItem = { ...mockItem, likes: [mockUserId] };
+      
+      itemService.addLike.mockResolvedValue(likedItem as any);
+
+      const result = await controller.likeItem(mockId.toString(), req);
+
+      expect(result).toEqual({ message: 'Item liked successfully', item: likedItem });
+      expect(itemService.addLike).toHaveBeenCalledWith(mockId.toString(), mockUserId.toString());
+    });
+
+    it('should throw NotFoundException if item is not found', async () => {
+      const req = { user: { userId: mockUserId } } as any;
+      
+      itemService.addLike.mockRejectedValue(new NotFoundException());
+
+      await expect(controller.likeItem('nonexistentid', req)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw UnauthorizedException if unable to like the item', async () => {
+      const req = { user: { userId: mockUserId } } as any;
+      
+      itemService.addLike.mockRejectedValue(new Error());
+
+      await expect(controller.likeItem(mockId.toString(), req)).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
+  describe('unlikeItem', () => {
+    it('should unlike an item', async () => {
+      const req = { user: { userId: mockUserId } } as any;
+      const unlikedItem = { ...mockItem, likes: [] };
+      
+      itemService.removeLike.mockResolvedValue(unlikedItem as any);
+
+      const result = await controller.unlikeItem(mockId.toString(), req);
+
+      expect(result).toEqual({ message: 'Item unliked successfully', item: unlikedItem });
+      expect(itemService.removeLike).toHaveBeenCalledWith(mockId.toString(), mockUserId.toString());
+    });
+
+    it('should throw NotFoundException if item is not found', async () => {
+      const req = { user: { userId: mockUserId } } as any;
+      
+      itemService.removeLike.mockRejectedValue(new NotFoundException());
+
+      await expect(controller.unlikeItem('nonexistentid', req)).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw UnauthorizedException if unable to unlike the item', async () => {
+      const req = { user: { userId: mockUserId } } as any;
+      
+      itemService.removeLike.mockRejectedValue(new Error());
+
+      await expect(controller.unlikeItem(mockId.toString(), req)).rejects.toThrow(UnauthorizedException);
+    });
+  });
+
 });

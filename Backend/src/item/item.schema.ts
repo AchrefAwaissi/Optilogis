@@ -22,4 +22,5 @@ export const ItemSchema = new Schema({
   floor: { type: Number, required: false },
   annexArea: { type: Number, required: false },
   exterior: { type: Boolean, required: false },
+  likes: { type: [Schema.Types.ObjectId], ref: 'users', default: [] },
 });

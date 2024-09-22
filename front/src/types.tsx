@@ -1,4 +1,5 @@
 export interface House {
+  likes?: string[];
   _id: string;
   name?: string;
   description?: string;

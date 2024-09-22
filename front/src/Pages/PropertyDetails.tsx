@@ -4,7 +4,7 @@ import {
   faDoorOpen, faBed, faHouse, faCouch,
   faRulerCombined, faCompass, faWheelchair, faBuilding,
   faWarehouse, faCar, faBox, faWineBottle, faTree,
-  faShare, faBookmark, faExpand, faDollarSign
+  faShare, faHeart, faExpand, faDollarSign
 } from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -12,10 +12,13 @@ import { Loader } from '@googlemaps/js-api-loader';
 import * as THREE from 'three';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { useAuth } from "../contexts/AuthContext";
+import axios from 'axios'; // Make sure axios is imported
 
 const stripePromise = loadStripe('pk_live_cI4tcOUyxlMYq9uSo8ZAKFfv00gI78MHLK');
 
 interface House {
+  likes: string[];
   _id: string;
   name: string;
   description: string;
@@ -77,14 +80,17 @@ const LargeInfoCard: React.FC<InfoCardProps> = ({ icon, value, label }) => (
 interface IconButtonProps {
   icon: IconDefinition;
   onClick?: () => void;
+  isLiked?: boolean;
 }
 
-const IconButton: React.FC<IconButtonProps> = ({ icon, onClick }) => (
+const IconButton: React.FC<IconButtonProps> = ({ icon, onClick, isLiked }) => (
   <button
-    className="w-[46px] h-[46px] bg-gray-100 rounded-full flex items-center justify-center"
+    className={`w-[46px] h-[46px] bg-gray-100 rounded-full flex items-center justify-center transition-colors duration-200 ${
+      isLiked ? 'text-red-500 hover:text-red-600' : 'text-gray-600 hover:text-gray-700'
+    }`}
     onClick={onClick}
   >
-    <FontAwesomeIcon icon={icon} className="text-gray-600" />
+    <FontAwesomeIcon icon={icon} />
   </button>
 );
 
@@ -198,6 +204,8 @@ const PropertyDetails: React.FC = () => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [neighborhoodBoundary, setNeighborhoodBoundary] = useState<google.maps.Circle | null>(null);
   const [showCandidaturePopup, setShowCandidaturePopup] = useState(false);
+  const { user } = useAuth(); // Use the auth context
+  const [isLiked, setIsLiked] = useState(false);
 
   const [selectedImage, setSelectedImage] = useState<string>(
     house?.images.length > 0
@@ -225,6 +233,10 @@ const PropertyDetails: React.FC = () => {
 
   useEffect(() => {
     if (!house) return;
+
+    if (user && house) {
+      setIsLiked(house.likes?.includes(user.id) || false);
+    }
 
     const loader = new Loader({
       apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || "",
@@ -359,6 +371,58 @@ const PropertyDetails: React.FC = () => {
 
   const truncatedAddress = truncateAddress(`${house.address}, ${house.city}, ${house.country}`);
 
+  const handleLikeToggle = async () => {
+    if (!user) {
+      console.log('User must be logged in to like/unlike');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log('No authentication token found');
+      return;
+    }
+
+    try {
+      const endpoint = `http://localhost:5000/item/${house._id}/like`;
+      const method = isLiked ? 'delete' : 'post';
+      console.log(`Sending ${method.toUpperCase()} request to ${endpoint}`);
+      
+      const response = await axios({
+        method: method,
+        url: endpoint,
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      console.log('Response:', response.data);
+
+      if (response.data) {
+        setIsLiked(!isLiked);
+        console.log(`Item ${isLiked ? 'unliked' : 'liked'} successfully`);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          console.error('Error response:', error.response.data);
+          console.error('Error status:', error.response.status);
+          if (error.response.status === 401) {
+            console.error('Authentication failed. Please log in again.');
+            // Here you might want to redirect to login page or refresh the token
+          }
+        } else if (error.request) {
+          console.error('Error request:', error.request);
+        } else {
+          console.error('Error message:', error.message);
+        }
+      } else {
+        console.error('Unexpected error:', error);
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col md:flex-row p-4 max-w-7xl mx-auto h-screen overflow-y-auto">
       <div className="w-full md:w-[60%] md:pr-4">
@@ -438,7 +502,11 @@ const PropertyDetails: React.FC = () => {
           </div>
           <div className="flex space-x-2">
             <IconButton icon={faShare} onClick={() => console.log('Share clicked')} />
-            <IconButton icon={faBookmark} onClick={() => console.log('Save clicked')} />
+            <IconButton 
+              icon={faHeart}
+              onClick={handleLikeToggle}
+              isLiked={isLiked}
+            />
           </div>
         </div>
         <div className="flex space-x-4 mb-6">

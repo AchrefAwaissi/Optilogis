@@ -13,10 +13,11 @@ import PropertyDetails from './Pages/PropertyDetails';
 import SignIn from './Component/SignIn';
 import SignUp from './Component/SignUp';
 import Candidature from './Pages/candidature';
+import ManageItemsPage from './Pages/ManageItemsPage'; // Import the new page
 
 interface User {
   username: string;
-  // Ajoutez d'autres propriétés utilisateur si nécessaire
+  // Add other user properties if necessary
 }
 
 // ProtectedRoute component
@@ -33,9 +34,10 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 const App: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
-  const { user, signout } = useAuth();  // On récupère l'utilisateur connecté depuis le contexte d'auth
+  const { user, signout } = useAuth();
 
   const handleAuthSuccess = (userData: User) => {
+    // This might not be necessary if your AuthContext handles user state
     setShowAuthModal(false);
   };
 
@@ -56,16 +58,11 @@ const App: React.FC = () => {
     <Router>
       <ItemProvider>
         <div className="flex h-screen overflow-hidden">
-          {/* Passez isAuthenticated à CombinedNavbar */}
           <CombinedNavbar
             onAuthClick={() => handleAuthClick(false)}
-            isAuthenticated={!!user}  // Utilise la vérification de l'utilisateur connecté
+            isAuthenticated={!!user}
           />
-<<<<<<< HEAD
-          <div className="flex-1 flex flex-col overflow-hidden max-w-6xl mx-auto w-full">
-=======
           <div className="flex-1 flex flex-col overflow-hidden">
->>>>>>> origin/jk
             <HorizontalNavbar
               user={user}
               onLogout={handleLogout}
@@ -100,11 +97,16 @@ const App: React.FC = () => {
                     <Candidature />
                   </ProtectedRoute>
                 } />
+                {/* New Route for ManageItemsPage */}
+                <Route path="/manage-items" element={
+                  <ProtectedRoute>
+                    <ManageItemsPage />
+                  </ProtectedRoute>
+                } />
               </Routes>
             </main>
           </div>
         </div>
-
         {showAuthModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
             {isSignUp ? (

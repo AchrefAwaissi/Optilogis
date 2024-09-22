@@ -1,44 +1,210 @@
-import React, { useState, useEffect } from 'react';
-import axios, { AxiosError } from 'axios';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import axios from 'axios';
+import { useItems } from '../contexts/ItemContext';
+import { useAuth } from '../contexts/AuthContext';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faHome, faMapMarkerAlt, faCity, faGlobe, faBed,
+  faRulerCombined, faCompass, faWheelchair, faBuilding,
+  faWarehouse, faCar, faBox, faWineBottle, faTree, faDollarSign, faImage
+} from "@fortawesome/free-solid-svg-icons";
 
 interface Suggestion {
   display_name: string;
-  lat: string;
-  lon: string;
 }
 
+interface FormData {
+  name: string;
+  description: string;
+  price: string;
+  title: string;
+  address: string;
+  city: string;
+  country: string;
+  typeOfHousing: string;
+  rooms: string;
+  bedrooms: string;
+  area: string;
+  exposure: string;
+  furnished: boolean;
+  notFurnished: boolean;
+  accessibility: string;
+  floor: string;
+  annexArea: string;
+  parking: boolean;
+  garage: boolean;
+  basement: boolean;
+  storageUnit: boolean;
+  cellar: boolean;
+  exterior: boolean;
+}
+
+type BooleanKeys<T> = {
+  [K in keyof T]: T[K] extends boolean ? K : never
+}[keyof T];
+
+const styles: { [key: string]: React.CSSProperties } = {
+  pageContainer: {
+    minHeight: '100vh',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    backgroundColor: '#f0f2f5',
+    padding: '20px 0',
+  },
+  formContainer: {
+    width: '100%',
+    maxWidth: '600px',
+    backgroundColor: 'white',
+    borderRadius: '20px',
+    boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
+    padding: '20px',
+    paddingBottom: '70px',
+    overflowY: 'auto',
+    maxHeight: 'calc(100vh - 40px)',
+  },
+  title: {
+    color: '#5c5c5c',
+    fontSize: '28px',
+    fontWeight: 700,
+    marginBottom: '20px',
+    textAlign: 'center',
+  },
+  form: {
+    width: '100%',
+  },
+  inputContainer: {
+    position: 'relative',
+    marginBottom: '15px',
+  },
+  input: {
+    width: '100%',
+    height: '60px',
+    backgroundColor: '#ffffff',
+    borderRadius: '7px',
+    border: '1px solid #c0c0c0',
+    padding: '0 20px 0 50px',
+    fontSize: '18px',
+    outline: 'none',
+  },
+  textarea: {
+    width: '100%',
+    height: '100px',
+    backgroundColor: '#ffffff',
+    borderRadius: '15px',
+    border: '1px solid #c0c0c0',
+    padding: '10px 15px 10px 40px',
+    fontSize: '16px',
+    outline: 'none',
+    resize: 'vertical',
+  },
+  icon: {
+    position: 'absolute',
+    top: '50%',
+    left: '15px',
+    transform: 'translateY(-50%)',
+    color: '#095550',
+    fontSize: '18px',
+  },
+  select: {
+    width: '100%',
+    height: '50px',
+    backgroundColor: '#ffffff',
+    borderRadius: '25px',
+    border: '1px solid #c0c0c0',
+    padding: '0 15px 0 40px',
+    fontSize: '16px',
+    outline: 'none',
+    appearance: 'none',
+    backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 15px top 50%',
+    backgroundSize: '12px auto',
+  },
+  button: {
+    cursor: 'pointer',
+    width: '100%',
+    height: '50px',
+    border: '0',
+    borderRadius: '25px',
+    backgroundColor: '#095550',
+    color: '#ffffff',
+    fontSize: '18px',
+    fontWeight: 600,
+    marginTop: '20px',
+    transition: 'background-color 0.3s ease',
+  },
+  error: {
+    color: '#e74c3c',
+    marginTop: '15px',
+    textAlign: 'center',
+    fontSize: '14px',
+  },
+  success: {
+    color: '#2ecc71',
+    marginTop: '15px',
+    textAlign: 'center',
+    fontSize: '14px',
+  },
+};
+
 const CreatePublication: React.FC = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     description: '',
     price: '',
     title: '',
     address: '',
     city: '',
-    country: '', 
+    country: '',
     typeOfHousing: '',
     rooms: '',
     bedrooms: '',
-    area: ''
+    area: '',
+    exposure: '',
+    furnished: false,
+    notFurnished: false,
+    accessibility: '',
+    floor: '',
+    annexArea: '',
+    parking: false,
+    garage: false,
+    basement: false,
+    storageUnit: false,
+    cellar: false,
+    exterior: false
   });
-  const [image, setImage] = useState<File | null>(null);
-  const [message, setMessage] = useState('');
+  const [images, setImages] = useState<File[]>([]);
+  const [message, setMessage] = useState<string>('');
+  const { user } = useAuth();
+  const { createItem } = useItems();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
 
     if (name === 'address') {
       handleAddressChange(value);
+    }
+
+    if (name === 'furnished' && checked) {
+      setFormData(prev => ({ ...prev, notFurnished: false }));
+    } else if (name === 'notFurnished' && checked) {
+      setFormData(prev => ({ ...prev, furnished: false }));
     }
   };
 
   const handleAddressChange = async (value: string) => {
     if (value.length > 2) {
       try {
-        const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}`);
+        const response = await axios.get<Suggestion[]>(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}`);
         setSuggestions(response.data);
         setShowSuggestions(true);
       } catch (error) {
@@ -59,43 +225,37 @@ const CreatePublication: React.FC = () => {
       ...prev,
       address: suggestion.display_name,
       city,
-      country // Mettre à jour automatiquement le champ country
+      country
     }));
     setSuggestions([]);
     setShowSuggestions(false);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setImage(e.target.files[0]);
+      setImages(Array.from(e.target.files));
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage('');
 
     const submitData = new FormData();
     Object.entries(formData).forEach(([key, value]) => {
-      submitData.append(key, value);
+      submitData.append(key, value.toString());
     });
-    if (image) {
-      submitData.append('image', image);
-    }
+    images.forEach(image => {
+      submitData.append('images', image);
+    });
 
     try {
-      const response = await axios.post('http://localhost:5000/item', submitData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const newItem = await createItem(submitData);
       setMessage('Publication créée avec succès!');
-      console.log('Réponse du serveur:', response.data);
-      // Réinitialiser le formulaire ici si nécessaire
-    } catch (error: unknown) {
-      if (axios.isAxiosError(error)) {
-        setMessage(`Erreur: ${error.response?.data.message || error.message || 'Une erreur est survenue'}`);
-      } else {
-        setMessage('Une erreur inattendue est survenue');
-      }
+      console.log('Nouvel item créé:', newItem);
+      // Reset form here if needed
+    } catch (error) {
+      setMessage('Erreur lors de la création de la publication');
       console.error('Erreur lors de l\'envoi:', error);
     }
   };
@@ -103,196 +263,315 @@ const CreatePublication: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = () => setShowSuggestions(false);
     document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
+
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .custom-select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+      document.head.removeChild(style);
+    };
   }, []);
 
   return (
-    <div className="max-w-md mx-auto h-screen flex flex-col">
-      <h2 className="text-2xl font-bold mb-6 text-center p-4">Créer une publication</h2>
-      <div className="flex-grow overflow-y-auto">
-        <div className="bg-white rounded-lg shadow-xl p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nom</label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="Nom de la propriété"
-              />
-            </div>
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="Description de la propriété"
-                rows={3}
-              />
-            </div>
-            <div>
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700">Prix</label>
-              <input
-                id="price"
-                name="price"
-                type="number"
-                required
-                value={formData.price}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="Prix"
-              />
-            </div>
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700">Titre</label>
-              <input
-                id="title"
-                name="title"
-                type="text"
-                value={formData.title}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="Titre de l'annonce"
-              />
-            </div>
-            <div className="relative">
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700">Adresse</label>
-              <input
-                id="address"
-                name="address"
-                type="text"
-                required
-                value={formData.address}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="Adresse de la propriété"
-              />
-              {showSuggestions && suggestions.length > 0 && (
-                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-auto">
-                  {suggestions.map((suggestion, index) => (
-                    <li 
-                      key={index} 
-                      className="p-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleSuggestionClick(suggestion)}
-                    >
-                      {suggestion.display_name}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-            <div>
-              <label htmlFor="city" className="block text-sm font-medium text-gray-700">Ville</label>
-              <input
-                id="city"
-                name="city"
-                type="text"
-                required
-                value={formData.city}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="Ville"
-              />
-            </div>
-            <div>
-              <label htmlFor="country" className="block text-sm font-medium text-gray-700">Pays</label>
-              <input
-                id="country"
-                name="country"
-                type="text"
-                required
-                value={formData.country}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="Pays"
-              />
-            </div>
-            <div>
-              <label htmlFor="rooms" className="block text-sm font-medium text-gray-700">Nombre de pièces</label>
-              <input
-                id="rooms"
-                name="rooms"
-                type="number"
-                value={formData.rooms}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="Nombre de pièces"
-              />
-            </div>
-            <div>
-              <label htmlFor="bedrooms" className="block text-sm font-medium text-gray-700">Nombre de chambres</label>
-              <input
-                id="bedrooms"
-                name="bedrooms"
-                type="number"
-                value={formData.bedrooms}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="Nombre de chambres"
-              />
-            </div>
-            <div>
-              <label htmlFor="area" className="block text-sm font-medium text-gray-700">Surface (m²)</label>
-              <input
-                id="area"
-                name="area"
-                type="number"
-                value={formData.area}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                placeholder="Surface en m²"
-              />
-            </div>
-            <div>
-              <label htmlFor="typeOfHousing" className="block text-sm font-medium text-gray-700">Type de logement</label>
-              <select
-                id="typeOfHousing"
-                name="typeOfHousing"
-                value={formData.typeOfHousing}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              >
-                <option value="">Sélectionnez un type de logement</option>
-                <option value="maison">Maison</option>
-                <option value="appartement">Appartement</option>
-                <option value="studio">Studio</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image</label>
-              <input
-                id="image"
-                name="image"
-                type="file"
-                onChange={handleImageChange}
-                className="mt-1 block w-full text-sm text-gray-500
-                  file:mr-4 file:py-2 file:px-4
-                  file:rounded-full file:border-0
-                  file:text-sm file:font-semibold
-                  file:bg-indigo-50 file:text-indigo-700
-                  hover:file:bg-indigo-100"
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+    <div style={styles.pageContainer}>
+      <div style={styles.formContainer}>
+        <h1 style={styles.title}>Publier une annonce</h1>
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faHome} style={styles.icon} />
+            <input
+              type="text"
+              name="name"
+              placeholder="Nom de la propriété"
+              value={formData.name}
+              onChange={handleChange}
+              style={styles.input}
+              required
+            />
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faHome} style={{ ...styles.icon, top: '25px' }} />
+            <textarea
+              name="description"
+              placeholder="Description de la propriété"
+              value={formData.description}
+              onChange={handleChange}
+              style={styles.textarea}
+            />
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faDollarSign} style={styles.icon} />
+            <input
+              type="number"
+              name="price"
+              placeholder="Prix"
+              value={formData.price}
+              onChange={handleChange}
+              style={styles.input}
+              required
+            />
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faMapMarkerAlt} style={styles.icon} />
+            <input
+              type="text"
+              name="address"
+              placeholder="Adresse de la propriété"
+              value={formData.address}
+              onChange={handleChange}
+              style={styles.input}
+              required
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <ul style={{
+                position: 'absolute',
+                zIndex: 10,
+                width: '100%',
+                backgroundColor: '#ffffff',
+                border: '1px solid #c0c0c0',
+                borderRadius: '10px',
+                marginTop: '5px',
+                maxHeight: '200px',
+                overflowY: 'auto',
+                listStyle: 'none',
+                padding: 0,
+              }}>
+                {suggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    style={{
+                      padding: '10px',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    {suggestion.display_name}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faCity} style={styles.icon} />
+            <input
+              type="text"
+              name="city"
+              placeholder="Ville"
+              value={formData.city}
+              onChange={handleChange}
+              style={styles.input}
+              required
+            />
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faGlobe} style={styles.icon} />
+            <input
+              type="text"
+              name="country"
+              placeholder="Pays"
+              value={formData.country}
+              onChange={handleChange}
+              style={styles.input}
+              required
+            />
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faHome} style={styles.icon} />
+            <select
+              name="typeOfHousing"
+              value={formData.typeOfHousing}
+              onChange={handleChange}
+              style={styles.select}
             >
-              Créer la publication
-            </button>
-          </form>
-          {message && (
-            <div className={`mt-4 p-4 rounded-md ${message.includes('Erreur') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-              {message}
+              <option value="">Sélectionnez un type de logement</option>
+              <option value="maison">Maison</option>
+              <option value="appartement">Appartement</option>
+              <option value="studio">Studio</option>
+            </select>
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faHome} style={styles.icon} />
+            <input
+              type="number"
+              name="rooms"
+              placeholder="Nombre de pièces"
+              value={formData.rooms}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faBed} style={styles.icon} />
+            <input
+              type="number"
+              name="bedrooms"
+              placeholder="Nombre de chambres"
+              value={formData.bedrooms}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faRulerCombined} style={styles.icon} />
+            <input
+              type="number"
+              name="area"
+              placeholder="Surface en m²"
+              value={formData.area}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faCompass} style={styles.icon} />
+            <select
+              name="exposure"
+              value={formData.exposure}
+              onChange={handleChange}
+              style={styles.select}
+            >
+              <option value="">Sélectionnez l'exposition</option>
+              <option value="nord">Nord</option>
+              <option value="sud">Sud</option>
+              <option value="est">Est</option>
+              <option value="ouest">Ouest</option>
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', marginBottom: '15px' }}>
+            <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: '#5c5c5c', marginBottom: '10px', width: '48%' }}>
+              <input
+                type="checkbox"
+                name="furnished"
+                checked={formData.furnished}
+                onChange={handleChange}
+                style={{ marginRight: '10px', width: '18px', height: '18px' }}
+              />
+              Meublé
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', fontSize: '14px', color: '#5c5c5c', marginBottom: '10px', width: '48%' }}>
+              <input
+                type="checkbox"
+                name="notFurnished"
+                checked={formData.notFurnished}
+                onChange={handleChange}
+                style={{ marginRight: '10px', width: '18px', height: '18px' }}
+              />
+              Non meublé
+            </label>
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faWheelchair} style={styles.icon} />
+            <input
+              type="text"
+              name="accessibility"
+              placeholder="Accessibilité"
+              value={formData.accessibility}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faBuilding} style={styles.icon} />
+            <input
+              type="number"
+              name="floor"
+              placeholder="Étage"
+              value={formData.floor}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faWarehouse} style={styles.icon} />
+            <input
+              type="number"
+              name="annexArea"
+              placeholder="Surface annexe en m²"
+              value={formData.annexArea}
+              onChange={handleChange}
+              style={styles.input}
+            />
+          </div>
+
+          <div style={{ marginBottom: '15px' }}>
+            <p style={{ fontSize: '16px', color: '#5c5c5c', marginBottom: '10px' }}>Options annexes</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+              {[
+                { name: 'parking', icon: faCar, label: 'Parking' },
+                { name: 'garage', icon: faCar, label: 'Garage' },
+                { name: 'basement', icon: faWarehouse, label: 'Sous-sol' },
+                { name: 'storageUnit', icon: faBox, label: 'Box' },
+                { name: 'cellar', icon: faWineBottle, label: 'Cave' }
+              ].map((option) => (
+                <label key={option.name} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', fontSize: '14px', color: '#5c5c5c', width: '48%' }}>
+                  <input
+                    type="checkbox"
+                    name={option.name}
+                    checked={formData[option.name as BooleanKeys<FormData>]}
+                    onChange={handleChange}
+                    style={{ marginRight: '10px', width: '18px', height: '18px' }}
+                  />
+                  <FontAwesomeIcon icon={option.icon} style={{ marginRight: '10px', fontSize: '18px', color: '#095550' }} />
+                  {option.label}
+                </label>
+              ))}
             </div>
-          )}
-        </div>
+          </div>
+
+          <label style={{ display: 'flex', alignItems: 'center', marginBottom: '15px', fontSize: '14px', color: '#5c5c5c' }}>
+            <input
+              type="checkbox"
+              name="exterior"
+              checked={formData.exterior}
+              onChange={handleChange}
+              style={{ marginRight: '10px', width: '18px', height: '18px' }}
+            />
+            <FontAwesomeIcon icon={faTree} style={{ marginRight: '10px', fontSize: '18px', color: '#095550' }} />
+            Extérieur
+          </label>
+
+          <div style={styles.inputContainer}>
+            <FontAwesomeIcon icon={faImage} style={{ ...styles.icon, top: '25px' }} />
+            <input
+              type="file"
+              name="images"
+              onChange={handleImageChange}
+              style={{ ...styles.input, paddingTop: '12px', paddingBottom: '12px', height: 'auto' }}
+              multiple
+            />
+          </div>
+
+          <button type="submit" style={styles.button}>
+            Créer la publication
+          </button>
+        </form>
+        {message && (
+          <div style={message.includes('Erreur') ? styles.error : styles.success}>
+            {message}
+          </div>
+        )}
       </div>
     </div>
   );

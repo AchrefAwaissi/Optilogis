@@ -1,10 +1,12 @@
 import { Document } from 'mongoose';
+import { Types } from 'mongoose';
 
 export interface Item extends Document {
+  userId: Types.ObjectId;
   name?: string;
   description?: string;
   price: number;
-  image?: string;
+  images?: string[];
   title?: string;
   address: string;
   city: string;
@@ -15,4 +17,5 @@ export interface Item extends Document {
   area?: number;
   latitude?: number;
   longitude?: number;
+  likes?: string[];
 }

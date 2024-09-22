@@ -20,7 +20,9 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "types": [
-      "google.maps"
+      "google.maps",
+      "jest",
+      "@testing-library/jest-dom"
     ],
   },
   "include": [

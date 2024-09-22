@@ -13,6 +13,7 @@ import PropertyDetails from './Pages/PropertyDetails';
 import SignIn from './Component/SignIn';
 import SignUp from './Component/SignUp';
 import Candidature from './Pages/candidature';
+import ManageItems from './Component/ManageItems';
 
 interface User {
   username: string;
@@ -95,6 +96,11 @@ const App: React.FC = () => {
                 <Route path="/candidature/:itemId" element={
                   <ProtectedRoute>
                     <Candidature />
+                  </ProtectedRoute>
+                } />
+                <Route path="/manage-items" element={
+                  <ProtectedRoute>
+                    <ManageItems/>
                   </ProtectedRoute>
                 } />
               </Routes>

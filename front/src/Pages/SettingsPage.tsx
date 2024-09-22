@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import ManageItems from '../Component/ManageItems';
 
 interface FormData {
   username: string;
@@ -21,7 +20,6 @@ const SettingsPage: React.FC = () => {
   });
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [activeTab, setActiveTab] = useState<'profile' | 'items'>('profile');
 
   useEffect(() => {
     if (user) {
@@ -88,18 +86,11 @@ const SettingsPage: React.FC = () => {
       <div className="relative py-3 sm:max-w-xl sm:mx-auto w-full px-4 sm:px-0">
         <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20 w-full max-w-md mx-auto">
           <div className="mb-6 flex justify-center">
-            <button
-              onClick={() => setActiveTab('profile')}
-              className={`mr-4 px-3 py-2 rounded-md ${activeTab === 'profile' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+            <div
+              className={"mr-4 px-3 py-2 rounded-md bg-indigo-600 text-white text-gray-600"}
             >
               Mon Compte
-            </button>
-            <button
-              onClick={() => setActiveTab('items')}
-              className={`px-3 py-2 rounded-md ${activeTab === 'items' ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-            >
-              Mes Annonces
-            </button>
+            </div>
           </div>
 
           {message && (
@@ -109,7 +100,7 @@ const SettingsPage: React.FC = () => {
           )}
 
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-            {activeTab === 'profile' && (
+            {(
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 <div className="flex justify-center mb-4">
                   <div className="relative w-32 h-32 rounded-full overflow-hidden">
@@ -181,8 +172,6 @@ const SettingsPage: React.FC = () => {
                 </button>
               </form>
             )}
-
-            {activeTab === 'items' && <ManageItems />}
           </div>
         </div>
       </div>

@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(updatedUser);
       
     } catch (error) {
-      console.error('Failed to update user', error);
+      console.error('Échec de la mise à jour de l utilisateur', error);
       throw error;
     }
   };
@@ -108,7 +108,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('useAuth doit être utilisé au sein d un AuthProvider');
   }
   return context;
 };

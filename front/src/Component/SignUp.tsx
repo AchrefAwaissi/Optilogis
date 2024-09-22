@@ -61,9 +61,9 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
       onSuccess({ username: formData.username });
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
-        setError(err.response.data.message || "An error occurred during signup");
+        setError(err.response.data.message || "Une erreur est survenue lors de l'inscription.");
       } else {
-        setError("An unexpected error occurred");
+        setError("Une erreur inattendue est survenue.");
       }
     }
   };

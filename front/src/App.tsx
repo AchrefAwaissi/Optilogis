@@ -12,6 +12,7 @@ import SettingsPage from './Pages/SettingsPage';
 import PropertyDetails from './Pages/PropertyDetails';
 import SignIn from './Component/SignIn';
 import SignUp from './Component/SignUp';
+import Candidature from './Pages/candidature';
 
 interface User {
   username: string;
@@ -60,7 +61,11 @@ const App: React.FC = () => {
             onAuthClick={() => handleAuthClick(false)}
             isAuthenticated={!!user}  // Utilise la vérification de l'utilisateur connecté
           />
+<<<<<<< HEAD
           <div className="flex-1 flex flex-col overflow-hidden max-w-6xl mx-auto w-full">
+=======
+          <div className="flex-1 flex flex-col overflow-hidden">
+>>>>>>> origin/jk
             <HorizontalNavbar
               user={user}
               onLogout={handleLogout}
@@ -88,6 +93,11 @@ const App: React.FC = () => {
                 <Route path="/settings" element={
                   <ProtectedRoute>
                     <SettingsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/candidature/:itemId" element={
+                  <ProtectedRoute>
+                    <Candidature />
                   </ProtectedRoute>
                 } />
               </Routes>

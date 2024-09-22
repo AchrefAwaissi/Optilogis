@@ -99,8 +99,8 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
             [travelMode.toLowerCase()]: { distance, duration },
           }));
         } else {
-          console.error(`Error fetching ${travelMode} routes:`, status);
-          setError(`Failed to fetch ${travelMode} routes. Please try again.`);
+          console.error(`Erreur lors de l'affiche ${travelMode} routes:`, status);
+          setError(`Erreur lors de l'affichage ${travelMode} routes. Merci de réessayer.`);
         }
       }
     );
@@ -158,8 +158,8 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
 
       setPois(newPois);
     } catch (err) {
-      setError('Failed to fetch POIs. Please try again.');
-      console.error('Error fetching POIs:', err);
+      setError('Échec de la récupération des points d intérêt Veuillez réessayer..');
+      console.error('Échec de la récupération des points d intérêt:', err);
     } finally {
       setLoading(false);
     }

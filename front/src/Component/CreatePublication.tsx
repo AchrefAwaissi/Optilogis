@@ -208,7 +208,7 @@ const CreatePublication: React.FC = () => {
         setSuggestions(response.data);
         setShowSuggestions(true);
       } catch (error) {
-        console.error('Error fetching address suggestions:', error);
+        console.error('Erreur lors de la récupération des suggestions d adresse.:', error);
       }
     } else {
       setSuggestions([]);

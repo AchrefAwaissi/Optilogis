@@ -190,4 +190,36 @@ async deleteItem(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     throw error;
   }
 }
+
+@Post(':id/like')
+  @UseGuards(JwtAuthGuard)
+  async likeItem(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    const userId = req.user.userId.toString();
+    try {
+      const updatedItem = await this.itemService.addLike(id, userId);
+      return { message: 'Item liked successfully', item: updatedItem };
+    } catch (error) {
+      console.error('Error liking item:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Unable to like the item');
+    }
+  }
+
+  @Delete(':id/like')
+  @UseGuards(JwtAuthGuard)
+  async unlikeItem(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
+    const userId = req.user.userId.toString();
+    try {
+      const updatedItem = await this.itemService.removeLike(id, userId);
+      return { message: 'Item unliked successfully', item: updatedItem };
+    } catch (error) {
+      console.error('Error unliking item:', error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new UnauthorizedException('Unable to unlike the item');
+    }
+  }
 }

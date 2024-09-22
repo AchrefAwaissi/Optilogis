@@ -17,4 +17,5 @@ export interface Item extends Document {
   area?: number;
   latitude?: number;
   longitude?: number;
+  likes?: string[];
 }

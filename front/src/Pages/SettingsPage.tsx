@@ -138,7 +138,6 @@ const SettingsPage: React.FC = () => {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-[#030303] font-poppins">{formData.username}</h2>
-              <p className="text-lg text-[#828282] font-poppins">{formData.email}</p>
             </div>
           </div>
           <button
@@ -185,11 +184,7 @@ const SettingsPage: React.FC = () => {
               </div>
             </div>
 
-            {isEditing && (
-              <button type="button" className="mt-6 bg-[#e6efee] text-[#095550] font-semibold py-2 px-4 rounded-lg hover:bg-[#d1e0df] transition duration-300">
-                + Add Email Address
-              </button>
-            )}
+            
 
             {isEditing && (
               <div className="mt-8 flex justify-start">

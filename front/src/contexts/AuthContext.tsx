@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         profilePhotoPath: response.data.profilePhotoPath
       });
     } catch (error) {
-      console.error('Failed to fetch user', error);
+      console.error('Echec affichage de l utilisateur', error);
       localStorage.removeItem('token');
     }
   };

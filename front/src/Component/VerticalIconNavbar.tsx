@@ -21,9 +21,10 @@ interface MenuItem {
 
 interface VerticalIconNavbarProps {
   onAuthClick: () => void;
+  isAuthenticated: boolean; // Nouvelle prop pour gérer la connexion de l'utilisateur
 }
 
-const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick }) => {
+const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick, isAuthenticated }) => {
   const location = useLocation();
   const [activeIcon, setActiveIcon] = useState<string>(location.pathname);
   const [isOpen, setIsOpen] = useState(false);
@@ -58,12 +59,13 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick }) 
       : "text-[#095550] hover:bg-gray-50 hover:text-[#095550]"
     }`;
 
+  // Affiche uniquement "Add" et "Settings" si l'utilisateur est connecté
   const menuItems: MenuItem[] = [
     { icon: faHome, label: "Home", path: "/" },
-    { icon: faPlus, label: "Add", path: "/publish" },
+    ...(isAuthenticated ? [{ icon: faPlus, label: "Add", path: "/publish" }] : []), // Condition pour afficher "Add"
     { icon: faCube, label: "3D", path: "/search" },
     { icon: faAddressBook, label: "Contact", path: "/contact" },
-    { icon: faCog, label: "Settings", path: "/settings" },
+    ...(isAuthenticated ? [{ icon: faCog, label: "Settings", path: "/settings" }] : []), // Condition pour afficher "Settings"
   ];
 
   return (
@@ -84,7 +86,7 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick }) 
             onClick={() => {
               setActiveIcon(item.path);
               if (!isOpen) {
-                toggleNavbar(); // Only expand when clicking on an item if the navbar is closed
+                toggleNavbar();
               }
             }}
           >

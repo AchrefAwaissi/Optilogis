@@ -32,10 +32,9 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 const App: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
-  const { user, signout } = useAuth();
+  const { user, signout } = useAuth();  // On récupère l'utilisateur connecté depuis le contexte d'auth
 
   const handleAuthSuccess = (userData: User) => {
-    // This might not be necessary if your AuthContext handles user state
     setShowAuthModal(false);
   };
 
@@ -56,7 +55,11 @@ const App: React.FC = () => {
     <Router>
       <ItemProvider>
         <div className="flex h-screen overflow-hidden">
-          <CombinedNavbar onAuthClick={() => handleAuthClick(false)} />
+          {/* Passez isAuthenticated à CombinedNavbar */}
+          <CombinedNavbar
+            onAuthClick={() => handleAuthClick(false)}
+            isAuthenticated={!!user}  // Utilise la vérification de l'utilisateur connecté
+          />
           <div className="flex-1 flex flex-col overflow-hidden max-w-6xl mx-auto w-full">
             <HorizontalNavbar
               user={user}

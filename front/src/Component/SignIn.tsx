@@ -75,7 +75,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
       width: '100%',
       height: '60px',
       backgroundColor: '#ffffff',
-      borderRadius: '30px',
+      borderRadius: '7px', // Modified to 7px
       border: '1px solid #c0c0c0',
       padding: '0 20px 0 50px',
       fontSize: '18px',
@@ -112,7 +112,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
       width: '100%',
       height: '60px',
       border: '0',
-      borderRadius: '30px',
+      borderRadius: '7px', // Modified to 7px
       backgroundColor: '#095550',
       color: '#ffffff',
       fontSize: '18px',
@@ -193,6 +193,5 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
     </div>
   );
 };
-
 
 export default SignIn;

@@ -91,27 +91,27 @@ const HomePage: React.FC = () => {
         (house.typeOfHousing &&
           house.typeOfHousing.toLowerCase().includes(filterCriteria.typeOfHousing.toLowerCase()));
 
-          const matchesRooms =
-          (filterCriteria.minRooms === undefined || (house.rooms ?? 0) >= filterCriteria.minRooms) &&
-          (filterCriteria.maxRooms === undefined || (house.rooms ?? 0) <= filterCriteria.maxRooms);
-    
-        const matchesBedrooms =
-          (filterCriteria.minBedrooms === undefined || (house.bedrooms ?? 0) >= filterCriteria.minBedrooms) &&
-          (filterCriteria.maxBedrooms === undefined || (house.bedrooms ?? 0) <= filterCriteria.maxBedrooms);
-    
-        const matchesFloor =
-          (filterCriteria.minFloor === undefined || (house.floor ?? 0) >= filterCriteria.minFloor) &&
-          (filterCriteria.maxFloor === undefined || (house.floor ?? 0) <= filterCriteria.maxFloor);
-    
-        const matchesAnnexArea =
-          (filterCriteria.minAnnexArea === undefined || (house.annexArea ?? 0) >= filterCriteria.minAnnexArea) &&
-          (filterCriteria.maxAnnexArea === undefined || (house.annexArea ?? 0) <= filterCriteria.maxAnnexArea);
-    
-        const matchesFurnished =
-          filterCriteria.furnished === undefined || house.furnished === filterCriteria.furnished;
-    
-        const matchesAccessibility =
-          !filterCriteria.accessibility || (house.accessibility !== '');
+      const matchesRooms =
+        (filterCriteria.minRooms === undefined || (house.rooms ?? 0) >= filterCriteria.minRooms) &&
+        (filterCriteria.maxRooms === undefined || (house.rooms ?? 0) <= filterCriteria.maxRooms);
+
+      const matchesBedrooms =
+        (filterCriteria.minBedrooms === undefined || (house.bedrooms ?? 0) >= filterCriteria.minBedrooms) &&
+        (filterCriteria.maxBedrooms === undefined || (house.bedrooms ?? 0) <= filterCriteria.maxBedrooms);
+
+      const matchesFloor =
+        (filterCriteria.minFloor === undefined || (house.floor ?? 0) >= filterCriteria.minFloor) &&
+        (filterCriteria.maxFloor === undefined || (house.floor ?? 0) <= filterCriteria.maxFloor);
+
+      const matchesAnnexArea =
+        (filterCriteria.minAnnexArea === undefined || (house.annexArea ?? 0) >= filterCriteria.minAnnexArea) &&
+        (filterCriteria.maxAnnexArea === undefined || (house.annexArea ?? 0) <= filterCriteria.maxAnnexArea);
+
+      const matchesFurnished =
+        filterCriteria.furnished === undefined || house.furnished === filterCriteria.furnished;
+
+      const matchesAccessibility =
+        !filterCriteria.accessibility || (house.accessibility !== '');
 
       return (
         matchesLocation &&
@@ -181,13 +181,14 @@ const HomePage: React.FC = () => {
           )}
         </div>
 
-        <div className={`flex-1 bg-gray-100 ${showMap ? 'block' : 'hidden'} md:block h-[calc(100vh-64px)] md:h-auto`}>
+        <div className={`flex-1 bg-gray-100 ${showMap ? 'block' : 'hidden'} md:block h-[calc(100vh-64px)] md:h-auto rounded-lg`}>
           <MapComponent
             houses={filteredHouses}
             selectedLocation={selectedLocation}
             onLocationSelect={handleLocationSelect}
           />
         </div>
+
       </div>
 
       <button

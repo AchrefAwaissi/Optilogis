@@ -21,7 +21,7 @@ interface User {
 // ProtectedRoute component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  
+
   if (!user) {
     return <Navigate to="/" replace />;
   }
@@ -57,7 +57,7 @@ const App: React.FC = () => {
       <ItemProvider>
         <div className="flex h-screen overflow-hidden">
           <CombinedNavbar onAuthClick={() => handleAuthClick(false)} />
-          <div className="flex-1 flex flex-col overflow-hidden">
+          <div className="flex-1 flex flex-col overflow-hidden max-w-6xl mx-auto w-full">
             <HorizontalNavbar
               user={user}
               onLogout={handleLogout}
@@ -70,7 +70,7 @@ const App: React.FC = () => {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/property-details" element={<PropertyDetails />} />
-                
+
                 {/* Protected Routes */}
                 <Route path="/publish" element={
                   <ProtectedRoute>
@@ -91,6 +91,7 @@ const App: React.FC = () => {
             </main>
           </div>
         </div>
+
         {showAuthModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex justify-center items-center">
             {isSignUp ? (

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import axios from 'axios';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTimes, faUser, faEnvelope, faLock, faImage } from "@fortawesome/free-solid-svg-icons";
@@ -21,22 +21,35 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
     confirmPassword: ''
   });
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.name === 'profilePhoto') {
       const files = e.target.files;
       if (files && files.length > 0) {
         setProfilePhoto(files[0]);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setProfilePhotoPreview(reader.result as string);
+        };
+        reader.readAsDataURL(files[0]);
       }
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
 
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setSuccessMessage(null);
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
@@ -58,7 +71,12 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
         }
       });
       console.log('Signup successful', response.data);
-      onSuccess({ username: formData.username });
+      setSuccessMessage("Inscription réussie ! Redirection vers la page de connexion...");
+
+      // Attendre 2 secondes avant de rediriger vers la page de connexion
+      setTimeout(() => {
+        onToggleForm();
+      }, 2000);
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
         setError(err.response.data.message || "An error occurred during signup");
@@ -108,7 +126,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
       width: '100%',
       height: '60px',
       backgroundColor: '#ffffff',
-      borderRadius: '30px',
+      borderRadius: '7px',
       border: '1px solid #c0c0c0',
       padding: '0 20px 0 50px',
       fontSize: '18px',
@@ -127,7 +145,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
       width: '100%',
       height: '60px',
       border: '0',
-      borderRadius: '30px',
+      borderRadius: '7px',
       backgroundColor: '#095550',
       color: '#ffffff',
       fontSize: '18px',
@@ -151,6 +169,35 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
       textAlign: 'center' as const,
       fontSize: '14px',
     },
+    successMessage: {
+      color: '#28a745',
+      marginBottom: '15px',
+      textAlign: 'center' as const,
+      fontSize: '14px',
+    },
+    imagePreview: {
+      width: '150px',
+      height: '150px',
+      borderRadius: '7px',
+      objectFit: 'cover' as const,
+      marginBottom: '20px',
+      cursor: 'pointer',
+      display: 'flex',
+      flexDirection: 'column' as const,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#e0e0e0',
+      border: '2px dashed #a0a0a0',
+    },
+    imagePreviewText: {
+      marginTop: '10px',
+      fontSize: '14px',
+      color: '#5c5c5c',
+      textAlign: 'center' as const,
+    },
+    hiddenFileInput: {
+      display: 'none',
+    },
   };
 
   return (
@@ -160,7 +207,26 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
       </button>
       <h1 style={styles.title}>Sign Up</h1>
       {error && <p style={styles.error}>{error}</p>}
+      {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
       <form onSubmit={handleSubmit} style={styles.form}>
+        <div onClick={handleImageClick} style={styles.imagePreview}>
+          {profilePhotoPreview ? (
+            <img src={profilePhotoPreview} alt="Profile Preview" style={{ width: '100%', height: '100%', borderRadius: '7px', objectFit: 'cover' }} />
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faImage} style={{ fontSize: '40px', color: '#a0a0a0' }} />
+              <div style={styles.imagePreviewText}>Ajouter une image</div>
+            </>
+          )}
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          name="profilePhoto"
+          onChange={handleChange}
+          style={styles.hiddenFileInput}
+          accept="image/*"
+        />
         <div style={styles.inputContainer}>
           <FontAwesomeIcon icon={faUser} style={styles.icon} />
           <input
@@ -209,16 +275,6 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
             required
           />
         </div>
-        <div style={styles.inputContainer}>
-          <FontAwesomeIcon icon={faImage} style={styles.icon} />
-          <input
-            type="file"
-            name="profilePhoto"
-            onChange={handleChange}
-            style={styles.input}
-            accept="image/*"
-          />
-        </div>
         <button type="submit" style={styles.button}>
           Sign Up
         </button>
@@ -232,6 +288,5 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
     </div>
   );
 };
-
 
 export default SignUp;

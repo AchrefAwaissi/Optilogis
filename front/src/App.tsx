@@ -13,7 +13,7 @@ import PropertyDetails from './Pages/PropertyDetails';
 import SignIn from './Component/SignIn';
 import SignUp from './Component/SignUp';
 import Candidature from './Pages/candidature';
-import ManageItems from './Component/ManageItems';
+import ManageItems from './Component/ManageItemsPage';
 
 interface User {
   username: string;

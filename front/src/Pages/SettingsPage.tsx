@@ -50,7 +50,7 @@ const SettingsPage: React.FC = () => {
     setMessage(null);
 
     if (formData.password !== formData.confirmPassword) {
-      setMessage({ type: 'error', text: 'Passwords do not match' });
+      setMessage({ type: 'error', text: 'Les mots de passe ne correspondent pas !' });
       return;
     }
 
@@ -66,7 +66,7 @@ const SettingsPage: React.FC = () => {
       }
 
       await updateUser(formDataToSend);
-      setMessage({ type: 'success', text: 'Profile updated successfully' });
+      setMessage({ type: 'success', text: 'Profil mis à jour avec succès !' });
       setFormData(prevState => ({
         ...prevState,
         password: '',
@@ -75,7 +75,7 @@ const SettingsPage: React.FC = () => {
       }));
       setIsEditing(false);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to update profile' });
+      setMessage({ type: 'error', text: 'Echec de la mise à jour du profil !' });
     }
   };
 
@@ -165,14 +165,14 @@ const SettingsPage: React.FC = () => {
               <InputField label="Email" name="email" type="email" />
               {isEditing && (
                 <>
-                  <InputField label="New Password" name="password" type="password" />
-                  <InputField label="Confirm New Password" name="confirmPassword" type="password" />
+                  <InputField label="Nouveau mot de passe" name="password" type="password" />
+                  <InputField label="Confirmez le mot de passe" name="confirmPassword" type="password" />
                 </>
               )}
             </div>
 
             <div className="mt-8">
-              <h3 className="text-xl font-bold text-[#030303] font-poppins mb-4">My Email Address</h3>
+              <h3 className="text-xl font-bold text-[#030303] font-poppins mb-4">Mon adresse E-Mail</h3>
               <div className="bg-[#f9f9f9] rounded-lg p-4 flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-[#095550] mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />

@@ -56,13 +56,13 @@ const HomePage: React.FC = () => {
     try {
       setLoading(true);
       const data = await getUserItems();
-      console.log("Fetched houses in HomePage:", data.length);
+      console.log("Maisons récupérées dans la page d'accueil :", data.length);
       setHouses(data);
       setFilteredHouses(data);
       setError(null);
     } catch (error) {
-      console.error("Error fetching houses:", error);
-      setError("Failed to load houses. Please try again later.");
+      console.error("Erreur lors de la récupération des maisons :", error);
+      setError("Échec du chargement des maisons. Veuillez réessayer plus tard.");
     } finally {
       setLoading(false);
     }

@@ -110,7 +110,7 @@ const ManageItems: React.FC = () => {
         }));
       setUserItems(filteredItems);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to load user items' });
+      setMessage({ type: 'error', text: 'Echec dans le chargement des utilisateurs' });
     }
   };
 
@@ -131,10 +131,10 @@ const ManageItems: React.FC = () => {
   };  
 
   const handleDeleteItem = async (itemId: string) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) {
       try {
         await deleteItem(itemId);
-        setMessage({ type: 'success', text: 'Item deleted successfully' });
+        setMessage({ type: 'success', text: 'Élément supprimé avec succès.' });
         loadUserItems();
         if (selectedItemId === itemId) {
           setSelectedItemId(null);
@@ -152,7 +152,7 @@ const ManageItems: React.FC = () => {
           });
         }
       } catch (error) {
-        setMessage({ type: 'error', text: 'Failed to delete item' });
+        setMessage({ type: 'error', text: 'Échec de la suppression' });
       }
     }
   };
@@ -162,7 +162,7 @@ const ManageItems: React.FC = () => {
     setMessage(null);
 
     if (!selectedItemId) {
-      setMessage({ type: 'error', text: 'Please select an item to update' });
+      setMessage({ type: 'error', text: 'Veuillez sélectionner un élément à mettre à jour.' });
       return;
     }
 
@@ -183,7 +183,7 @@ const ManageItems: React.FC = () => {
       }
 
       await updateItem(selectedItemId, formData);
-      setMessage({ type: 'success', text: 'Item updated successfully' });
+      setMessage({ type: 'success', text: 'Élément mis à jour avec succès.' });
       loadUserItems();
       setSelectedItemId(null);
       setItemData({
@@ -199,7 +199,7 @@ const ManageItems: React.FC = () => {
         area: 0,
       });
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to update item' });
+      setMessage({ type: 'error', text: 'Échec de la mise à jour' });
     }
   };
 

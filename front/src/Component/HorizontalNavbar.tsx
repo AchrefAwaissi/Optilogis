@@ -107,7 +107,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
               <FontAwesomeIcon icon={faSearch} className="text-gray-500 text-lg mr-2" />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Recherche..."
                 className="bg-transparent outline-none w-full text-gray-500 text-sm"
               />
             </div>

@@ -311,7 +311,7 @@ const PropertyDetails: React.FC = () => {
         setIsMapLoaded(true);
       }
     }).catch((e) => {
-      console.error('Error loading Google Maps library: ', e);
+      console.error('Erreur lors du chargement de la bibliothèque Google Maps.: ', e);
     });
   }, [house]);
 
@@ -379,7 +379,7 @@ const PropertyDetails: React.FC = () => {
 
     const token = localStorage.getItem('token');
     if (!token) {
-      console.log('No authentication token found');
+      console.log('Pas de Token trouvé');
       return;
     }
 
@@ -409,7 +409,7 @@ const PropertyDetails: React.FC = () => {
           console.error('Error response:', error.response.data);
           console.error('Error status:', error.response.status);
           if (error.response.status === 401) {
-            console.error('Authentication failed. Please log in again.');
+            console.error('Echec Authentification, veuillez réessayer.');
             // Here you might want to redirect to login page or refresh the token
           }
         } else if (error.request) {
@@ -501,7 +501,7 @@ const PropertyDetails: React.FC = () => {
             <p className="text-sm text-[#3e3e3e]">{truncatedAddress}</p>
           </div>
           <div className="flex space-x-2">
-            <IconButton icon={faShare} onClick={() => console.log('Share clicked')} />
+            <IconButton icon={faShare} onClick={() => console.log('Partager cliqué')} />
             <IconButton 
               icon={faHeart}
               onClick={handleLikeToggle}

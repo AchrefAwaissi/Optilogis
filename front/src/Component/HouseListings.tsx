@@ -38,7 +38,7 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
 
     const token = localStorage.getItem('token');
     if (!token) {
-      console.log('No authentication token found');
+      console.log('Aucun jeton d authentification trouvé');
       return;
     }
 
@@ -61,7 +61,7 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
         console.log(`Item ${isLiked ? 'unliked' : 'liked'} successfully`);
       }
     } catch (error) {
-      console.error('Error toggling like:', error);
+      console.error('Erreur Ajout ou retrait du like:', error);
     }
   };
 

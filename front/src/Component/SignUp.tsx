@@ -289,9 +289,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
   );
 };
 
-<<<<<<< HEAD
 export default SignUp;
-=======
 
-export default SignUp;
->>>>>>> origin/jk
+
+

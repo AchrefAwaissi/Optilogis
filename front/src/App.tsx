@@ -13,15 +13,11 @@ import PropertyDetails from './Pages/PropertyDetails';
 import SignIn from './Component/SignIn';
 import SignUp from './Component/SignUp';
 import Candidature from './Pages/candidature';
-<<<<<<< HEAD
-import ManageItemsPage from './Pages/ManageItemsPage'; // Import the new page
-=======
 import ManageItems from './Component/ManageItemsPage';
->>>>>>> origin/jk
 
 interface User {
   username: string;
-  // Add other user properties if necessary
+  // Ajoutez d'autres propriétés utilisateur si nécessaire
 }
 
 // ProtectedRoute component
@@ -62,9 +58,10 @@ const App: React.FC = () => {
     <Router>
       <ItemProvider>
         <div className="flex h-screen overflow-hidden">
+          {/* Passez isAuthenticated à CombinedNavbar */}
           <CombinedNavbar
             onAuthClick={() => handleAuthClick(false)}
-            isAuthenticated={!!user}
+            isAuthenticated={!!user}  // Utilise la vérification de l'utilisateur connecté
           />
           <div className="flex-1 flex flex-col overflow-hidden">
             <HorizontalNavbar
@@ -101,16 +98,9 @@ const App: React.FC = () => {
                     <Candidature />
                   </ProtectedRoute>
                 } />
-<<<<<<< HEAD
-                {/* New Route for ManageItemsPage */}
                 <Route path="/manage-items" element={
                   <ProtectedRoute>
-                    <ManageItemsPage />
-=======
-                <Route path="/manage-items" element={
-                  <ProtectedRoute>
-                    <ManageItems/>
->>>>>>> origin/jk
+                    <ManageItems />
                   </ProtectedRoute>
                 } />
               </Routes>

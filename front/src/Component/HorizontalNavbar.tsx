@@ -180,9 +180,4 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
   return user ? <FullNavbar /> : <MobileNavbar />;
 };
 
-<<<<<<< HEAD
 export default HorizontalNavbar;
-
-=======
-export default HorizontalNavbar;
->>>>>>> origin/jk

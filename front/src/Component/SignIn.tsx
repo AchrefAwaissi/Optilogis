@@ -194,9 +194,5 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
   );
 };
 
-<<<<<<< HEAD
 export default SignIn;
-=======
 
-export default SignIn;
->>>>>>> origin/jk

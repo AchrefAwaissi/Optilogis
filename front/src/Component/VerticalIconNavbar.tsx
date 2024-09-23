@@ -106,7 +106,7 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick, is
             className="w-full flex items-center justify-center px-4 py-2 bg-[#095550] text-white rounded-lg hover:bg-[#073d3a] transition-colors duration-300"
           >
             <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />
-            <span className={isOpen ? "" : "hidden"}>Sign In</span>
+            <span className={isOpen ? "" : "hidden"}>Se connecter</span>
           </button>
         </div>
       )}

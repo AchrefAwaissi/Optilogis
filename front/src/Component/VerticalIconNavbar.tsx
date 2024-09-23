@@ -62,12 +62,12 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick, is
 
   // Affiche uniquement "Add" et "Settings" si l'utilisateur est connecté
   const menuItems: MenuItem[] = [
-    { icon: faHome, label: "Home", path: "/" },
-    ...(isAuthenticated ? [{ icon: faPlus, label: "Add", path: "/publish" }] : []), // Condition pour afficher "Add"
-    { icon: faCube, label: "3D", path: "/search" },
-    ...(isAuthenticated ? [{ icon: faList, label: "My Items", path: "/manage-items" }] : []), // Condition pour afficher "My items"
+    { icon: faHome, label: "Accueil", path: "/" },
+    ...(isAuthenticated ? [{ icon: faPlus, label: "Créer une Annonce", path: "/publish" }] : []), // Condition pour afficher "Add"
+    { icon: faCube, label: "Vue 3D", path: "/search" },
+    ...(isAuthenticated ? [{ icon: faList, label: "Mes Annonces", path: "/manage-items" }] : []), // Condition pour afficher "My items"
     { icon: faAddressBook, label: "Contact", path: "/contact" },
-    ...(isAuthenticated ? [{ icon: faCog, label: "Settings", path: "/settings" }] : []), // Condition pour afficher "Settings"
+    ...(isAuthenticated ? [{ icon: faCog, label: "Paramètres", path: "/settings" }] : []), // Condition pour afficher "Settings"
   ];
 
   return (

@@ -62,10 +62,10 @@ const PropertyCard: React.FC<{ item: Item; onEdit: () => void; onDelete: () => v
           <p className="text-sm font-medium text-teal-700">€{item.price.toLocaleString()}/ mois</p>
           <div>
             <button onClick={onEdit} className="mr-2 px-3 py-2 bg-[#095550] text-white text-sm font-normal rounded-lg hover:bg-[#074440] transition-colors duration-200">
-              <FontAwesomeIcon icon={faPencilAlt} className="mr-1" /> Edit
+              <FontAwesomeIcon icon={faPencilAlt} className="mr-1" /> Modifier
             </button>
             <button onClick={onDelete} className="px-3 py-2 bg-red-500 text-white text-sm font-normal rounded-lg hover:bg-red-600 transition-colors duration-200">
-              <FontAwesomeIcon icon={faTrash} className="mr-1" /> Delete
+              <FontAwesomeIcon icon={faTrash} className="mr-1" /> Supprimer
             </button>
           </div>
         </div>
@@ -367,7 +367,7 @@ const ManageItems: React.FC = () => {
             type="submit"
             className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            Update Property
+            Sauvegarder les changements
           </button>
         </form>
       )}

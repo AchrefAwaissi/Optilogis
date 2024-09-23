@@ -4,14 +4,14 @@ import {
   faDoorOpen, faBed, faHouse, faCouch,
   faRulerCombined, faCompass, faWheelchair, faBuilding,
   faWarehouse, faCar, faBox, faWineBottle, faTree,
-  faShare, faHeart, faExpand, faDollarSign
+  faShare, faHeart, faExpand, faDollarSign, faCheckCircle
 } from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
 import * as THREE from 'three';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import { useAuth } from "../contexts/AuthContext";
 import axios from 'axios'; 
 import PaymentForm from '../Component/PaymentForm';
@@ -115,14 +115,16 @@ const PropertyDetails: React.FC = () => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [neighborhoodBoundary, setNeighborhoodBoundary] = useState<google.maps.Circle | null>(null);
   const [showCandidaturePopup, setShowCandidaturePopup] = useState(false);
-  const { user } = useAuth(); // Use the auth context
+  const { user, updateUser } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
-
   const [selectedImage, setSelectedImage] = useState<string>(
     house?.images.length > 0
       ? `http://localhost:5000/uploads/${house.images[0]}`
       : 'https://via.placeholder.com/800x400'
   );
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
 
   const addNeighborhoodBoundary = (map: google.maps.Map) => {
     const center = new google.maps.LatLng(house.latitude, house.longitude);
@@ -273,24 +275,40 @@ const PropertyDetails: React.FC = () => {
 
   const handleCandidatureClick = () => {
     if (user?.isPremium) {
-      // Si l'utilisateur est premium, naviguer directement vers la page de candidature
       navigate(`/candidature/${house._id}`, { state: { isPremium: true } });
     } else {
-      // Sinon, afficher le popup de paiement
       setShowCandidaturePopup(true);
     }
   };
 
-  const handleCandidatureSuccess = () => {
-    setShowCandidaturePopup(false);
-    navigate(`/candidature/${house._id}`, { state: { isPremium: true } });
+  const handleCandidatureSuccess = async () => {
+    setIsProcessingPayment(true);
+    try {
+      // Simulate API call to update user status (replace with actual API call)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Update user status
+      updateUser({ ...user, isPremium: true });
+      
+      setIsProcessingPayment(false);
+      setShowSuccessMessage(true);
+      
+      // Close popup after showing success message
+      setTimeout(() => {
+        setFadeOut(true);
+        setTimeout(() => {
+          setShowCandidaturePopup(false);
+          setShowSuccessMessage(false);
+          setFadeOut(false);
+          navigate(`/candidature/${house._id}`, { state: { isPremium: true } });
+        }, 500); // Match this with your CSS transition time
+      }, 2000);
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      setIsProcessingPayment(false);
+      // Handle error (show error message to user)
+    }
   };
-
-  if (!house) {
-    return <div className="p-4">No property details available.</div>;
-  }
-
-  const truncatedAddress = truncateAddress(`${house.address}, ${house.city}, ${house.country}`);
 
   const handleLikeToggle = async () => {
     if (!user) {
@@ -344,6 +362,12 @@ const PropertyDetails: React.FC = () => {
     }
   };
 
+  if (!house) {
+    return <div className="p-4">No property details available.</div>;
+  }
+
+  const truncatedAddress = truncateAddress(`${house.address}, ${house.city}, ${house.country}`);
+
   return (
     <div className="flex flex-col md:flex-row p-4 max-w-7xl mx-auto h-screen overflow-y-auto">
       <div className="w-full md:w-[60%] md:pr-4">
@@ -359,7 +383,7 @@ const PropertyDetails: React.FC = () => {
           >
             <FontAwesomeIcon icon={faExpand} />
           </button>
-          </div>
+        </div>
         {house.images.length > 1 && (
           <div className="flex mt-4 space-x-2 md:space-x-4 overflow-x-auto pb-2">
             {house.images.map((image, index) => (
@@ -439,11 +463,16 @@ const PropertyDetails: React.FC = () => {
           <div className="text-[25px] font-bold text-[#095550] mb-2 md:mb-0">€{house.price.toLocaleString()}/ mois</div>
           <div className="flex flex-row space-x-2">
           <button
-            onClick={handleCandidatureClick}
-            className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap"
-          >
-            {user?.isPremium ? "Déposer ma candidature" : "Devenir premium et candidater"}
-          </button>
+              onClick={handleCandidatureClick}
+              className="w-full md:w-auto h-10 bg-teal-700 text-white px-4 py-2 rounded-md text-xs md:text-sm whitespace-nowrap"
+            >
+              <span className="hidden md:inline">
+                {user?.isPremium ? "Déposer ma candidature" : "Devenir premium et candidater"}
+              </span>
+              <span className="md:hidden">
+                {user?.isPremium ? "Candidater" : "Devenir premium"}
+              </span>
+            </button>
           </div>
         </div>
         <h2 className="text-[23px] font-medium text-[#2c2c2c] mb-4">Description</h2>
@@ -470,18 +499,33 @@ const PropertyDetails: React.FC = () => {
         </div>
       </div>
       {showCandidaturePopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
           <div className="bg-white p-8 rounded-lg max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4">Déposer une candidature</h2>
-            <Elements stripe={stripePromise}>
-              <PaymentForm onSuccess={handleCandidatureSuccess} />
-            </Elements>
-            <button
-              onClick={() => setShowCandidaturePopup(false)}
-              className="mt-4 text-gray-500 hover:text-gray-700"
-            >
-              Annuler
-            </button>
+            {isProcessingPayment ? (
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-700 mx-auto mb-4"></div>
+                <p className="text-lg font-semibold">Traitement du paiement en cours...</p>
+              </div>
+            ) : showSuccessMessage ? (
+              <div className="text-center">
+                <FontAwesomeIcon icon={faCheckCircle} className="text-5xl text-green-500 mb-4" />
+                <h2 className="text-2xl font-bold mb-2">Paiement réussi !</h2>
+                <p>Vous êtes maintenant un utilisateur premium. Redirection vers le formulaire de candidature...</p>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold mb-4">Déposer une candidature</h2>
+                <Elements stripe={stripePromise}>
+                  <PaymentForm onSuccess={handleCandidatureSuccess} />
+                </Elements>
+                <button
+                  onClick={() => setShowCandidaturePopup(false)}
+                  className="mt-4 text-gray-500 hover:text-gray-700"
+                >
+                  Annuler
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

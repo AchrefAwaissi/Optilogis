@@ -3,7 +3,7 @@ import { useLocation, Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faExclamationTriangle, faSpinner, faHome, faCoins } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faExclamationTriangle, faSpinner, faHome, faCoins, faInfoCircle, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 
 interface Item {
   _id: string;
@@ -35,6 +35,7 @@ const Candidature: React.FC = () => {
   const [error, setError] = useState('');
   const [isUrlValid, setIsUrlValid] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
 
   useEffect(() => {
     const fetchItem = async () => {
@@ -171,10 +172,41 @@ const Candidature: React.FC = () => {
           </div>
         )}
 
-        <p className="text-gray-700 mb-6">
-          Pour finaliser votre candidature, veuillez fournir le lien vers votre dossier DossierFacile. 
-          Cela permettra au propriétaire d'examiner votre dossier en toute sécurité.
-        </p>
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+          <p className="flex items-start">
+            <FontAwesomeIcon icon={faInfoCircle} className="text-blue-500 mr-2 mt-1" />
+            <span>
+              Pour finaliser votre candidature, vous devez fournir un lien vers votre dossier DossierFacile. 
+              {!showDetails && (
+                <button
+                  onClick={() => setShowDetails(true)}
+                  className="text-blue-600 hover:underline ml-1 focus:outline-none"
+                >
+                  Afficher plus
+                  <FontAwesomeIcon icon={faChevronDown} className="ml-1" />
+                </button>
+              )}
+            </span>
+          </p>
+          {showDetails && (
+            <div className="mt-2">
+              <p>Si vous n'avez pas encore de dossier, suivez ces étapes :</p>
+              <ol className="list-decimal list-inside mt-2 ml-5">
+                <li>Rendez-vous sur <a href="https://www.dossierfacile.logement.gouv.fr/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">DossierFacile</a></li>
+                <li>Créez un compte</li>
+                <li>Soumettez vos documents</li>
+                <li>Une fois validé, vous recevrez un lien à utiliser ci-dessous</li>
+              </ol>
+              <button
+                onClick={() => setShowDetails(false)}
+                className="text-blue-600 hover:underline mt-2 focus:outline-none"
+              >
+                Afficher moins
+                <FontAwesomeIcon icon={faChevronUp} className="ml-1" />
+              </button>
+            </div>
+          )}
+        </div>
 
         <form onSubmit={handleSubmit} className="mb-6">
           <div className="mb-4">

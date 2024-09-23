@@ -16,6 +16,8 @@ describe('AuthController', () => {
     findOne: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
+    updatePremiumStatus: jest.fn(),
+    findAllPremiumUsers: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -38,7 +40,7 @@ describe('AuthController', () => {
   });
 
   describe('signUp', () => {
-    it('should create a new user', async () => {
+    it('should create a new user with isPremium set to false', async () => {
       const createUserDto: CreateUserDto = {
         username: 'testuser',
         email: 'test@example.com',
@@ -48,9 +50,10 @@ describe('AuthController', () => {
         path: 'path/to/photo.jpg',
       } as Express.Multer.File;
       
-      mockAuthService.signUp.mockResolvedValue({...createUserDto, profilePhotoPath: 'path/to/photo.jpg'});
+      const expectedUser = {...createUserDto, profilePhotoPath: 'path/to/photo.jpg', isPremium: false};
+      mockAuthService.signUp.mockResolvedValue(expectedUser);
 
-      expect(await controller.signUp(createUserDto, mockFile)).toEqual({...createUserDto, profilePhotoPath: 'path/to/photo.jpg'});
+      expect(await controller.signUp(createUserDto, mockFile)).toEqual(expectedUser);
       expect(mockAuthService.signUp).toHaveBeenCalledWith({...createUserDto, profilePhotoPath: 'path/to/photo.jpg'});
     });
 
@@ -61,9 +64,10 @@ describe('AuthController', () => {
         password: 'password123',
       };
       
-      mockAuthService.signUp.mockResolvedValue(createUserDto);
+      const expectedUser = {...createUserDto, isPremium: false};
+      mockAuthService.signUp.mockResolvedValue(expectedUser);
 
-      expect(await controller.signUp(createUserDto, undefined)).toEqual(createUserDto);
+      expect(await controller.signUp(createUserDto, undefined)).toEqual(expectedUser);
       expect(mockAuthService.signUp).toHaveBeenCalledWith(createUserDto);
     });
   });
@@ -160,6 +164,31 @@ describe('AuthController', () => {
 
       expect(await controller.getCurrentUser(mockRequest)).toEqual(result);
       expect(mockAuthService.findOne).toHaveBeenCalledWith('1');
+    });
+  });
+
+  describe('updatePremiumStatus', () => {
+    it('should update premium status of a user', async () => {
+      const userId = '1';
+      const isPremium = true;
+      const result = { id: userId, username: 'testuser', isPremium };
+      mockAuthService.updatePremiumStatus.mockResolvedValue(result);
+
+      expect(await controller.updatePremiumStatus(userId, isPremium)).toEqual(result);
+      expect(mockAuthService.updatePremiumStatus).toHaveBeenCalledWith(userId, isPremium);
+    });
+  });
+
+  describe('findAllPremiumUsers', () => {
+    it('should return an array of premium users', async () => {
+      const result = [
+        { id: '1', username: 'user1', isPremium: true },
+        { id: '2', username: 'user2', isPremium: true }
+      ];
+      mockAuthService.findAllPremiumUsers.mockResolvedValue(result);
+
+      expect(await controller.findAllPremiumUsers()).toEqual(result);
+      expect(mockAuthService.findAllPremiumUsers).toHaveBeenCalled();
     });
   });
 });

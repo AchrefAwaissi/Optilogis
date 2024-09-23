@@ -6,6 +6,7 @@ interface User {
   username: string;
   email: string;
   profilePhotoPath: string;
+  isPremium: boolean;
 }
 
 interface AuthContextType {
@@ -13,6 +14,7 @@ interface AuthContextType {
   signin: (username: string, password: string) => Promise<void>;
   signout: () => void;
   updateUser: (userData: Partial<User> | FormData) => Promise<void>;
+  upgradeToPremium: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,7 +38,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: response.data._id,
         username: response.data.username,
         email: response.data.email,
-        profilePhotoPath: response.data.profilePhotoPath
+        profilePhotoPath: response.data.profilePhotoPath,
+        isPremium: response.data.isPremium
       });
     } catch (error) {
       console.error('Echec affichage de l utilisateur', error);
@@ -70,8 +73,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             'Content-Type': 'multipart/form-data'
           }
         });
-
-        console.log('Server response:', response.data);
       } else {
         response = await axios.put('http://localhost:5000/auth/update', userData, {
           headers: { Authorization: `Bearer ${token}` }
@@ -82,10 +83,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         id: response.data._id,
         username: response.data.username,
         email: response.data.email,
-        profilePhotoPath: response.data.profilePhotoPath
+        profilePhotoPath: response.data.profilePhotoPath,
+        isPremium: response.data.isPremium
       };
   
-      // Ajouter un timestamp à l'URL de la photo pour forcer le rechargement
       if (updatedUser.profilePhotoPath) {
         updatedUser.profilePhotoPath = `${updatedUser.profilePhotoPath}?t=${new Date().getTime()}`;
       }
@@ -98,8 +99,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const upgradeToPremium = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!user) throw new Error('User not found');
+      const response = await axios.patch(`http://localhost:5000/auth/users/${user.id}/premium`, 
+        { isPremium: true },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      if (response.data) {
+        setUser(prevUser => prevUser ? { ...prevUser, isPremium: true } : null);
+      }
+    } catch (error) {
+      console.error('Échec de la mise à niveau vers premium', error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, signin, signout, updateUser }}>
+    <AuthContext.Provider value={{ user, signin, signout, updateUser, upgradeToPremium }}>
       {children}
     </AuthContext.Provider>
   );

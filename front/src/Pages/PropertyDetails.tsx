@@ -110,6 +110,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess }) => {
   const [lastName, setLastName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const { upgradeToPremium } = useAuth();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -124,22 +125,26 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess }) => {
     const cardElement = elements.getElement(CardElement);
 
     if (cardElement) {
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-        billing_details: {
-          name: `${firstName} ${lastName}`,
-        },
-      });
+      try {
+        const { error, paymentMethod } = await stripe.createPaymentMethod({
+          type: 'card',
+          card: cardElement,
+          billing_details: {
+            name: `${firstName} ${lastName}`,
+          },
+        });
 
-      if (error) {
-        setError(error.message || "Une erreur est survenue lors du traitement de votre carte.");
-        setProcessing(false);
-      } else {
-        setTimeout(() => {
-          setProcessing(false);
+        if (error) {
+          setError(error.message || "Une erreur est survenue lors du traitement de votre carte.");
+        } else {
+          // Mise à jour du statut premium de l'utilisateur
+          await upgradeToPremium();
           onSuccess();
-        }, 1000);
+        }
+      } catch (error) {
+        setError("Une erreur est survenue lors de la mise à niveau vers premium. Veuillez réessayer.");
+      } finally {
+        setProcessing(false);
       }
     }
   };
@@ -360,6 +365,16 @@ const PropertyDetails: React.FC = () => {
     }
   }, [map, isMapLoaded]);
 
+  const handleCandidatureClick = () => {
+    if (user?.isPremium) {
+      // Si l'utilisateur est premium, naviguer directement vers la page de candidature
+      navigate(`/candidature/${house._id}`, { state: { isPremium: true } });
+    } else {
+      // Sinon, afficher le popup de paiement
+      setShowCandidaturePopup(true);
+    }
+  };
+
   const handleCandidatureSuccess = () => {
     setShowCandidaturePopup(false);
     navigate(`/candidature/${house._id}`, { state: { isPremium: true } });
@@ -517,12 +532,12 @@ const PropertyDetails: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div className="text-[25px] font-bold text-[#095550] mb-2 md:mb-0">€{house.price.toLocaleString()}/ mois</div>
           <div className="flex flex-row space-x-2">
-            <button
-              onClick={() => setShowCandidaturePopup(true)}
-              className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap"
-            >
-              Déposer une candidature
-            </button>
+          <button
+            onClick={handleCandidatureClick}
+            className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap"
+          >
+            {user?.isPremium ? "Déposer ma candidature" : "Devenir premium et candidater"}
+          </button>
           </div>
         </div>
         <h2 className="text-[23px] font-medium text-[#2c2c2c] mb-4">Description</h2>

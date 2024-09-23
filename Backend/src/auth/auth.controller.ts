@@ -10,7 +10,8 @@ import {
   Request,
   ValidationPipe,
   UseInterceptors,
-  UploadedFile
+  UploadedFile,
+  Patch
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Express } from 'express';
@@ -146,5 +147,19 @@ export class AuthController {
   @Delete('users/:id')
   async remove(@Param('id') id: string) {
     return this.authService.remove(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('users/:id/premium')
+  async updatePremiumStatus(
+    @Param('id') id: string, 
+    @Body('isPremium') isPremium: boolean
+  ) {
+    return this.authService.updatePremiumStatus(id, isPremium);
+  }
+
+  @Get('users/premium')
+  async findAllPremiumUsers() {
+    return this.authService.findAllPremiumUsers();
   }
 }

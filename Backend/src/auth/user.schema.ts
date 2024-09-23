@@ -14,6 +14,9 @@ export class User extends Document {
 
   @Prop()
   profilePhotoPath: string; 
+
+  @Prop({ default: false })
+  isPremium: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

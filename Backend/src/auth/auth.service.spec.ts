@@ -48,13 +48,13 @@ describe('AuthService', () => {
   });
 
   describe('signUp', () => {
-    it('should create a new user', async () => {
+    it('should create a new user with isPremium set to false', async () => {
       const createUserDto: CreateUserDto = {
         username: 'testuser',
         email: 'test@example.com',
         password: 'password123',
       };
-      const createdUser = { ...createUserDto, _id: 'some_id' };
+      const createdUser = { ...createUserDto, _id: 'some_id', isPremium: false };
   
       jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashedPassword' as never);
       mockUserModel.create.mockResolvedValue(createdUser);
@@ -65,6 +65,7 @@ describe('AuthService', () => {
       expect(mockUserModel.create).toHaveBeenCalledWith({
         ...createUserDto,
         password: 'hashedPassword',
+        isPremium: false,
       });
     });
   });
@@ -83,7 +84,7 @@ describe('AuthService', () => {
 
       const result = await service.signIn('testuser', 'password123');
 
-      expect(result).toEqual({ access_token: 'test_token' });
+      expect(result).toEqual({ access_token: 'test_token', userId: 'user_id' });
       expect(mockUserModel.findOne).toHaveBeenCalledWith({ username: 'testuser' });
     });
 
@@ -181,6 +182,50 @@ describe('AuthService', () => {
       });
 
       await expect(service.remove('1')).rejects.toThrow('User with ID "1" not found');
+    });
+  });
+
+  describe('updatePremiumStatus', () => {
+    it('should update premium status of a user', async () => {
+      const userId = '1';
+      const isPremium = true;
+      const updatedUser = { _id: userId, username: 'user1', isPremium };
+      mockUserModel.findByIdAndUpdate.mockReturnValue({
+        select: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(updatedUser),
+      });
+
+      const result = await service.updatePremiumStatus(userId, isPremium);
+
+      expect(result).toEqual(updatedUser);
+      expect(mockUserModel.findByIdAndUpdate).toHaveBeenCalledWith(userId, { isPremium }, { new: true });
+    });
+
+    it('should throw NotFoundException if user not found during premium status update', async () => {
+      mockUserModel.findByIdAndUpdate.mockReturnValue({
+        select: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(null),
+      });
+
+      await expect(service.updatePremiumStatus('1', true)).rejects.toThrow('User with ID "1" not found');
+    });
+  });
+
+  describe('findAllPremiumUsers', () => {
+    it('should return an array of premium users', async () => {
+      const premiumUsers = [
+        { _id: '1', username: 'user1', isPremium: true },
+        { _id: '2', username: 'user2', isPremium: true }
+      ];
+      mockUserModel.find.mockReturnValue({
+        select: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(premiumUsers),
+      });
+
+      const result = await service.findAllPremiumUsers();
+
+      expect(result).toEqual(premiumUsers);
+      expect(mockUserModel.find).toHaveBeenCalledWith({ isPremium: true });
     });
   });
 });

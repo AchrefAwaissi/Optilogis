@@ -93,4 +93,59 @@ export class ItemService {
       throw error;
     }
   }
+
+  async addLike(itemId: string, userId: string): Promise<Item> {
+    try {
+      console.log(`Adding like for item ${itemId} by user ${userId}`);
+      const item = await this.itemModel.findById(itemId);
+      if (!item) {
+        throw new NotFoundException(`Item with ID ${itemId} not found`);
+      }
+
+      if (!item.likes.includes(new Types.ObjectId(userId).toString())) {
+        item.likes.push(new Types.ObjectId(userId).toString());
+        await item.save();
+        console.log('Like added successfully');
+      } else {
+        console.log('User has already liked this item');
+      }
+
+      return item;
+    } catch (error) {
+      console.error('Error adding like:', error);
+      throw error;
+    }
+  }
+
+  async removeLike(itemId: string, userId: string): Promise<Item> {
+    try {
+      console.log(`Removing like for item ${itemId} by user ${userId}`);
+      const item = await this.itemModel.findById(itemId);
+      if (!item) {
+        throw new NotFoundException(`Item with ID ${itemId} not found`);
+      }
+  
+      const userIdObj = new Types.ObjectId(userId);
+      const index = item.likes.findIndex((id) => {
+        if (Types.ObjectId.isValid(id)) {
+          return (id as unknown as Types.ObjectId).equals(userIdObj);
+        } else {
+          return id === userId;
+        }
+      });
+  
+      if (index > -1) {
+        item.likes.splice(index, 1);
+        await item.save();
+        console.log('Like removed successfully');
+      } else {
+        console.log('User has not liked this item');
+      }
+  
+      return item;
+    } catch (error) {
+      console.error('Error removing like:', error);
+      throw error;
+    }
+  }
 }

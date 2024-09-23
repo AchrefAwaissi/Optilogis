@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { House } from "../types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBed, faBath, faRulerCombined, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from "../contexts/AuthContext";
+import axios from "axios";
 
 interface HouseListingsProps {
   houses: House[];
@@ -15,16 +17,52 @@ const truncateAddress = (address: string, maxLength: number) => {
 };
 
 const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, onClick }) => {
+  const { user } = useAuth(); // Utilisez le hook useAuth pour obtenir l'utilisateur connecté
+  const [isLiked, setIsLiked] = useState(user && house.likes?.includes(user.id));
+  const [likeCount, setLikeCount] = useState(house.likes?.length || 0);
   const truncatedAddress = truncateAddress(house.address, 30);
 
   const imageUrl = house.images && house.images.length > 0
     ? `http://localhost:5000/uploads/${house.images[0]}`
     : 'https://via.placeholder.com/165x155';
 
-  const handleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    // Implement favorite functionality here
-    console.log('Favorite clicked for:', house.title);
+
+  const handleLikeToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();  // Empêche la propagation de l'événement
+    e.stopPropagation(); // Assure que l'événement ne se propage pas au parent
+
+    if (!user) {
+      console.log('User must be logged in to like/unlike');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log('Aucun jeton d authentification trouvé');
+      return;
+    }
+
+    try {
+      const endpoint = `http://localhost:5000/item/${house._id}/like`;
+      const method = isLiked ? 'delete' : 'post';
+      
+      const response = await axios({
+        method: method,
+        url: endpoint,
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.data) {
+        setIsLiked(!isLiked);
+        setLikeCount(prevCount => isLiked ? prevCount - 1 : prevCount + 1);
+        console.log(`Item ${isLiked ? 'unliked' : 'liked'} successfully`);
+      }
+    } catch (error) {
+      console.error('Erreur Ajout ou retrait du like:', error);
+    }
   };
 
   return (
@@ -38,11 +76,15 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
           className="w-full h-full rounded-xl bg-center bg-cover bg-no-repeat"
           style={{ backgroundImage: `url(${imageUrl})` }}
         />
-        <button
-          onClick={handleFavorite}
-          className="absolute top-2 right-2 text-white hover:text-red-500 transition-colors duration-200"
+         <button
+          onClick={handleLikeToggle}
+          className="absolute top-2 right-2 bg-white bg-opacity-70 rounded-full p-2 flex items-center space-x-1 z-10"
         >
-          <FontAwesomeIcon icon={faHeart} className="text-2xl" />
+          <FontAwesomeIcon 
+            icon={faHeart} 
+            className={`text-xl ${isLiked ? 'text-red-500' : 'text-gray-500'}`} 
+          />
+          <span className="text-sm font-semibold">{likeCount}</span>
         </button>
       </div>
       <div className="flex-1 p-4 flex flex-col justify-between">
@@ -73,7 +115,7 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
 };
 
 const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect, city }) => {
-  console.log("HouseListings received houses:", houses.length);
+  console.log("Liste des logement reçue:", houses.length);
 
   return (
     <div className="flex flex-col items-center space-y-4 p-4 pb-20">

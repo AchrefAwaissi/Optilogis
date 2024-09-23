@@ -151,7 +151,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
           <input
             type="text"
             name="username"
-            placeholder="Username or email"
+            placeholder="Utilisateur ou Mail"
             value={formData.username}
             onChange={handleChange}
             style={styles.input}
@@ -163,7 +163,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
           <input
             type="password"
             name="password"
-            placeholder="Password"
+            placeholder="Mot de Passe"
             value={formData.password}
             onChange={handleChange}
             style={styles.input}
@@ -194,4 +194,9 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
   );
 };
 
+<<<<<<< HEAD
 export default SignIn;
+=======
+
+export default SignIn;
+>>>>>>> origin/jk

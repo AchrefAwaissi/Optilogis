@@ -42,7 +42,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
       console.log("Fetched items:", response.data.length); // Ajoutez ce log
       return response.data; // Retournez toutes les données sans filtrage
     } catch (error) {
-      console.error('Error fetching items:', error);
+      console.error('Erreur affichage des élements:', error);
       throw error;
     }
   };
@@ -59,7 +59,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
       setItems(prevItems => prevItems.map(i => i._id === id ? response.data : i));
       return response.data;
     } catch (error) {
-      console.error('Error updating item:', error);
+      console.error('Erreur lors de la mise à jour:', error);
       throw error;
     }
   };
@@ -74,7 +74,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
       });
       setItems(prevItems => prevItems.filter(item => item._id !== id));
     } catch (error) {
-      console.error('Error deleting item:', error);
+      console.error('Erreur lors de la suppression:', error);
       throw error;
     }
   };
@@ -91,7 +91,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
       setItems(prevItems => [...prevItems, response.data]);
       return response.data;
     } catch (error) {
-      console.error('Error creating item:', error);
+      console.error('Erreur lors de la création:', error);
       throw error;
     }
   };
@@ -106,7 +106,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
 export const useItems = (): ItemContextType => {
   const context = useContext(ItemContext);
   if (context === undefined) {
-    throw new Error('useItems must be used within an ItemProvider');
+    throw new Error('useItems doit être utilisé au sein des ItemProvide');
   }
   return context;
 };

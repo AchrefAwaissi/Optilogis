@@ -13,7 +13,11 @@ import PropertyDetails from './Pages/PropertyDetails';
 import SignIn from './Component/SignIn';
 import SignUp from './Component/SignUp';
 import Candidature from './Pages/candidature';
+<<<<<<< HEAD
 import ManageItemsPage from './Pages/ManageItemsPage'; // Import the new page
+=======
+import ManageItems from './Component/ManageItemsPage';
+>>>>>>> origin/jk
 
 interface User {
   username: string;
@@ -97,10 +101,16 @@ const App: React.FC = () => {
                     <Candidature />
                   </ProtectedRoute>
                 } />
+<<<<<<< HEAD
                 {/* New Route for ManageItemsPage */}
                 <Route path="/manage-items" element={
                   <ProtectedRoute>
                     <ManageItemsPage />
+=======
+                <Route path="/manage-items" element={
+                  <ProtectedRoute>
+                    <ManageItems/>
+>>>>>>> origin/jk
                   </ProtectedRoute>
                 } />
               </Routes>

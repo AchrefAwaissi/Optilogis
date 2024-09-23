@@ -24,11 +24,11 @@ const StyledGoogleMap: React.FC<StyledGoogleMapProps> = ({ lat, lng, show3D }) =
   }), [show3D]);
 
   if (loadError) {
-    return <div>Error loading maps</div>;
+    return <div>Erreur lors du chargement de la carte</div>;
   }
 
   if (!isLoaded) {
-    return <div>Loading maps</div>;
+    return <div>Chargement des cartes</div>;
   }
 
   return (

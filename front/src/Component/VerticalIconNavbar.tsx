@@ -10,6 +10,7 @@ import {
   faCog,
   faSignOutAlt,
   IconDefinition,
+  faSignInAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import logo from "../image/logoa.png";
 
@@ -64,7 +65,11 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick, is
     { icon: faHome, label: "Home", path: "/" },
     ...(isAuthenticated ? [{ icon: faPlus, label: "Add", path: "/publish" }] : []), // Condition pour afficher "Add"
     { icon: faCube, label: "3D", path: "/search" },
+<<<<<<< HEAD
     { icon: faList, label: "My Items", path: "/manage-items" },
+=======
+    ...(isAuthenticated ? [{ icon: faList, label: "My Items", path: "/manage-items" }] : []), // Condition pour afficher "My items"
+>>>>>>> origin/jk
     { icon: faAddressBook, label: "Contact", path: "/contact" },
     ...(isAuthenticated ? [{ icon: faCog, label: "Settings", path: "/settings" }] : []), // Condition pour afficher "Settings"
   ];
@@ -98,15 +103,17 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick, is
           </Link>
         ))}
       </div>
-      <div className="p-6">
-        <button
-          onClick={onAuthClick}
-          className={`w-full flex items-center justify-center px-4 py-3 bg-[#095550] text-white rounded-lg hover:bg-[#073d3a] transition-colors duration-300`}
-        >
-          <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-          <span className={isOpen ? "" : "hidden"}>Sign In / Sign Up</span>
-        </button>
-      </div>
+      {!isAuthenticated && (
+        <div className="p-4">
+          <button
+            onClick={onAuthClick}
+            className="w-full flex items-center justify-center px-4 py-2 bg-[#095550] text-white rounded-lg hover:bg-[#073d3a] transition-colors duration-300"
+          >
+            <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />
+            <span className={isOpen ? "" : "hidden"}>Sign In</span>
+          </button>
+        </div>
+      )}
     </nav>
   );
 };

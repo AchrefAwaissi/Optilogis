@@ -30,22 +30,22 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
   const NavLinks = () => (
     <>
       <Link to="/" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Home
+        Accueil
       </Link>
       <Link to="/publish" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Publish
+        Créer une annonce
       </Link>
       <Link to="/manage-items" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        My items
+        Mes annonces
       </Link>
       <Link to="/search" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Search
+        Recherche
       </Link>
       <Link to="/matching" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Matching
+        Colocation
       </Link>
       <Link to="/settings" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Settings
+        Paramètres
       </Link>
     </>
   );
@@ -128,7 +128,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
               className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm"
             >
               <FontAwesomeIcon icon={faSignOutAlt} className="mr-1 text-[#095550]" />
-              Logout
+              Se déconnecter
             </button>
           </div>
 
@@ -150,7 +150,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
             <FontAwesomeIcon icon={faSearch} className="text-gray-500 text-lg mr-2" />
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Recherche..."
               className="bg-transparent outline-none w-full text-gray-500 text-sm"
             />
           </div>

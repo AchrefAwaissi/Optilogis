@@ -221,14 +221,14 @@ const ManageItems: React.FC = () => {
 
   return (
     <div className="min-h-screen h-screen w-full overflow-y-auto px-4 py-8 pb-12">
-      <h1 className="text-2xl font-bold mb-6 text-center">Manage Your Properties</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">Gérer vos annonces</h1>
       {message && (
         <div className={`mb-4 p-3 rounded ${message.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
           {message.text}
         </div>
       )}
       {userItems.length === 0 ? (
-        <p className="text-center py-4">You haven't posted any properties yet.</p>
+        <p className="text-center py-4">Vous n'avez pas encore posté d'annonces</p>
       ) : (
         <div className="flex flex-col items-center space-y-4">
           {userItems.map(item => (
@@ -244,7 +244,7 @@ const ManageItems: React.FC = () => {
       {selectedItemId && (
         <form onSubmit={handleItemSubmit} className="space-y-4 bg-white p-4 rounded-lg shadow mt-6">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Property Name</label>
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nom de la propriété</label>
             <input
               id="name"
               name="name"
@@ -267,7 +267,7 @@ const ManageItems: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price (per month)</label>
+            <label htmlFor="price" className="block text-sm font-medium text-gray-700">Prix (par mois)</label>
             <input
               id="price"
               name="price"
@@ -280,7 +280,7 @@ const ManageItems: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
+            <label htmlFor="address" className="block text-sm font-medium text-gray-700">Adresse</label>
             <input
               id="address"
               name="address"
@@ -292,7 +292,7 @@ const ManageItems: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
+            <label htmlFor="city" className="block text-sm font-medium text-gray-700">Ville</label>
             <input
               id="city"
               name="city"
@@ -304,7 +304,7 @@ const ManageItems: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="country" className="block text-sm font-medium text-gray-700">Country</label>
+            <label htmlFor="country" className="block text-sm font-medium text-gray-700">Pays</label>
             <input
               id="country"
               name="country"
@@ -316,7 +316,7 @@ const ManageItems: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="rooms" className="block text-sm font-medium text-gray-700">Number of Rooms</label>
+            <label htmlFor="rooms" className="block text-sm font-medium text-gray-700">Nombre de pièces</label>
             <input
               id="rooms"
               name="rooms"
@@ -328,7 +328,7 @@ const ManageItems: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="bedrooms" className="block text-sm font-medium text-gray-700">Number of Bedrooms</label>
+            <label htmlFor="bedrooms" className="block text-sm font-medium text-gray-700">Nombre de chambres</label>
             <input
               id="bedrooms"
               name="bedrooms"
@@ -340,7 +340,7 @@ const ManageItems: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="area" className="block text-sm font-medium text-gray-700">Area (m²)</label>
+            <label htmlFor="area" className="block text-sm font-medium text-gray-700">Superficie (m²)</label>
             <input
               id="area"
               name="area"

@@ -116,7 +116,7 @@ const SettingsPage: React.FC = () => {
             <div className="relative mb-4 md:mb-0 md:mr-6">
               <img
                 src={previewUrl || "/default-avatar.png"}
-                alt="Profile"
+                alt="Profil"
                 className="w-24 h-24 rounded-full object-cover"
               />
               {isEditing && (
@@ -148,7 +148,7 @@ const SettingsPage: React.FC = () => {
                 : 'bg-[#095550] text-white hover:bg-[#074440]'
             }`}
           >
-            {isEditing ? 'Cancel' : 'Edit'}
+            {isEditing ? 'Annuler' : 'Modifier'}
           </button>
         </div>
 
@@ -161,7 +161,7 @@ const SettingsPage: React.FC = () => {
         <div className="overflow-y-auto max-h-[calc(100vh-300px)]">
           <form onSubmit={handleProfileSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField label="Username" name="username" />
+              <InputField label="Utilisateur" name="username" />
               <InputField label="Email" name="email" type="email" />
               {isEditing && (
                 <>
@@ -189,7 +189,7 @@ const SettingsPage: React.FC = () => {
             {isEditing && (
               <div className="mt-8 flex justify-start">
                 <button type="submit" className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300">
-                  Save Changes
+                  Sauvegarder les changements
                 </button>
               </div>
             )}

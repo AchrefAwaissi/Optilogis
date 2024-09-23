@@ -14,17 +14,22 @@ interface HorizontalNavbarProps {
   onLogout: () => void;
   onSignInClick: () => void;
   onSignUpClick: () => void;
+  onFavoritesToggle: () => void;
+  showFavorites: boolean;
 }
 
-const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onSignInClick, onSignUpClick }) => {
+const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ 
+  user, 
+  onLogout, 
+  onSignInClick, 
+  onSignUpClick,
+  onFavoritesToggle,
+  showFavorites 
+}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
-  };
-
-  const handleFavoritesClick = () => {
-    console.log('Afficher les annonces favorites');
   };
 
   const NavLinks = () => (
@@ -115,8 +120,8 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
 
           <div className="hidden lg:flex items-center space-x-4">
             <button
-              onClick={handleFavoritesClick}
-              className="text-gray-500 hover:text-red-500 p-2 rounded flex items-center justify-center"
+              onClick={onFavoritesToggle}
+              className={`text-gray-500 hover:text-red-500 p-2 rounded flex items-center justify-center ${showFavorites ? 'text-red-500' : ''}`}
               aria-label="Favorites"
             >
               <FontAwesomeIcon icon={faHeart} className="text-[#095550]" />
@@ -156,8 +161,8 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
           </div>
           <div className="flex justify-between items-center mt-2">
             <button
-              onClick={handleFavoritesClick}
-              className="text-gray-500 hover:text-red-500 p-2 rounded flex items-center justify-center"
+              onClick={onFavoritesToggle}
+              className={`text-gray-500 hover:text-red-500 p-2 rounded flex items-center justify-center ${showFavorites ? 'text-red-500' : ''}`}
               aria-label="Favorites"
             >
               <FontAwesomeIcon icon={faHeart} className="text-[#095550]" />

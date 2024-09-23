@@ -14,6 +14,7 @@ import SignIn from './Component/SignIn';
 import SignUp from './Component/SignUp';
 import Candidature from './Pages/candidature';
 import ManageItems from './Component/ManageItemsPage';
+import Planner from './Pages/Planner';
 
 interface User {
   username: string;
@@ -23,7 +24,7 @@ interface User {
 // ProtectedRoute component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
-  
+
   if (!user) {
     return <Navigate to="/" replace />;
   }
@@ -76,7 +77,7 @@ const App: React.FC = () => {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/property-details" element={<PropertyDetails />} />
-                
+
                 {/* Protected Routes */}
                 <Route path="/publish" element={
                   <ProtectedRoute>
@@ -98,9 +99,14 @@ const App: React.FC = () => {
                     <Candidature />
                   </ProtectedRoute>
                 } />
+                      <Route path="/Planner" element={
+                  <ProtectedRoute>
+                    <Planner />
+                  </ProtectedRoute>
+                } />
                 <Route path="/manage-items" element={
                   <ProtectedRoute>
-                    <ManageItems/>
+                    <ManageItems />
                   </ProtectedRoute>
                 } />
               </Routes>

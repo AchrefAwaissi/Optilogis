@@ -142,11 +142,10 @@ const SettingsPage: React.FC = () => {
           </div>
           <button
             onClick={toggleEdit}
-            className={`font-bold py-2 px-4 rounded-lg transition duration-300 ${
-              isEditing
+            className={`font-bold py-2 px-4 rounded-lg transition duration-300 ${isEditing
                 ? 'bg-[#e6efee] text-[#095550] hover:bg-[#d1e0df]'
                 : 'bg-[#095550] text-white hover:bg-[#074440]'
-            }`}
+              }`}
           >
             {isEditing ? 'Cancel' : 'Edit'}
           </button>
@@ -184,7 +183,7 @@ const SettingsPage: React.FC = () => {
               </div>
             </div>
 
-            
+
 
             {isEditing && (
               <div className="mt-8 flex justify-start">

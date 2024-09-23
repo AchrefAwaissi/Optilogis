@@ -57,7 +57,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log('Signup successful', response.data);
+      console.log('Inscription réussie', response.data);
       onSuccess({ username: formData.username });
     } catch (err) {
       if (axios.isAxiosError(err) && err.response) {
@@ -158,7 +158,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
       <button onClick={onClose} style={styles.closeButton}>
         <FontAwesomeIcon icon={faTimes} />
       </button>
-      <h1 style={styles.title}>Sign Up</h1>
+      <h1 style={styles.title}>Inscription</h1>
       {error && <p style={styles.error}>{error}</p>}
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.inputContainer}>
@@ -166,7 +166,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
           <input
             type="text"
             name="username"
-            placeholder="Username"
+            placeholder="Utilisateur"
             value={formData.username}
             onChange={handleChange}
             style={styles.input}
@@ -190,7 +190,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
           <input
             type="password"
             name="password"
-            placeholder="Password"
+            placeholder="Mot de Passe"
             value={formData.password}
             onChange={handleChange}
             style={styles.input}
@@ -202,7 +202,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
           <input
             type="password"
             name="confirmPassword"
-            placeholder="Confirm Password"
+            placeholder="Confirmez le mot de passe"
             value={formData.confirmPassword}
             onChange={handleChange}
             style={styles.input}
@@ -220,13 +220,13 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
           />
         </div>
         <button type="submit" style={styles.button}>
-          Sign Up
+          S'inscrire
         </button>
       </form>
       <div style={styles.footer}>
-        Already have an account?{' '}
+        Vous avez déjà un compte ?{' '}
         <span onClick={onToggleForm} style={styles.link}>
-          Sign In
+          Se connecter
         </span>
       </div>
     </div>

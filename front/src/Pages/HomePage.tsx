@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMap, faList } from "@fortawesome/free-solid-svg-icons";
+import { faMap, faList, faHeart } from "@fortawesome/free-solid-svg-icons";
 import HouseListings from "../Component/HouseListings";
 import Filter from "../Component/Filter";
 import MapComponent from "../Component/Map";
 import { FilterCriteria, Location, House } from "../types";
 import { useItems } from "../contexts/ItemContext";
+import { useAuth } from "../contexts/AuthContext";
 
-const HomePage: React.FC = () => {
+interface HomePageProps {
+  showFavorites: boolean;
+}
+
+const HomePage: React.FC<HomePageProps> = ({ showFavorites }) => {
   const { getUserItems } = useItems();
+  const { user } = useAuth();
   const [houses, setHouses] = useState<House[]>([]);
   const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +56,7 @@ const HomePage: React.FC = () => {
 
   useEffect(() => {
     filterHouses();
-  }, [houses, filterCriteria]);
+  }, [houses, filterCriteria, showFavorites]);
 
   const fetchHouses = async () => {
     try {
@@ -69,7 +75,7 @@ const HomePage: React.FC = () => {
   };
 
   const filterHouses = () => {
-    const filtered = houses.filter((house) => {
+    let filtered = houses.filter((house) => {
       const matchesLocation =
         !filterCriteria.location ||
         (house.city &&
@@ -126,6 +132,11 @@ const HomePage: React.FC = () => {
         matchesAccessibility
       );
     });
+
+    if (showFavorites && user) {
+      filtered = filtered.filter(house => house.likes?.includes(user.id));
+    }
+
     setFilteredHouses(filtered);
   };
 
@@ -156,49 +167,49 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="flex flex-col md:flex-row h-screen overflow-hidden relative">
-      <div className="w-full md:w-[250px] bg-white overflow-y-auto">
-        <div className="m-4">
-          <Filter
-            onFilterChange={handleFilterChange}
-            onLocationSelect={handleLocationSelect}
-            filterCriteria={filterCriteria}
-          />
-        </div>
+    <div className="w-full md:w-[250px] bg-white overflow-y-auto">
+      <div className="m-4">
+        <Filter
+          onFilterChange={handleFilterChange}
+          onLocationSelect={handleLocationSelect}
+          filterCriteria={filterCriteria}
+        />
       </div>
-
-      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
-        <div className={`w-full md:w-[500px] overflow-y-auto p-4 ${showMap ? 'hidden' : 'block'} md:block`}>
-          {loading ? (
-            <p>Loading houses...</p>
-          ) : error ? (
-            <p className="text-red-500">{error}</p>
-          ) : (
-            <HouseListings
-              houses={filteredHouses}
-              onHouseSelect={handleHouseSelect}
-              city={currentCity}
-            />
-          )}
-        </div>
-
-        <div className={`flex-1 bg-gray-100 ${showMap ? 'block' : 'hidden'} md:block h-[calc(100vh-64px)] md:h-auto rounded-lg`}>
-          <MapComponent
-            houses={filteredHouses}
-            selectedLocation={selectedLocation}
-            onLocationSelect={handleLocationSelect}
-          />
-        </div>
-
-      </div>
-
-      <button
-        className="md:hidden fixed bottom-4 left-4 z-10 bg-blue-500 text-white p-3 rounded-full shadow-lg"
-        onClick={toggleMap}
-      >
-        <FontAwesomeIcon icon={showMap ? faList : faMap} />
-      </button>
     </div>
-  );
+
+    <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+      <div className={`w-full md:w-[500px] overflow-y-auto p-4 ${showMap ? 'hidden' : 'block'} md:block`}>
+        {loading ? (
+          <p>Loading houses...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <HouseListings
+            houses={filteredHouses}
+            onHouseSelect={handleHouseSelect}
+            city={currentCity}
+            showFavorites={showFavorites}
+          />
+        )}
+      </div>
+
+      <div className={`flex-1 bg-gray-100 ${showMap ? 'block' : 'hidden'} md:block h-[calc(100vh-64px)] md:h-auto rounded-lg`}>
+        <MapComponent
+          houses={filteredHouses}
+          selectedLocation={selectedLocation}
+          onLocationSelect={handleLocationSelect}
+        />
+      </div>
+    </div>
+
+    <button
+      className="md:hidden fixed bottom-4 left-4 z-10 bg-blue-500 text-white p-3 rounded-full shadow-lg"
+      onClick={toggleMap}
+    >
+      <FontAwesomeIcon icon={showMap ? faList : faMap} />
+    </button>
+  </div>
+);
 };
 
 export default HomePage;

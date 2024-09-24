@@ -22,6 +22,7 @@ export class AuthService {
       email,
       password: hashedPassword,
       profilePhotoPath,
+      isPremium: false,
     });
     return newUser;
   }
@@ -76,5 +77,23 @@ export class AuthService {
       throw new NotFoundException(`User with ID "${id}" not found`);
     }
     return deletedUser;
+  }
+
+  async updatePremiumStatus(id: string, isPremium: boolean): Promise<User> {
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      id,
+      { isPremium },
+      { new: true }
+    ).select('-password').exec();
+
+    if (!updatedUser) {
+      throw new NotFoundException(`User with ID "${id}" not found`);
+    }
+
+    return updatedUser;
+  }
+
+  async findAllPremiumUsers(): Promise<User[]> {
+    return this.userModel.find({ isPremium: true }).select('-password').exec();
   }
 }

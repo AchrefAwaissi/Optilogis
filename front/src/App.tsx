@@ -40,6 +40,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 const App: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
+  const [showFavorites, setShowFavorites] = useState<boolean>(false);
   const { user, signout } = useAuth();
 
   const handleAuthSuccess = (userData: User) => {
@@ -60,14 +61,17 @@ const App: React.FC = () => {
     setIsSignUp(!isSignUp);
   };
 
+  const handleFavoritesToggle = () => {
+    setShowFavorites(!showFavorites);
+  };
+
   return (
     <Router>
       <ItemProvider>
         <div className="flex h-screen overflow-hidden">
-          {/* Passez isAuthenticated à CombinedNavbar */}
           <CombinedNavbar
             onAuthClick={() => handleAuthClick(false)}
-            isAuthenticated={!!user}  // Utilise la vérification de l'utilisateur connecté
+            isAuthenticated={!!user}
           />
           <div className="flex-1 flex flex-col overflow-hidden">
             <HorizontalNavbar
@@ -75,11 +79,13 @@ const App: React.FC = () => {
               onLogout={handleLogout}
               onSignInClick={() => handleAuthClick(false)}
               onSignUpClick={() => handleAuthClick(true)}
+              onFavoritesToggle={handleFavoritesToggle}
+              showFavorites={showFavorites}
             />
 
             <main className="flex-1 overflow-hidden">
               <Routes>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/" element={<HomePage showFavorites={showFavorites} />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/property-details" element={<PropertyDetails />} />
             
@@ -111,7 +117,7 @@ const App: React.FC = () => {
                     <Candidature />
                   </ProtectedRoute>
                 } />
-                      <Route path="/Planner" element={
+                <Route path="/Planner" element={
                   <ProtectedRoute>
                     <Planner />
                   </ProtectedRoute>

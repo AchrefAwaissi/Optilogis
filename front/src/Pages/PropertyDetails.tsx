@@ -4,16 +4,17 @@ import {
   faDoorOpen, faBed, faHouse, faCouch,
   faRulerCombined, faCompass, faWheelchair, faBuilding,
   faWarehouse, faCar, faBox, faWineBottle, faTree,
-  faShare, faHeart, faExpand, faDollarSign
+  faShare, faHeart, faExpand, faPlus, faCheckCircle
 } from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
 import * as THREE from 'three';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import { useAuth } from "../contexts/AuthContext";
-import axios from 'axios'; // Make sure axios is imported
+import axios from 'axios'; 
+import PaymentForm from '../Component/PaymentForm';
 
 const stripePromise = loadStripe('pk_live_cI4tcOUyxlMYq9uSo8ZAKFfv00gI78MHLK');
 
@@ -99,96 +100,6 @@ const truncateAddress = (address: string, maxLength: number = 50): string => {
   return address.substr(0, maxLength) + '...';
 };
 
-interface PaymentFormProps {
-  onSuccess: () => void;
-}
-
-const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess }) => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [processing, setProcessing] = useState(false);
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setProcessing(true);
-
-    if (!stripe || !elements) {
-      setError("Stripe n'est pas chargé correctement. Veuillez réessayer.");
-      setProcessing(false);
-      return;
-    }
-
-    const cardElement = elements.getElement(CardElement);
-
-    if (cardElement) {
-      const { error, paymentMethod } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-        billing_details: {
-          name: `${firstName} ${lastName}`,
-        },
-      });
-
-      if (error) {
-        setError(error.message || "Une erreur est survenue lors du traitement de votre carte.");
-        setProcessing(false);
-      } else {
-        setTimeout(() => {
-          setProcessing(false);
-          onSuccess();
-        }, 1000);
-      }
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      <div className="mb-4">
-        <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">Prénom</label>
-        <input
-          type="text"
-          id="firstName"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          required
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Nom</label>
-        <input
-          type="text"
-          id="lastName"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          required
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="card-element" className="block text-sm font-medium text-gray-700">Carte de crédit</label>
-        <div className="mt-1 p-3 border border-gray-300 rounded-md shadow-sm">
-          <CardElement id="card-element" />
-        </div>
-      </div>
-      <p className="text-sm text-gray-600 mb-4">
-        Aucun frais ne sera prélevé. Votre carte est requise pour validation uniquement.
-      </p>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      <button
-        type="submit"
-        disabled={!stripe || processing}
-        className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-      >
-        {processing ? 'Traitement...' : 'Déposer ma candidature'}
-      </button>
-    </form>
-  );
-};
-
 const PropertyDetails: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -204,14 +115,17 @@ const PropertyDetails: React.FC = () => {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [neighborhoodBoundary, setNeighborhoodBoundary] = useState<google.maps.Circle | null>(null);
   const [showCandidaturePopup, setShowCandidaturePopup] = useState(false);
-  const { user } = useAuth(); // Use the auth context
+  const { user, updateUser } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
-
+  const [visibleImages, setVisibleImages] = useState(4);
   const [selectedImage, setSelectedImage] = useState<string>(
     house?.images.length > 0
       ? `http://localhost:5000/uploads/${house.images[0]}`
       : 'https://via.placeholder.com/800x400'
   );
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
 
   const addNeighborhoodBoundary = (map: google.maps.Map) => {
     const center = new google.maps.LatLng(house.latitude, house.longitude);
@@ -360,16 +274,42 @@ const PropertyDetails: React.FC = () => {
     }
   }, [map, isMapLoaded]);
 
-  const handleCandidatureSuccess = () => {
-    setShowCandidaturePopup(false);
-    navigate(`/candidature/${house._id}`, { state: { isPremium: true } });
+  const handleCandidatureClick = () => {
+    if (user?.isPremium) {
+      navigate(`/candidature/${house._id}`, { state: { isPremium: true } });
+    } else {
+      setShowCandidaturePopup(true);
+    }
   };
 
-  if (!house) {
-    return <div className="p-4">No property details available.</div>;
-  }
-
-  const truncatedAddress = truncateAddress(`${house.address}, ${house.city}, ${house.country}`);
+  const handleCandidatureSuccess = async () => {
+    setIsProcessingPayment(true);
+    try {
+      // Simulate API call to update user status (replace with actual API call)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Update user status
+      updateUser({ ...user, isPremium: true });
+      
+      setIsProcessingPayment(false);
+      setShowSuccessMessage(true);
+      
+      // Close popup after showing success message
+      setTimeout(() => {
+        setFadeOut(true);
+        setTimeout(() => {
+          setShowCandidaturePopup(false);
+          setShowSuccessMessage(false);
+          setFadeOut(false);
+          navigate(`/candidature/${house._id}`, { state: { isPremium: true } });
+        }, 500); // Match this with your CSS transition time
+      }, 2000);
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      setIsProcessingPayment(false);
+      // Handle error (show error message to user)
+    }
+  };
 
   const handleLikeToggle = async () => {
     if (!user) {
@@ -423,6 +363,12 @@ const PropertyDetails: React.FC = () => {
     }
   };
 
+  if (!house) {
+    return <div className="p-4">No property details available.</div>;
+  }
+
+  const truncatedAddress = truncateAddress(`${house.address}, ${house.city}, ${house.country}`);
+
   return (
     <div className="flex flex-col md:flex-row p-4 max-w-7xl mx-auto h-screen overflow-y-auto">
       <div className="w-full md:w-[60%] md:pr-4">
@@ -438,10 +384,10 @@ const PropertyDetails: React.FC = () => {
           >
             <FontAwesomeIcon icon={faExpand} />
           </button>
-          </div>
+        </div>
         {house.images.length > 1 && (
           <div className="flex mt-4 space-x-2 md:space-x-4 overflow-x-auto pb-2">
-            {house.images.map((image, index) => (
+            {house.images.slice(0, visibleImages).map((image, index) => (
               <img
                 key={index}
                 src={`http://localhost:5000/uploads/${image}`}
@@ -450,6 +396,17 @@ const PropertyDetails: React.FC = () => {
                 onClick={() => setSelectedImage(`http://localhost:5000/uploads/${image}`)}
               />
             ))}
+            {house.images.length > visibleImages && (
+              <div 
+                className="w-20 h-20 md:w-24 md:h-24 bg-gray-200 rounded-md flex-shrink-0 flex items-center justify-center cursor-pointer"
+                onClick={() => setVisibleImages(prev => Math.min(prev + 4, house.images.length))}
+              >
+                <FontAwesomeIcon icon={faPlus} className="text-gray-600 mr-1" />
+                <span className="text-sm font-medium text-gray-600">
+                  {house.images.length - visibleImages}
+                </span>
+              </div>
+            )}
           </div>
         )}
         <div className="mt-4">
@@ -517,11 +474,16 @@ const PropertyDetails: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div className="text-[25px] font-bold text-[#095550] mb-2 md:mb-0">€{house.price.toLocaleString()}/ mois</div>
           <div className="flex flex-row space-x-2">
-            <button
-              onClick={() => setShowCandidaturePopup(true)}
-              className="w-28 md:w-auto h-10 bg-teal-700 text-white px-4 rounded-md text-xs md:text-sm whitespace-nowrap"
+          <button
+              onClick={handleCandidatureClick}
+              className="w-full md:w-auto h-10 bg-teal-700 text-white px-4 py-2 rounded-md text-xs md:text-sm whitespace-nowrap"
             >
-              Déposer une candidature
+              <span className="hidden md:inline">
+                {user?.isPremium ? "Déposer ma candidature" : "Devenir premium et candidater"}
+              </span>
+              <span className="md:hidden">
+                {user?.isPremium ? "Candidater" : "Devenir premium"}
+              </span>
             </button>
           </div>
         </div>
@@ -549,18 +511,33 @@ const PropertyDetails: React.FC = () => {
         </div>
       </div>
       {showCandidaturePopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
           <div className="bg-white p-8 rounded-lg max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4">Déposer une candidature</h2>
-            <Elements stripe={stripePromise}>
-              <PaymentForm onSuccess={handleCandidatureSuccess} />
-            </Elements>
-            <button
-              onClick={() => setShowCandidaturePopup(false)}
-              className="mt-4 text-gray-500 hover:text-gray-700"
-            >
-              Annuler
-            </button>
+            {isProcessingPayment ? (
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-700 mx-auto mb-4"></div>
+                <p className="text-lg font-semibold">Traitement du paiement en cours...</p>
+              </div>
+            ) : showSuccessMessage ? (
+              <div className="text-center">
+                <FontAwesomeIcon icon={faCheckCircle} className="text-5xl text-green-500 mb-4" />
+                <h2 className="text-2xl font-bold mb-2">Paiement réussi !</h2>
+                <p>Vous êtes maintenant un utilisateur premium. Redirection vers le formulaire de candidature...</p>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-2xl font-bold mb-4">Déposer une candidature</h2>
+                <Elements stripe={stripePromise}>
+                  <PaymentForm onSuccess={handleCandidatureSuccess} />
+                </Elements>
+                <button
+                  onClick={() => setShowCandidaturePopup(false)}
+                  className="mt-4 text-gray-500 hover:text-gray-700"
+                >
+                  Annuler
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

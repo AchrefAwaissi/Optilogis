@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { House } from "../types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBed, faBath, faRulerCombined, faHeart } from '@fortawesome/free-solid-svg-icons';
@@ -9,6 +9,7 @@ interface HouseListingsProps {
   houses: House[];
   onHouseSelect: (house: House) => void;
   city: string;
+  showFavorites: boolean; // New prop to control whether to show all items or only favorites
 }
 
 const truncateAddress = (address: string, maxLength: number) => {
@@ -114,21 +115,36 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
   );
 };
 
-const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect, city }) => {
-  console.log("Liste des logement reçue:", houses.length);
+const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect, city, showFavorites }) => {
+  const { user } = useAuth();
+  const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
+
+  useEffect(() => {
+    if (showFavorites && user) {
+      // Filter houses to show only those liked by the current user
+      const userLikedHouses = houses.filter(house => house.likes?.includes(user.id));
+      setFilteredHouses(userLikedHouses);
+    } else {
+      // Show all houses
+      setFilteredHouses(houses);
+    }
+  }, [houses, showFavorites, user]);
 
   return (
     <div className="flex flex-col items-center space-y-4 p-4 pb-20">
       <h2 className="text-2xl font-bold mb-4 self-start w-full">
-        {houses.length} Résultats {city || "toutes les villes"}
+        {filteredHouses.length} Résultats {showFavorites ? "favoris" : ""} {city ? `à ${city}` : "toutes les villes"}
       </h2>
-      {houses.map((house) => (
+      {filteredHouses.map((house) => (
         <PropertyCard
           key={house._id} 
           house={house}
           onClick={() => onHouseSelect(house)}
         />
       ))}
+      {showFavorites && filteredHouses.length === 0 && (
+        <p className="text-gray-500">Vous n'avez pas encore de favoris.</p>
+      )}
     </div>
   );
 };

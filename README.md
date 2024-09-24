@@ -85,23 +85,10 @@ Le projet est divisé en deux dossiers principaux :
 
 ## Technologies Utilisées
 
-- **Frontend** : React, HTML, CSS, JavaScript
+- **Frontend** : React, HTML, CSS, TypeScript
 - **Backend** : Node.js, Express
 - **Base de données** : MongoDB
 - **Autres** : Google Maps API, Authentification JWT, etc.
 
-## Contribuer
-Les contributions sont les bienvenues ! Si vous souhaitez contribuer, veuillez suivre les étapes suivantes :
 
-1. Fork le projet.
-2. Créez une nouvelle branche (`git checkout -b ma-nouvelle-fonctionnalite`).
-3. Effectuez vos modifications et committez-les (`git commit -am 'Ajout d'une nouvelle fonctionnalité'`).
-4. Poussez sur la branche (`git push origin ma-nouvelle-fonctionnalite`).
-5. Ouvrez une Pull Request.
 
-## Licence
-Ce projet est sous licence [MIT](LICENSE).
-
----
-
-Ce README est adaptable en fonction des détails supplémentaires ou spécifiques que tu souhaites ajouter. Il permet aux utilisateurs de comprendre rapidement comment installer et utiliser ton projet, ainsi que les fonctionnalités clés qu'il propose.

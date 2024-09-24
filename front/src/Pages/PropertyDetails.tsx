@@ -4,7 +4,7 @@ import {
   faDoorOpen, faBed, faHouse, faCouch,
   faRulerCombined, faCompass, faWheelchair, faBuilding,
   faWarehouse, faCar, faBox, faWineBottle, faTree,
-  faShare, faHeart, faExpand, faDollarSign, faCheckCircle
+  faShare, faHeart, faExpand, faPlus, faCheckCircle
 } from "@fortawesome/free-solid-svg-icons";
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -117,6 +117,7 @@ const PropertyDetails: React.FC = () => {
   const [showCandidaturePopup, setShowCandidaturePopup] = useState(false);
   const { user, updateUser } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
+  const [visibleImages, setVisibleImages] = useState(4);
   const [selectedImage, setSelectedImage] = useState<string>(
     house?.images.length > 0
       ? `http://localhost:5000/uploads/${house.images[0]}`
@@ -386,7 +387,7 @@ const PropertyDetails: React.FC = () => {
         </div>
         {house.images.length > 1 && (
           <div className="flex mt-4 space-x-2 md:space-x-4 overflow-x-auto pb-2">
-            {house.images.map((image, index) => (
+            {house.images.slice(0, visibleImages).map((image, index) => (
               <img
                 key={index}
                 src={`http://localhost:5000/uploads/${image}`}
@@ -395,6 +396,17 @@ const PropertyDetails: React.FC = () => {
                 onClick={() => setSelectedImage(`http://localhost:5000/uploads/${image}`)}
               />
             ))}
+            {house.images.length > visibleImages && (
+              <div 
+                className="w-20 h-20 md:w-24 md:h-24 bg-gray-200 rounded-md flex-shrink-0 flex items-center justify-center cursor-pointer"
+                onClick={() => setVisibleImages(prev => Math.min(prev + 4, house.images.length))}
+              >
+                <FontAwesomeIcon icon={faPlus} className="text-gray-600 mr-1" />
+                <span className="text-sm font-medium text-gray-600">
+                  {house.images.length - visibleImages}
+                </span>
+              </div>
+            )}
           </div>
         )}
         <div className="mt-4">

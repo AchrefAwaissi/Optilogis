@@ -9,13 +9,13 @@ Le projet est divisé en deux dossiers principaux :
 ## Installation
 
 1. Clonez le projet sur votre machine locale :
-    ```bash
-    git clone https://github.com/username/mon-projet-immobilier.git
+    ```bash 
+    git clone https://github.com/AchrefAwaissi/Optilogis
     ```
 
 2. Accédez au dossier du projet :
     ```bash
-    cd mon-projet-immobilier
+    cd Optilogis
     ```
 
 3. Installez les dépendances pour le backend et le frontend :

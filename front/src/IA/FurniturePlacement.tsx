@@ -1,65 +1,74 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
+import { Cloudinary } from "@cloudinary/url-gen";
+import { AdvancedImage } from "@cloudinary/react";
+import { fill } from "@cloudinary/url-gen/actions/resize";
+
+const CLOUD_NAME = 'dxynfkwzx';
+// Configure Cloudinary
+const cld = new Cloudinary({
+  cloud: {
+    cloudName: CLOUD_NAME
+  }
+});
+
+interface Placement {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
 
 const FurniturePlacement: React.FC = () => {
-  const [apiKey, setApiKey] = useState<string>('sk-v8IV8Sh86ea2F64kzIofgRIs1Kk');
-  const [roomImage, setRoomImage] = useState<string | null>(null);
-  const [productImage, setProductImage] = useState<string | null>(null);
-  const [placement, setPlacement] = useState({ x: 270, y: 70, w: 103, h: 297 });
-  const [area, setArea] = useState({ x: 0, y: 0, w: 10, h: 10 });
+  const [apiKey] = useState<string>('sk-iYiywwNzEzcDy-ZarW4fwNWscUs');
+  const [roomImage, setRoomImage] = useState<File | null>(null);
+  const [productImage, setProductImage] = useState<File | null>(null);
+  const [roomImagePublicId, setRoomImagePublicId] = useState<string>('');
+  const [productImagePublicId, setProductImagePublicId] = useState<string>('');
+  const [placement, setPlacement] = useState<Placement>({ x: 0, y: 0, w: 100, h: 100 });
+  const [area, setArea] = useState<Placement>({ x: 0, y: 0, w: 300, h: 300 });
   const [loading, setLoading] = useState<boolean>(false);
+  const [generating, setGenerating] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [resultImage, setResultImage] = useState<string | null>(null);
+  const [resultImageUrl, setResultImageUrl] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const roomImageInputRef = useRef<HTMLInputElement>(null);
-  const productImageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (roomImage && productImage) {
+    if (roomImagePublicId && productImagePublicId) {
       drawImages();
     }
-  }, [roomImage, productImage, placement, area]);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, setImage: React.Dispatch<React.SetStateAction<string | null>>) => {
-    if (e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setImage(event.target?.result as string);
-      };
-      reader.readAsDataURL(e.target.files[0]);
-    }
-  };
+  }, [roomImagePublicId, productImagePublicId, placement, area]);
 
   const drawImages = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
-    if (!canvas || !ctx || !roomImage || !productImage) return;
+    if (!canvas || !ctx) return;
 
     const roomImg = new Image();
+    roomImg.crossOrigin = "Anonymous";
     roomImg.onload = () => {
       canvas.width = roomImg.width;
       canvas.height = roomImg.height;
       ctx.drawImage(roomImg, 0, 0, canvas.width, canvas.height);
 
       const productImg = new Image();
+      productImg.crossOrigin = "Anonymous";
       productImg.onload = () => {
         ctx.drawImage(productImg, placement.x, placement.y, placement.w, placement.h);
         
-        // Draw blue rectangle around the product
         ctx.strokeStyle = 'blue';
         ctx.lineWidth = 2;
         ctx.strokeRect(placement.x, placement.y, placement.w, placement.h);
 
-        // Draw area rectangle
         ctx.strokeStyle = 'green';
         ctx.setLineDash([5, 5]);
         ctx.strokeRect(area.x, area.y, area.w, area.h);
         ctx.setLineDash([]);
       };
-      productImg.src = productImage;
+      productImg.src = cld.image(productImagePublicId).toURL();
     };
-    roomImg.src = roomImage;
+    roomImg.src = cld.image(roomImagePublicId).toURL();
   };
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -72,40 +81,84 @@ const FurniturePlacement: React.FC = () => {
 
     setPlacement(prev => ({
       ...prev,
-      x: x,
-      y: y
+      x: Math.round(x),
+      y: Math.round(y)
     }));
   };
 
-  const handlePlacementChange = (key: keyof typeof placement, value: string) => {
+  const handlePlacementChange = (key: keyof Placement, value: string) => {
     setPlacement(prev => ({
       ...prev,
-      [key]: parseFloat(value) || 0
+      [key]: parseInt(value) || 0
     }));
   };
 
-  const handleAreaChange = (key: keyof typeof area, value: string) => {
+  const handleAreaChange = (key: keyof Placement, value: string) => {
     setArea(prev => ({
       ...prev,
-      [key]: parseFloat(value) || 0
+      [key]: parseInt(value) || 0
     }));
+  };
+
+  const handleImageUpload = async (file: File, setImagePublicId: React.Dispatch<React.SetStateAction<string>>) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ml_default');
+
+      const response = await axios.post<{ public_id: string }>(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        formData
+      );
+
+      setImagePublicId(response.data.public_id);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setError('Erreur lors du téléchargement de l\'image. Veuillez réessayer.');
+    }
+  };
+
+  const handleRoomImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setRoomImage(file);
+      handleImageUpload(file, setRoomImagePublicId);
+    }
+  };
+
+  const handleProductImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setProductImage(file);
+      handleImageUpload(file, setProductImagePublicId);
+    }
   };
 
   const handlePlaceFurniture = async () => {
-    if (!roomImage || !productImage) {
-      setError("Please upload both room and product images before continuing.");
+    if (!roomImagePublicId || !productImagePublicId) {
+      setError("Veuillez télécharger les images de la pièce et du produit avant de continuer.");
       return;
     }
-
+  
     setLoading(true);
+    setGenerating(true);
     setError(null);
-
+    setResultImageUrl(null);
+  
     try {
-      const response = await axios.post(
+      console.log('Envoi de la requête à Spacely API...');
+      console.log('URLs des images:', {
+        room: cld.image(roomImagePublicId).toURL(),
+        product: cld.image(productImagePublicId).toURL()
+      });
+      console.log('Placement:', placement);
+      console.log('Area:', area);
+  
+      const response = await axios.post<{ data: string }>(
         'https://api.spacely.ai/api/v1/generate/furniture-placement',
         {
-          imageUrl: roomImage,
-          productImageUrl: productImage,
+          imageUrl: cld.image(roomImagePublicId).toURL(),
+          productImageUrl: cld.image(productImagePublicId).toURL(),
           placement,
           area
         },
@@ -116,131 +169,199 @@ const FurniturePlacement: React.FC = () => {
           }
         }
       );
-
-      setResultImage(response.data.resultImageUrl);
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(`Error: ${err.response?.status} - ${err.response?.statusText}`);
-      } else {
-        setError('An unexpected error occurred');
-      }
-    } finally {
+  
+      console.log('Réponse de Spacely API:', response.data);
+      const refId = response.data.data;
       setLoading(false);
+      await checkResult(refId);
+    } catch (err) {
+      console.error('Erreur lors de l\'appel à Spacely API:', err);
+      if (axios.isAxiosError(err)) {
+        setError(`Erreur: ${err.response?.status} - ${err.response?.statusText}`);
+      } else {
+        setError('Une erreur inattendue s\'est produite');
+      }
+      setLoading(false);
+      setGenerating(false);
     }
   };
 
+  const checkResult = async (refId: string) => {
+    const maxAttempts = 10;
+    const delayBetweenAttempts = 3000; // 3 secondes
+  
+    const pollResult = async (attemptCount: number): Promise<void> => {
+      if (attemptCount >= maxAttempts) {
+        setError("La génération a pris trop de temps. Veuillez réessayer.");
+        setGenerating(false);
+        return;
+      }
+  
+      try {
+        const response = await axios.get<{ 
+          data: { 
+            status: string, 
+            result: string[], 
+            webhookUrl: string 
+          } 
+        }>(
+          `https://api.spacely.ai/api/v1/generate/poll-result?refId=${refId}`,
+          {
+            headers: {
+              'X-API-KEY': apiKey,
+            }
+          }
+        );
+  
+        console.log(`Tentative ${attemptCount + 1}: Réponse de l'API Spacely:`, response.data);
+  
+        if (response.data.data.status === 'processing') {
+          console.log(`Génération toujours en cours. Nouvelle tentative dans ${delayBetweenAttempts / 1000} secondes.`);
+          setTimeout(() => pollResult(attemptCount + 1), delayBetweenAttempts);
+        } else if (response.data.data.status === 'success' && response.data.data.result && response.data.data.result.length > 0) {
+          const imageUrl = response.data.data.result[0];
+          console.log('Génération réussie. URL de l\'image résultante:', imageUrl);
+          setResultImageUrl(imageUrl);
+          setGenerating(false);
+        } else {
+          setError('La génération a échoué ou n\'a pas produit de résultat.');
+          setGenerating(false);
+        }
+      } catch (err) {
+        console.error('Erreur lors de la récupération du résultat:', err);
+        setError('Erreur lors de la récupération du résultat. Veuillez réessayer.');
+        setGenerating(false);
+      }
+    };
+  
+    pollResult(0);
+  };
+
   return (
-    <div className="p-4 max-w-4xl mx-auto min-h-screen h-screen overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-4">Spacely AI Furniture Placement</h2>
-      
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label className="block mb-2">Room Image:</label>
-          <div 
-            className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors h-64 flex items-center justify-center overflow-y-auto"
-            onClick={() => roomImageInputRef.current?.click()}
-          >
-            {roomImage ? (
-              <img src={roomImage} alt="Room" className="max-w-full max-h-full object-contain" />
-            ) : (
-              <p>Click to upload room image</p>
+    <div className="h-screen overflow-y-auto bg-gray-100">
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
+        <h2 className="text-3xl font-bold text-center mb-8">Placement de Meubles avec Spacely AI</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Image de la pièce</h3>
+            <input 
+              type="file" 
+              accept="image/*"
+              onChange={handleRoomImageChange}
+              className="w-full p-2 border rounded bg-white"
+              disabled={loading || generating}
+            />
+            {roomImagePublicId && (
+              <AdvancedImage
+                cldImg={cld.image(roomImagePublicId).resize(fill().width(300).height(200))}
+                className="w-full h-auto rounded shadow-md"
+              />
             )}
           </div>
-          <input 
-            type="file" 
-            ref={roomImageInputRef}
-            onChange={(e) => handleImageChange(e, setRoomImage)}
-            className="hidden" 
-            accept="image/*"
-          />
-        </div>
-        <div>
-          <label className="block mb-2">Product Image:</label>
-          <div 
-            className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors h-64 flex items-center justify-center overflow-y-auto"
-            onClick={() => productImageInputRef.current?.click()}
-          >
-            {productImage ? (
-              <img src={productImage} alt="Product" className="max-w-full max-h-full object-contain" />
-            ) : (
-              <p>Click to upload product image</p>
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Image du produit</h3>
+            <input 
+              type="file" 
+              accept="image/*"
+              onChange={handleProductImageChange}
+              className="w-full p-2 border rounded bg-white"
+              disabled={loading || generating}
+            />
+            {productImagePublicId && (
+              <AdvancedImage
+                cldImg={cld.image(productImagePublicId).resize(fill().width(300).height(200))}
+                className="w-full h-auto rounded shadow-md"
+              />
             )}
           </div>
-          <input 
-            type="file" 
-            ref={productImageInputRef}
-            onChange={(e) => handleImageChange(e, setProductImage)}
-            className="hidden" 
-            accept="image/*"
-          />
         </div>
-      </div>
-  
-      <div className="mb-4">
-        <label className="block mb-2">Placement (x, y, w, h):</label>
-        <div className="grid grid-cols-4 gap-2">
-          {(['x', 'y', 'w', 'h'] as const).map((key) => (
-            <input
-              key={key}
-              type="number"
-              value={placement[key]}
-              onChange={(e) => handlePlacementChange(key, e.target.value)}
-              className="w-full p-2 border rounded"
-              placeholder={key.toUpperCase()}
+    
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold">Placement (x, y, w, h)</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {(['x', 'y', 'w', 'h'] as const).map((key) => (
+              <div key={key}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{key.toUpperCase()}</label>
+                <input
+                  type="number"
+                  value={placement[key]}
+                  onChange={(e) => handlePlacementChange(key, e.target.value)}
+                  className="w-full p-2 border rounded bg-white"
+                  placeholder={key.toUpperCase()}
+                  disabled={loading || generating}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+    
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold">Zone (x, y, w, h)</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {(['x', 'y', 'w', 'h'] as const).map((key) => (
+              <div key={key}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{key.toUpperCase()}</label>
+                <input
+                  type="number"
+                  value={area[key]}
+                  onChange={(e) => handleAreaChange(key, e.target.value)}
+                  className="w-full p-2 border rounded bg-white"
+                  placeholder={key.toUpperCase()}
+                  disabled={loading || generating}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+    
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold">Aperçu du placement</h3>
+          <div className="border rounded-lg bg-white p-4 shadow-inner">
+            <canvas 
+              ref={canvasRef}
+              onClick={handleCanvasClick}
+              className="w-full h-96 object-contain cursor-crosshair"
             />
-          ))}
+          </div>
+          <p className="text-sm text-gray-600">Cliquez pour déplacer le meuble. Le rectangle vert montre la contrainte de zone.</p>
         </div>
-      </div>
-  
-      <div className="mb-4">
-        <label className="block mb-2">Area (x, y, w, h):</label>
-        <div className="grid grid-cols-4 gap-2">
-          {(['x', 'y', 'w', 'h'] as const).map((key) => (
-            <input
-              key={key}
-              type="number"
-              value={area[key]}
-              onChange={(e) => handleAreaChange(key, e.target.value)}
-              className="w-full p-2 border rounded"
-              placeholder={key.toUpperCase()}
+    
+        <div className="flex justify-center">
+          <button 
+            onClick={handlePlaceFurniture} 
+            disabled={loading || generating || !roomImagePublicId || !productImagePublicId}
+            className={`px-6 py-3 rounded-full text-lg font-semibold transition-colors ${
+              loading || generating || !roomImagePublicId || !productImagePublicId
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
+          >
+            {loading ? 'Envoi en cours...' : generating ? 'Génération en cours...' : 'Générer'}
+          </button>
+        </div>
+        
+        {(loading || generating) && (
+          <p className="text-center mt-4 text-lg text-blue-600">
+            {loading ? 'Envoi de la requête...' : 'Génération de l\'image en cours... Cela peut prendre quelques instants.'}
+          </p>
+        )}
+        
+        {error && <p className="text-center mt-4 text-lg text-red-500">{error}</p>}
+    
+        {resultImageUrl && (
+          <div className="mt-8 space-y-4">
+            <h3 className="text-2xl font-bold text-center">Résultat</h3>
+            <img 
+              src={resultImageUrl} 
+              alt="Résultat du placement de meuble" 
+              className="w-full border rounded-lg shadow-lg"
             />
-          ))}
-        </div>
+          </div>
+        )}
       </div>
-  
-      <div className="mb-4 overflow-y-auto" style={{ height: '400px' }}>
-        <label className="block mb-2">Placement Preview:</label>
-        <canvas 
-          ref={canvasRef}
-          onClick={handleCanvasClick}
-          className="border rounded-lg w-full h-96 object-contain cursor-crosshair"
-        />
-        <p className="text-sm text-gray-600 mt-1">Click to move the furniture. Green rectangle shows the area constraint.</p>
-      </div>
-  
-      <div className="flex justify-center mb-4">
-        <button 
-          onClick={handlePlaceFurniture} 
-          disabled={loading}
-          className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors"
-        >
-          Generate
-        </button>
-      </div>
-      
-      {loading && <p className="text-center mt-4">Loading...</p>}
-      
-      {error && <p className="text-center mt-4 text-red-500">{error}</p>}
-  
-      {resultImage && (
-        <div className="mt-8 overflow-y-auto" style={{ height: '400px' }}>
-          <h3 className="text-xl font-bold mb-2">Result:</h3>
-          <img src={resultImage} alt="Placement Result" className="w-full border rounded-lg" />
-        </div>
-      )}
     </div>
   );
-  
 }
 
 export default FurniturePlacement;

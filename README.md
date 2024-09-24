@@ -85,8 +85,8 @@ Le projet est divisé en deux dossiers principaux :
 
 ## Technologies Utilisées
 
-- **Frontend** : React, HTML, CSS, TypeScript
-- **Backend** : Node.js, Express
+- **Frontend** : React, JSX, Tailwind CSS, TypeScript
+- **Backend** : Nest.JS
 - **Base de données** : MongoDB
 - **Autres** : Google Maps API, Authentification JWT, etc.
 

@@ -1,9 +1,3 @@
-Voici un exemple de README pour ton projet GitHub, détaillant les étapes d'installation, les fonctionnalités et les différentes pages de ton application. Il est structuré pour être clair et informatif pour les utilisateurs et les contributeurs potentiels.
-
----
-
-# Mon Projet Immobilier
-
 ## Description
 Ce projet est une plateforme immobilière qui permet aux utilisateurs de créer, consulter et gérer des annonces immobilières. Les utilisateurs peuvent s'inscrire, se connecter, créer des annonces et interagir avec les biens disponibles (liker, partager, voir les détails, déposer une candidature, etc.). La plateforme inclut aussi des fonctionnalités avancées comme une vue en 3D des logements et une carte Google Map intégrée pour la localisation des biens.
 

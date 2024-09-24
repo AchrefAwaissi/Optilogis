@@ -15,6 +15,11 @@ import SignUp from './Component/SignUp';
 import Candidature from './Pages/candidature';
 import ManageItems from './Component/ManageItemsPage';
 import Planner from './Pages/Planner';
+import StyleTransfer from './IA/StyleTransfer';
+import SearchArticle from './IA/searchArticle';
+import EmptyRoom from './IA/EmptyRoom';
+import FurniturePlacement from './IA/FurniturePlacement';
+import ColorChange from './IA/ColorChange';
 
 interface User {
   username: string;
@@ -77,7 +82,14 @@ const App: React.FC = () => {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/property-details" element={<PropertyDetails />} />
-
+            
+                <Route path="/Planner" element={<Planner />} />
+                <Route path="/style-transfer" element={<StyleTransfer />} />
+          <Route path="/search-article" element={<SearchArticle />} />
+          <Route path="/furniture-placement" element={<FurniturePlacement />} />
+          <Route path="/empty-room" element={<EmptyRoom />} />
+          <Route path="/color-transfer" element={<ColorChange />}/>
+    
                 {/* Protected Routes */}
                 <Route path="/publish" element={
                   <ProtectedRoute>

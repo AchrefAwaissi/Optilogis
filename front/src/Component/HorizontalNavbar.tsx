@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faSignOutAlt, faHeart, faSearch, faBell, faSignInAlt, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faSignOutAlt, faHeart, faSearch, faBell, faSignInAlt, faUserPlus, faCog } from '@fortawesome/free-solid-svg-icons';
 import logo from "../image/logoa.png";
 
 interface User {
@@ -27,10 +27,44 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
   showFavorites 
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const closeDropdown = () => {
+    setShowDropdown(false);
+  };
+
+  const handleSettingsClick = () => {
+    closeDropdown();
+    navigate('/settings');
+  };
+
+  const handleLogoutClick = () => {
+    closeDropdown();
+    onLogout();
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const NavLinks = () => (
     <>
@@ -48,9 +82,6 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
       </Link>
       <Link to="/matching" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
         Matching
-      </Link>
-      <Link to="/settings" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Settings
       </Link>
     </>
   );
@@ -127,14 +158,32 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
               <FontAwesomeIcon icon={faHeart} className="text-[#095550]" />
             </button>
             <FontAwesomeIcon icon={faBell} className="text-gray-500 text-xl cursor-pointer" />
-            <img src={user?.profilePhotoPath || '/default-avatar.png'} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
-            <button
-              onClick={onLogout}
-              className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm"
-            >
-              <FontAwesomeIcon icon={faSignOutAlt} className="mr-1 text-[#095550]" />
-              Logout
-            </button>
+            <div className="relative" ref={dropdownRef}>
+              <img 
+                src={user?.profilePhotoPath || '/default-avatar.png'} 
+                alt="Profile" 
+                className="w-8 h-8 rounded-full object-cover cursor-pointer" 
+                onClick={toggleDropdown}
+              />
+              {showDropdown && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                  <button
+                    onClick={handleSettingsClick}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <FontAwesomeIcon icon={faCog} className="mr-2" />
+                    Settings
+                  </button>
+                  <button
+                    onClick={handleLogoutClick}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="lg:hidden flex items-center">
@@ -170,7 +219,13 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
             <FontAwesomeIcon icon={faBell} className="text-gray-500 text-xl cursor-pointer" />
             <img src={user?.profilePhotoPath || '/default-avatar.png'} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
             <button
-              onClick={onLogout}
+              onClick={handleSettingsClick}
+              className="text-gray-500 hover:text-blue-600"
+            >
+              <FontAwesomeIcon icon={faCog} />
+            </button>
+            <button
+              onClick={handleLogoutClick}
               className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm"
             >
               <FontAwesomeIcon icon={faSignOutAlt} className="mr-1 text-[#095550]" />

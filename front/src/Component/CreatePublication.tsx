@@ -273,12 +273,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faHome, faMapMarkerAlt, faCity, faGlobe, faBed,
   faRulerCombined, faCompass, faWheelchair, faBuilding,
-  faWarehouse, faCar, faBox, faWineBottle, faTree, faDollarSign, faImage
+  faWarehouse, faCar, faBox, faWineBottle, faTree, faDollarSign, faImage,
+  faTimes,
+  faPlus,
+  faMinus
 } from "@fortawesome/free-solid-svg-icons";
 
 interface Suggestion {
   display_name: string;
 }
+
+const MAX_IMAGES = 10;
+const INITIAL_VISIBLE_IMAGES = 5;
 
 interface FormData {
   name: string;
@@ -333,7 +339,9 @@ const CreatePublication: React.FC = () => {
     exterior: false
   });
   const [images, setImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showAllImages, setShowAllImages] = useState(false);
   const { user } = useAuth();
   const { createItem } = useItems();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -391,9 +399,41 @@ const CreatePublication: React.FC = () => {
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setImages(Array.from(e.target.files));
+      const selectedFiles = Array.from(e.target.files);
+      const remainingSlots = MAX_IMAGES - images.length;
+      const filesToAdd = selectedFiles.slice(0, remainingSlots);
+      
+      setImages(prevImages => [...prevImages, ...filesToAdd]);
+      
+      // Générer des aperçus pour les nouvelles images
+      const newPreviews = filesToAdd.map(file => URL.createObjectURL(file));
+      setImagePreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
+
+      if (selectedFiles.length > remainingSlots) {
+        setMessage({ type: 'error', text: `Vous ne pouvez ajouter que ${remainingSlots} image(s) supplémentaire(s). Les autres ont été ignorées.` });
+      }
     }
   };
+
+  const removeImage = (index: number) => {
+    setImages(prevImages => prevImages.filter((_, i) => i !== index));
+    setImagePreviews(prevPreviews => {
+      const updatedPreviews = prevPreviews.filter((_, i) => i !== index);
+      URL.revokeObjectURL(prevPreviews[index]);
+      return updatedPreviews;
+    });
+  };
+
+  const toggleShowAllImages = () => {
+    setShowAllImages(prev => !prev);
+  };
+
+  useEffect(() => {
+    // Nettoyer les URLs des aperçus lorsque le composant est démonté
+    return () => {
+      imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
+    };
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -578,18 +618,62 @@ const CreatePublication: React.FC = () => {
           </div>
 
           <div className="mt-6">
-            <label className="block text-[#030303] text-xl font-poppins mb-2">Images</label>
+            <label className="block text-[#030303] text-xl font-poppins mb-2">Images ({images.length}/{MAX_IMAGES})</label>
             <div className="flex items-center justify-center w-full">
-              <label className="flex flex-col w-full h-32 border-4 border-[#095550] border-dashed hover:bg-gray-100 hover:border-gray-300">
+              <label className={`flex flex-col w-full h-32 border-4 border-[#095550] border-dashed hover:bg-gray-100 hover:border-gray-300 ${images.length >= MAX_IMAGES ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}>
                 <div className="flex flex-col items-center justify-center pt-7">
                   <FontAwesomeIcon icon={faImage} className="w-8 h-8 text-[#095550] group-hover:text-gray-600" />
                   <p className="pt-1 text-sm tracking-wider text-[#095550] group-hover:text-gray-600">
-                    Sélectionnez des images
+                    {images.length >= MAX_IMAGES ? 'Limite atteinte' : 'Sélectionnez des images'}
                   </p>
                 </div>
-                <input type="file" name="images" onChange={handleImageChange} className="opacity-0" multiple />
+                <input 
+                  type="file" 
+                  name="images" 
+                  onChange={handleImageChange} 
+                  className="opacity-0" 
+                  multiple 
+                  accept="image/*"
+                  disabled={images.length >= MAX_IMAGES}
+                />
               </label>
             </div>
+            {imagePreviews.length > 0 && (
+              <div className="mt-4 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {imagePreviews.slice(0, showAllImages ? imagePreviews.length : INITIAL_VISIBLE_IMAGES).map((preview, index) => (
+                  <div key={index} className="relative">
+                    <img src={preview} alt={`Preview ${index + 1}`} className="w-full h-24 object-cover rounded" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                    >
+                      <FontAwesomeIcon icon={faTimes} className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                {!showAllImages && imagePreviews.length > INITIAL_VISIBLE_IMAGES && (
+                  <button
+                    type="button"
+                    onClick={toggleShowAllImages}
+                    className="relative w-full h-24 bg-gray-200 rounded flex items-center justify-center hover:bg-gray-300 transition-colors"
+                  >
+                    <FontAwesomeIcon icon={faPlus} className="text-gray-600 mr-2" />
+                    <span className="text-gray-600 font-bold">{imagePreviews.length - INITIAL_VISIBLE_IMAGES}</span>
+                  </button>
+                )}
+                {showAllImages && imagePreviews.length > INITIAL_VISIBLE_IMAGES && (
+                  <button
+                    type="button"
+                    onClick={toggleShowAllImages}
+                    className="relative w-full h-24 bg-gray-200 rounded flex items-center justify-center hover:bg-gray-300 transition-colors"
+                  >
+                    <FontAwesomeIcon icon={faMinus} className="text-gray-600 mr-2" />
+                    <span className="text-gray-600 font-bold">Réduire</span>
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="mt-8 flex justify-start">

@@ -1,271 +1,4 @@
-// import React, { useState, ChangeEvent, FormEvent } from 'react';
-// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import {
-//   faHome, faMapMarkerAlt, faCity, faGlobe, faBed,
-//   faRulerCombined, faCompass, faCar, faBox, faWineBottle, faTree, faDollarSign, faImage
-// } from "@fortawesome/free-solid-svg-icons";
-// import { useItems } from '../contexts/ItemContext';
-// import { useAuth } from '../contexts/AuthContext';
-
-// interface FormData {
-//   name: string;
-//   description: string;
-//   price: string;
-//   title: string;
-//   address: string;
-//   city: string;
-//   country: string;
-//   typeOfHousing: string;
-//   rooms: string;
-//   bedrooms: string;
-//   area: string;
-//   exposure: string;
-//   furnished: boolean;
-//   notFurnished: boolean;
-//   accessibility: string;
-//   floor: string;
-//   annexArea: string;
-//   parking: boolean;
-//   garage: boolean;
-//   basement: boolean;
-//   storageUnit: boolean;
-//   cellar: boolean;
-//   exterior: boolean;
-// }
-
-// const CreatePublication: React.FC = () => {
-//   const [formData, setFormData] = useState<FormData>({
-//     name: '',
-//     description: '',
-//     price: '',
-//     title: '',
-//     address: '',
-//     city: '',
-//     country: '',
-//     typeOfHousing: '',
-//     rooms: '',
-//     bedrooms: '',
-//     area: '',
-//     exposure: '',
-//     furnished: false,
-//     notFurnished: false,
-//     accessibility: '',
-//     floor: '',
-//     annexArea: '',
-//     parking: false,
-//     garage: false,
-//     basement: false,
-//     storageUnit: false,
-//     cellar: false,
-//     exterior: false
-//   });
-//   const [images, setImages] = useState<File[]>([]);
-//   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-//   const { user } = useAuth();
-//   const { createItem } = useItems();
-
-//   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-//     const { name, value, type } = e.target;
-//     const checked = (e.target as HTMLInputElement).checked;
-
-//     setFormData(prev => ({
-//       ...prev,
-//       [name]: type === 'checkbox' ? checked : value
-//     }));
-
-//     if (name === 'furnished' && checked) {
-//       setFormData(prev => ({ ...prev, notFurnished: false }));
-//     } else if (name === 'notFurnished' && checked) {
-//       setFormData(prev => ({ ...prev, furnished: false }));
-//     }
-//   };
-
-//   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-//     if (e.target.files) {
-//       setImages(Array.from(e.target.files));
-//     }
-//   };
-
-//   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-//     e.preventDefault();
-//     setMessage(null);
-
-//     const submitData = new FormData();
-//     Object.entries(formData).forEach(([key, value]) => {
-//       submitData.append(key, value.toString());
-//     });
-//     images.forEach(image => {
-//       submitData.append('images', image);
-//     });
-
-//     try {
-//       const newItem = await createItem(submitData);
-//       setMessage({ type: 'success', text: 'Publication créée avec succès!' });
-//       console.log('Nouvel item créé:', newItem);
-//       // Reset form here if needed
-//     } catch (error) {
-//       setMessage({ type: 'error', text: 'Erreur lors de la création de la publication' });
-//       console.error('Erreur lors de l\'envoi:', error);
-//     }
-//   };
-
-//   const InputField: React.FC<{ label: string; name: keyof FormData; type?: string; icon: any; required?: boolean }> = ({ label, name, type = 'text', icon, required }) => (
-//     <div className="mb-4">
-//       <label className="block text-[#030303] text-xl font-poppins mb-2">
-//         {label} {required && <span className="text-red-500">*</span>}
-//       </label>
-//       <div className="relative">
-//         <FontAwesomeIcon icon={icon} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
-//         <input
-//           type={type}
-//           name={name}
-//           value={formData[name] as string}
-//           onChange={handleChange}
-//           className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
-//           placeholder={`Your ${label}`}
-//           required={required}
-//         />
-//       </div>
-//     </div>
-//   );
-
-//   const SelectField: React.FC<{ label: string; name: keyof FormData; options: string[]; icon: any; required?: boolean }> = ({ label, name, options, icon, required }) => (
-//     <div className="mb-4">
-//       <label className="block text-[#030303] text-xl font-poppins mb-2">
-//         {label} {required && <span className="text-red-500">*</span>}
-//       </label>
-//       <div className="relative">
-//         <FontAwesomeIcon icon={icon} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
-//         <select
-//           name={name}
-//           value={formData[name] as string}
-//           onChange={handleChange}
-//           className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550] appearance-none"
-//           required={required}
-//         >
-//           <option value="">Sélectionnez une option</option>
-//           {options.map(option => (
-//             <option key={option} value={option}>{option}</option>
-//           ))}
-//         </select>
-//       </div>
-//     </div>
-//   );
-
-//   return (
-//     <div className="w-full bg-white overflow-y-auto" style={{ maxHeight: 'calc(100vh - 64px)' }}>
-//       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-//         <h1 className="text-3xl font-bold text-[#030303] font-poppins mb-8">Publier une annonce</h1>
-
-//         {message && (
-//           <div className={`mb-4 p-3 rounded ${message.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-//             {message.text}
-//           </div>
-//         )}
-
-//         <form onSubmit={handleSubmit}>
-//           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//             <InputField label="Nom de la propriété" name="name" icon={faHome} />
-//             <InputField label="Prix" name="price" type="number" icon={faDollarSign} required />
-//             <InputField label="Adresse" name="address" icon={faMapMarkerAlt} required />
-//             <InputField label="Ville" name="city" icon={faCity} required />
-//             <InputField label="Pays" name="country" icon={faGlobe} required />
-//             <SelectField
-//               label="Type de logement"
-//               name="typeOfHousing"
-//               options={['Maison', 'Appartement', 'Studio']}
-//               icon={faHome}
-//             />
-//             <InputField label="Nombre de pièces" name="rooms" type="number" icon={faHome} />
-//             <InputField label="Nombre de chambres" name="bedrooms" type="number" icon={faBed} />
-//             <InputField label="Surface en m²" name="area" type="number" icon={faRulerCombined} />
-//             <SelectField
-//               label="Exposition"
-//               name="exposure"
-//               options={['Nord', 'Sud', 'Est', 'Ouest']}
-//               icon={faCompass}
-//             />
-//           </div>
-
-//           <div className="mt-6">
-//             <label className="block text-[#030303] text-xl font-poppins mb-2">Description</label>
-//             <textarea
-//               name="description"
-//               value={formData.description}
-//               onChange={handleChange}
-//               className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
-//               rows={4}
-//               placeholder="Description de la propriété"
-//             ></textarea>
-//           </div>
-
-//           <div className="mt-6">
-//             <h3 className="text-xl font-bold text-[#030303] font-poppins mb-4">Options</h3>
-//             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-//               {[
-//                 { name: 'furnished', label: 'Meublé', icon: faHome },
-//                 { name: 'notFurnished', label: 'Non meublé', icon: faHome },
-//                 { name: 'parking', label: 'Parking', icon: faCar },
-//                 { name: 'garage', label: 'Garage', icon: faCar },
-//                 { name: 'basement', label: 'Sous-sol', icon: faBox },
-//                 { name: 'storageUnit', label: 'Box', icon: faBox },
-//                 { name: 'cellar', label: 'Cave', icon: faWineBottle },
-//                 { name: 'exterior', label: 'Extérieur', icon: faTree },
-//               ].map((option) => (
-//                 <label key={option.name} className="flex items-center space-x-2">
-//                   <input
-//                     type="checkbox"
-//                     name={option.name}
-//                     checked={formData[option.name as keyof FormData] as boolean}
-//                     onChange={handleChange}
-//                     className="form-checkbox h-5 w-5 text-[#095550]"
-//                   />
-//                   <FontAwesomeIcon icon={option.icon} className="text-[#095550]" />
-//                   <span className="text-[#030303] font-poppins">{option.label}</span>
-//                 </label>
-//               ))}
-//             </div>
-//           </div>
-
-//           <div className="mt-6">
-//             <label className="block text-[#030303] text-xl font-poppins mb-2">Images</label>
-//             <div className="flex items-center justify-center w-full">
-//               <label className="flex flex-col w-full h-32 border-4 border-[#095550] border-dashed hover:bg-gray-100 hover:border-gray-300">
-//                 <div className="flex flex-col items-center justify-center pt-7">
-//                   <FontAwesomeIcon icon={faImage} className="w-8 h-8 text-[#095550] group-hover:text-gray-600" />
-//                   <p className="pt-1 text-sm tracking-wider text-[#095550] group-hover:text-gray-600">
-//                     Sélectionnez des images
-//                   </p>
-//                 </div>
-//                 <input type="file" name="images" onChange={handleImageChange} className="opacity-0" multiple />
-//               </label>
-//             </div>
-//           </div>
-
-//           <div className="mt-8 flex justify-start">
-//             <button type="submit" className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300">
-//               Créer la publication
-//             </button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CreatePublication;
-
-
-
-
-
-
-
-
-
-
-
-import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent, useCallback } from 'react';
 import axios from 'axios';
 import { useItems } from '../contexts/ItemContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -274,9 +7,7 @@ import {
   faHome, faMapMarkerAlt, faCity, faGlobe, faBed,
   faRulerCombined, faCompass, faWheelchair, faBuilding,
   faWarehouse, faCar, faBox, faWineBottle, faTree, faDollarSign, faImage,
-  faTimes,
-  faPlus,
-  faMinus
+  faTimes, faPlus, faMinus
 } from "@fortawesome/free-solid-svg-icons";
 
 interface Suggestion {
@@ -347,27 +78,23 @@ const CreatePublication: React.FC = () => {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
 
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
+      ...(name === 'furnished' && checked ? { notFurnished: false } : {}),
+      ...(name === 'notFurnished' && checked ? { furnished: false } : {})
     }));
 
     if (name === 'address') {
       handleAddressChange(value);
     }
+  }, []);
 
-    if (name === 'furnished' && checked) {
-      setFormData(prev => ({ ...prev, notFurnished: false }));
-    } else if (name === 'notFurnished' && checked) {
-      setFormData(prev => ({ ...prev, furnished: false }));
-    }
-  };
-
-  const handleAddressChange = async (value: string) => {
+  const handleAddressChange = useCallback(async (value: string) => {
     if (value.length > 2) {
       try {
         const response = await axios.get<Suggestion[]>(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(value)}`);
@@ -380,9 +107,9 @@ const CreatePublication: React.FC = () => {
       setSuggestions([]);
       setShowSuggestions(false);
     }
-  };
+  }, []);
 
-  const handleSuggestionClick = (suggestion: Suggestion) => {
+  const handleSuggestionClick = useCallback((suggestion: Suggestion) => {
     const addressParts = suggestion.display_name.split(',');
     const city = addressParts.slice(-2, -1)[0].trim();
     const country = addressParts.slice(-1)[0].trim();
@@ -395,9 +122,9 @@ const CreatePublication: React.FC = () => {
     }));
     setSuggestions([]);
     setShowSuggestions(false);
-  };
+  }, []);
 
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFiles = Array.from(e.target.files);
       const remainingSlots = MAX_IMAGES - images.length;
@@ -405,7 +132,6 @@ const CreatePublication: React.FC = () => {
       
       setImages(prevImages => [...prevImages, ...filesToAdd]);
       
-      // Générer des aperçus pour les nouvelles images
       const newPreviews = filesToAdd.map(file => URL.createObjectURL(file));
       setImagePreviews(prevPreviews => [...prevPreviews, ...newPreviews]);
 
@@ -413,29 +139,22 @@ const CreatePublication: React.FC = () => {
         setMessage({ type: 'error', text: `Vous ne pouvez ajouter que ${remainingSlots} image(s) supplémentaire(s). Les autres ont été ignorées.` });
       }
     }
-  };
+  }, [images.length]);
 
-  const removeImage = (index: number) => {
+  const removeImage = useCallback((index: number) => {
     setImages(prevImages => prevImages.filter((_, i) => i !== index));
     setImagePreviews(prevPreviews => {
       const updatedPreviews = prevPreviews.filter((_, i) => i !== index);
       URL.revokeObjectURL(prevPreviews[index]);
       return updatedPreviews;
     });
-  };
-
-  const toggleShowAllImages = () => {
-    setShowAllImages(prev => !prev);
-  };
-
-  useEffect(() => {
-    // Nettoyer les URLs des aperçus lorsque le composant est démonté
-    return () => {
-      imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
-    };
   }, []);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const toggleShowAllImages = useCallback(() => {
+    setShowAllImages(prev => !prev);
+  }, []);
+
+  const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
 
@@ -451,12 +170,11 @@ const CreatePublication: React.FC = () => {
       const newItem = await createItem(submitData);
       setMessage({ type: 'success', text: 'Publication créée avec succès!' });
       console.log('Nouvel item créé:', newItem);
-      // Reset form here if needed
     } catch (error) {
       setMessage({ type: 'error', text: 'Erreur lors de la création de la publication' });
       console.error('Erreur lors de l\'envoi:', error);
     }
-  };
+  }, [formData, images, createItem]);
 
   useEffect(() => {
     const handleClickOutside = () => setShowSuggestions(false);
@@ -467,48 +185,11 @@ const CreatePublication: React.FC = () => {
     };
   }, []);
 
-  const InputField: React.FC<{ label: string; name: keyof FormData; type?: string; icon: any; required?: boolean }> = ({ label, name, type = 'text', icon, required }) => (
-    <div className="mb-4">
-      <label className="block text-[#030303] text-xl font-poppins mb-2">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <div className="relative">
-        <FontAwesomeIcon icon={icon} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
-        <input
-          type={type}
-          name={name}
-          value={formData[name] as string}
-          onChange={handleChange}
-          className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
-          placeholder={`${label}`}
-          required={required}
-        />
-      </div>
-    </div>
-  );
-
-  const SelectField: React.FC<{ label: string; name: keyof FormData; options: string[]; icon: any; required?: boolean }> = ({ label, name, options, icon, required }) => (
-    <div className="mb-4">
-      <label className="block text-[#030303] text-xl font-poppins mb-2">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
-      <div className="relative">
-        <FontAwesomeIcon icon={icon} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
-        <select
-          name={name}
-          value={formData[name] as string}
-          onChange={handleChange}
-          className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550] appearance-none"
-          required={required}
-        >
-          <option value="">Sélectionnez une option</option>
-          {options.map(option => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-      </div>
-    </div>
-  );
+  useEffect(() => {
+    return () => {
+      imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
+    };
+  }, [imagePreviews]);
 
   return (
     <div className="w-full bg-white overflow-y-auto" style={{ maxHeight: 'calc(100vh - 64px)' }}>
@@ -523,8 +204,45 @@ const CreatePublication: React.FC = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InputField label="Nom de la propriété" name="name" icon={faHome} required />
-            <InputField label="Prix" name="price" type="number" icon={faDollarSign} required />
+            {/* Nom de la propriété */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Nom de la propriété <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faHome} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Nom de la propriété"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Prix */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Prix <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faDollarSign} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <input
+                  type="number"
+                  name="price"
+                  value={formData.price}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Prix"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Adresse */}
             <div className="mb-4">
               <label className="block text-[#030303] text-xl font-poppins mb-2">
                 Adresse <span className="text-red-500">*</span>
@@ -555,28 +273,197 @@ const CreatePublication: React.FC = () => {
                 )}
               </div>
             </div>
-            <InputField label="Ville" name="city" icon={faCity} required />
-            <InputField label="Pays" name="country" icon={faGlobe} required />
-            <SelectField
-              label="Type de logement"
-              name="typeOfHousing"
-              options={['Maison', 'Appartement', 'Studio']}
-              icon={faHome}
-            />
-            <InputField label="Nombre de pièces" name="rooms" type="number" icon={faHome} />
-            <InputField label="Nombre de chambres" name="bedrooms" type="number" icon={faBed} />
-            <InputField label="Surface en m²" name="area" type="number" icon={faRulerCombined} />
-            <SelectField
-              label="Exposition"
-              name="exposure"
-              options={['Nord', 'Sud', 'Est', 'Ouest']}
-              icon={faCompass}
-            />
-            <InputField label="Accessibilité" name="accessibility" icon={faWheelchair} />
-            <InputField label="Étage" name="floor" type="number" icon={faBuilding} />
-            <InputField label="Surface annexe en m²" name="annexArea" type="number" icon={faWarehouse} />
+
+            {/* Ville */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Ville <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faCity} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Ville"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Pays */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Pays <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faGlobe} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <input
+                  type="text"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Pays"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Type de logement */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Type de logement
+              </label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faHome} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <select
+                  name="typeOfHousing"
+                  value={formData.typeOfHousing}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550] appearance-none"
+                >
+                  <option value="">Sélectionnez une option</option>
+                  {['Maison', 'Appartement', 'Studio'].map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Nombre de pièces */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Nombre de pièces
+              </label>
+              <div className="relative">
+              <FontAwesomeIcon icon={faHome} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <input
+                  type="number"
+                  name="rooms"
+                  value={formData.rooms}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Nombre de pièces"
+                />
+              </div>
+            </div>
+
+            {/* Nombre de chambres */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Nombre de chambres
+              </label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faBed} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <input
+                  type="number"
+                  name="bedrooms"
+                  value={formData.bedrooms}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Nombre de chambres"
+                />
+              </div>
+            </div>
+
+            {/* Surface en m² */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Surface en m²
+              </label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faRulerCombined} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <input
+                  type="number"
+                  name="area"
+                  value={formData.area}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Surface en m²"
+                />
+              </div>
+            </div>
+
+            {/* Exposition */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Exposition
+              </label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faCompass} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <select
+                  name="exposure"
+                  value={formData.exposure}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550] appearance-none"
+                >
+                  <option value="">Sélectionnez une option</option>
+                  {['Nord', 'Sud', 'Est', 'Ouest'].map(option => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Accessibilité */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Accessibilité
+              </label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faWheelchair} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <input
+                  type="text"
+                  name="accessibility"
+                  value={formData.accessibility}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Accessibilité"
+                />
+              </div>
+            </div>
+
+            {/* Étage */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Étage
+              </label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faBuilding} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <input
+                  type="number"
+                  name="floor"
+                  value={formData.floor}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Étage"
+                />
+              </div>
+            </div>
+
+            {/* Surface annexe en m² */}
+            <div className="mb-4">
+              <label className="block text-[#030303] text-xl font-poppins mb-2">
+                Surface annexe en m²
+              </label>
+              <div className="relative">
+                <FontAwesomeIcon icon={faWarehouse} className="absolute top-1/2 left-3 transform -translate-y-1/2 text-[#095550]" />
+                <input
+                  type="number"
+                  name="annexArea"
+                  value={formData.annexArea}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 pl-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Surface annexe en m²"
+                />
+              </div>
+            </div>
           </div>
 
+          {/* Description */}
           <div className="mt-6">
             <label className="block text-[#030303] text-xl font-poppins mb-2">Description</label>
             <textarea
@@ -589,6 +476,7 @@ const CreatePublication: React.FC = () => {
             ></textarea>
           </div>
 
+          {/* Options */}
           <div className="mt-6">
             <h3 className="text-xl font-bold text-[#030303] font-poppins mb-4">Options</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -617,6 +505,7 @@ const CreatePublication: React.FC = () => {
             </div>
           </div>
 
+          {/* Images */}
           <div className="mt-6">
             <label className="block text-[#030303] text-xl font-poppins mb-2">Images ({images.length}/{MAX_IMAGES})</label>
             <div className="flex items-center justify-center w-full">
@@ -676,6 +565,7 @@ const CreatePublication: React.FC = () => {
             )}
           </div>
 
+          {/* Submit Button */}
           <div className="mt-8 flex justify-start">
             <button type="submit" className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300">
               Créer la publication
@@ -687,4 +577,4 @@ const CreatePublication: React.FC = () => {
   );
 };
 
-export default CreatePublication;
+export default React.memo(CreatePublication);

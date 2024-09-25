@@ -616,7 +616,7 @@ const PropertyDetails: React.FC = () => {
               <div className="text-center">
                 <FontAwesomeIcon icon={faCheckCircle} className="text-5xl text-green-500 mb-4" />
                 <h2 className="text-2xl font-bold mb-2">Paiement réussi !</h2>
-                <p>Vous êtes maintenant un utilisateur premium. Redirection vers le formulaire de candidature...</p>
+                <p>Vous êtes maintenant un utilisateur premium. Redirection vers le formulaire de candidature..</p>
               </div>
             ) : (
               <>

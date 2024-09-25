@@ -4,8 +4,13 @@ import {
   faDoorOpen, faBed, faHouse, faCouch,
   faRulerCombined, faCompass, faWheelchair, faBuilding,
   faWarehouse, faCar, faBox, faWineBottle, faTree,
-  faShare, faHeart, faExpand, faPlus, faCheckCircle
+  faShare, faHeart, faExpand, faPlus, faCheckCircle,
+  faEnvelope,
+
 } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFacebookF, faTwitter, faLinkedinIn
+} from '@fortawesome/free-brands-svg-icons';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Loader } from '@googlemaps/js-api-loader';
@@ -126,24 +131,7 @@ const PropertyDetails: React.FC = () => {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
-
-  const addNeighborhoodBoundary = (map: google.maps.Map) => {
-    const center = new google.maps.LatLng(house.latitude, house.longitude);
-    const radius = 100;
-
-    const circle = new google.maps.Circle({
-      strokeColor: "#0f766e",
-      strokeOpacity: 0.8,
-      strokeWeight: 2,
-      fillColor: "#0f766e",
-      fillOpacity: 0.35,
-      map: map,
-      center: center,
-      radius: radius
-    });
-
-    setNeighborhoodBoundary(circle);
-  };
+  const [showSharePopup, setShowSharePopup] = useState(false);
 
   useEffect(() => {
     if (!house) return;
@@ -227,7 +215,7 @@ const PropertyDetails: React.FC = () => {
     }).catch((e) => {
       console.error('Erreur lors du chargement de la bibliothèque Google Maps.: ', e);
     });
-  }, [house]);
+  }, [house, user]);
 
   useEffect(() => {
     if (map && isMapLoaded) {
@@ -246,6 +234,24 @@ const PropertyDetails: React.FC = () => {
       }
     }
   }, [activeTab, show3DView, map, isMapLoaded, neighborhoodBoundary]);
+
+  const addNeighborhoodBoundary = (map: google.maps.Map) => {
+    const center = new google.maps.LatLng(house.latitude, house.longitude);
+    const radius = 100;
+
+    const circle = new google.maps.Circle({
+      strokeColor: "#0f766e",
+      strokeOpacity: 0.8,
+      strokeWeight: 2,
+      fillColor: "#0f766e",
+      fillOpacity: 0.35,
+      map: map,
+      center: center,
+      radius: radius
+    });
+
+    setNeighborhoodBoundary(circle);
+  };
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
@@ -363,6 +369,30 @@ const PropertyDetails: React.FC = () => {
     }
   };
 
+  const handleShare = (platform: string) => {
+    let shareUrl = '';
+    const text = `Check out this property: ${house.name} in ${house.city}`;
+    const url = window.location.href;
+
+    switch (platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+        break;
+      case 'linkedin':
+        shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${encodeURIComponent(text)}`;
+        break;
+      case 'email':
+        shareUrl = `mailto:?subject=${encodeURIComponent(text)}&body=${encodeURIComponent(url)}`;
+        break;
+    }
+
+    window.open(shareUrl, '_blank');
+    setShowSharePopup(false);
+  };
+
   if (!house) {
     return <div className="p-4">No property details available.</div>;
   }
@@ -458,7 +488,7 @@ const PropertyDetails: React.FC = () => {
             <p className="text-sm text-[#3e3e3e]">{truncatedAddress}</p>
           </div>
           <div className="flex space-x-2">
-            <IconButton icon={faShare} onClick={() => console.log('Partager cliqué')} />
+            <IconButton icon={faShare} onClick={() => setShowSharePopup(true)} />
             <IconButton 
               icon={faHeart}
               onClick={handleLikeToggle}
@@ -500,7 +530,6 @@ const PropertyDetails: React.FC = () => {
           <LargeInfoCard icon={faWheelchair} value={house.accessibility} label="Accessibilité" />
           <LargeInfoCard icon={faCouch} value={house.furnished ? "Meublé" : "Non meublé"} label="Ameublement" />
         </div>
-        <h2 className="text-[23px] font-medium text-[#2c2c2c] mb-4">Options annexes</h2>
         <div className="grid grid-cols-3 gap-4">
           {house.parking && <LargeInfoCard icon={faCar} value="Oui" label="Parking" />}
           {house.garage && <LargeInfoCard icon={faCar} value="Oui" label="Garage" />}
@@ -510,6 +539,7 @@ const PropertyDetails: React.FC = () => {
           {house.exterior && <LargeInfoCard icon={faTree} value="Oui" label="Extérieur" />}
         </div>
       </div>
+      
       {showCandidaturePopup && (
         <div className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-500 ${fadeOut ? 'opacity-0' : 'opacity-100'}`}>
           <div className="bg-white p-8 rounded-lg max-w-md w-full">
@@ -538,6 +568,34 @@ const PropertyDetails: React.FC = () => {
                 </button>
               </>
             )}
+          </div>
+        </div>
+      )}
+
+      {showSharePopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg">
+            <h2 className="text-2xl font-bold mb-4">Partager</h2>
+            <div className="flex space-x-4">
+              <button onClick={() => handleShare('facebook')} className="bg-blue-600 text-white p-2 rounded">
+                <FontAwesomeIcon icon={faFacebookF} />
+              </button>
+              <button onClick={() => handleShare('twitter')} className="bg-blue-400 text-white p-2 rounded">
+                <FontAwesomeIcon icon={faTwitter} />
+              </button>
+              <button onClick={() => handleShare('linkedin')} className="bg-blue-700 text-white p-2 rounded">
+                <FontAwesomeIcon icon={faLinkedinIn} />
+              </button>
+              <button onClick={() => handleShare('email')} className="bg-gray-500 text-white p-2 rounded">
+                <FontAwesomeIcon icon={faEnvelope} />
+              </button>
+            </div>
+            <button
+              onClick={() => setShowSharePopup(false)}
+              className="mt-4 text-gray-500 hover:text-gray-700"
+            >
+              Fermer
+            </button>
           </div>
         </div>
       )}

@@ -9,9 +9,12 @@ describe('FilterService', () => {
   let model: Model<Item>;
 
   const mockItemModel = {
-    find: jest.fn().mockReturnThis(),
-    exec: jest.fn().mockResolvedValue([]),
+    find: jest.fn().mockReturnThis(), // Keeps return this for chaining
+    sort: jest.fn().mockReturnThis(), // Allows sort to chain as well
+    exec: jest.fn().mockResolvedValue([]), // Resolves to an empty array
   };
+  
+  
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -260,25 +263,42 @@ describe('FilterService', () => {
     });
   });
 
-  // Filter by annex area
-  describe('filterByAnnexArea', () => {
-    it('should call the model with the correct filter for minAnnexArea', async () => {
-      const minAnnexArea = 5;
-      await service.filterByAnnexArea(minAnnexArea);
-      expect(mockItemModel.find).toHaveBeenCalledWith({ annexArea: { $gte: minAnnexArea } });
-    });
+ // Filter by annex area
+describe('filterByAnnexArea', () => {
+  it('should call the model with the correct filter for minAnnexArea', async () => {
+    const minAnnexArea = 5;
+    await service.filterByAnnexArea(minAnnexArea);
+    expect(mockItemModel.find).toHaveBeenCalledWith({ annexArea: { $gte: minAnnexArea } });
+  });
 
-    it('should call the model with the correct filter for maxAnnexArea', async () => {
-      const maxAnnexArea = 50;
-      await service.filterByAnnexArea(undefined, maxAnnexArea);
-      expect(mockItemModel.find).toHaveBeenCalledWith({ annexArea: { $lte: maxAnnexArea } });
-    });
+  it('should call the model with the correct filter for maxAnnexArea', async () => {
+    const maxAnnexArea = 50;
+    await service.filterByAnnexArea(undefined, maxAnnexArea);
+    expect(mockItemModel.find).toHaveBeenCalledWith({ annexArea: { $lte: maxAnnexArea } });
+  });
 
-    it('should call the model with the correct filter for both minAnnexArea and maxAnnexArea', async () => {
-      const minAnnexArea = 5;
-      const maxAnnexArea = 50;
-      await service.filterByAnnexArea(minAnnexArea, maxAnnexArea);
-      expect(mockItemModel.find).toHaveBeenCalledWith({ annexArea: { $gte: minAnnexArea, $lte: maxAnnexArea } });
-    });
+  it('should call the model with the correct filter for both minAnnexArea and maxAnnexArea', async () => {
+    const minAnnexArea = 5;
+    const maxAnnexArea = 50;
+    await service.filterByAnnexArea(minAnnexArea, maxAnnexArea);
+    expect(mockItemModel.find).toHaveBeenCalledWith({ annexArea: { $gte: minAnnexArea, $lte: maxAnnexArea } });
   });
 });
+
+// Filter by price ascending
+describe('filterByPriceAscending', () => {
+  it('should call the model and sort by price in ascending order', async () => {
+    await service.filterByPriceAscending();
+    expect(mockItemModel.find).toHaveBeenCalled(); // Vérifie que find est appelé
+    expect(mockItemModel.sort).toHaveBeenCalledWith({ price: 1 }); // Vérifie que sort est appelé en ordre croissant
+  });
+});
+
+// Filter by price descending
+describe('filterByPriceDescending', () => {
+  it('should call the model and sort by price in descending order', async () => {
+    await service.filterByPriceDescending();
+    expect(mockItemModel.find).toHaveBeenCalled(); // Vérifie que find est appelé
+    expect(mockItemModel.sort).toHaveBeenCalledWith({ price: -1 }); // Vérifie que sort est appelé en ordre décroissant
+  });
+});});

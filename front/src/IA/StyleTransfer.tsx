@@ -1,10 +1,21 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
+import { Cloudinary } from "@cloudinary/url-gen";
+import { AdvancedImage } from "@cloudinary/react";
+import { fill } from "@cloudinary/url-gen/actions/resize";
+
+const CLOUD_NAME = 'dxynfkwzx';
+// Configure Cloudinary
+const cld = new Cloudinary({
+  cloud: {
+    cloudName: CLOUD_NAME
+  }
+});
 
 const StyleTransfer: React.FC = () => {
-  const [apiKey, setApiKey] = useState<string>('sk-v8IV8Sh86ea2F64kzIofgRIs1Kk');
-  const [roomImage, setRoomImage] = useState<string | null>(null);
-  const [styleImage, setStyleImage] = useState<string | null>(null);
+  const [apiKey] = useState<string>('sk-v8IV8Sh86ea2F64kzIofgRIs1Kk');
+  const [roomImagePublicId, setRoomImagePublicId] = useState<string>('');
+  const [styleImagePublicId, setStyleImagePublicId] = useState<string>('');
   const [spaceType, setSpaceType] = useState<string>('bedroom');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -21,18 +32,32 @@ const StyleTransfer: React.FC = () => {
     'patio', 'small_garden'
   ];
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, setImage: React.Dispatch<React.SetStateAction<string | null>>) => {
+  const handleImageUpload = async (file: File, setImagePublicId: React.Dispatch<React.SetStateAction<string>>) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ml_default');
+
+      const response = await axios.post<{ public_id: string }>(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        formData
+      );
+
+      setImagePublicId(response.data.public_id);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setError('Error uploading the image. Please try again.');
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>, setImagePublicId: React.Dispatch<React.SetStateAction<string>>) => {
     if (e.target.files && e.target.files[0]) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        setImage(event.target?.result as string);
-      };
-      reader.readAsDataURL(e.target.files[0]);
+      handleImageUpload(e.target.files[0], setImagePublicId);
     }
   };
 
   const handleStyleTransfer = async () => {
-    if (!roomImage || !styleImage) {
+    if (!roomImagePublicId || !styleImagePublicId) {
       setError("Please upload both room and style images before continuing.");
       return;
     }
@@ -45,8 +70,8 @@ const StyleTransfer: React.FC = () => {
       const response = await axios.post(
         'https://api.spacely.ai/api/v1/generate/style-transfer',
         {
-          imageUrl: roomImage,
-          styleImageUrl: styleImage,
+          imageUrl: cld.image(roomImagePublicId).toURL(),
+          styleImageUrl: cld.image(styleImagePublicId).toURL(),
           spaceType: spaceType,
           renovateType: 'residential'
         },
@@ -71,11 +96,13 @@ const StyleTransfer: React.FC = () => {
   };
 
   const handleReset = () => {
-    setRoomImage(null);
-    setStyleImage(null);
+    setRoomImagePublicId('');
+    setStyleImagePublicId('');
     setSpaceType('bedroom');
     setResultImages([]);
     setError(null);
+    if (roomImageInputRef.current) roomImageInputRef.current.value = '';
+    if (styleImageInputRef.current) styleImageInputRef.current.value = '';
   };
 
   return (
@@ -89,8 +116,11 @@ const StyleTransfer: React.FC = () => {
             className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors h-64 flex items-center justify-center"
             onClick={() => roomImageInputRef.current?.click()}
           >
-            {roomImage ? (
-              <img src={roomImage} alt="Room" className="max-w-full max-h-full object-contain" />
+            {roomImagePublicId ? (
+              <AdvancedImage
+                cldImg={cld.image(roomImagePublicId).resize(fill().width(300).height(200))}
+                className="max-w-full max-h-full object-contain"
+              />
             ) : (
               <p>Click to upload room image</p>
             )}
@@ -98,7 +128,7 @@ const StyleTransfer: React.FC = () => {
           <input 
             type="file" 
             ref={roomImageInputRef}
-            onChange={(e) => handleImageChange(e, setRoomImage)}
+            onChange={(e) => handleImageChange(e, setRoomImagePublicId)}
             className="hidden" 
             accept="image/*"
           />
@@ -109,8 +139,11 @@ const StyleTransfer: React.FC = () => {
             className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors h-64 flex items-center justify-center"
             onClick={() => styleImageInputRef.current?.click()}
           >
-            {styleImage ? (
-              <img src={styleImage} alt="Style" className="max-w-full max-h-full object-contain" />
+            {styleImagePublicId ? (
+              <AdvancedImage
+                cldImg={cld.image(styleImagePublicId).resize(fill().width(300).height(200))}
+                className="max-w-full max-h-full object-contain"
+              />
             ) : (
               <p>Click to upload style image</p>
             )}
@@ -118,7 +151,7 @@ const StyleTransfer: React.FC = () => {
           <input 
             type="file" 
             ref={styleImageInputRef}
-            onChange={(e) => handleImageChange(e, setStyleImage)}
+            onChange={(e) => handleImageChange(e, setStyleImagePublicId)}
             className="hidden" 
             accept="image/*"
           />
@@ -160,7 +193,7 @@ const StyleTransfer: React.FC = () => {
         </button>
         <button 
           onClick={handleStyleTransfer} 
-          disabled={loading}
+          disabled={loading || !roomImagePublicId || !styleImagePublicId}
           className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-gray-400"
         >
           Generate
@@ -193,7 +226,6 @@ const StyleTransfer: React.FC = () => {
       </div>
     </div>
   );  
-  
 }
 
 export default StyleTransfer;

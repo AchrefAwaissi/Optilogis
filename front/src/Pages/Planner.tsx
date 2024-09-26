@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Planner: React.FC = () => {
   return (
-    <div className="flex flex-col sm:flex-row flex-wrap gap-6 justify-center items-center p-6 bg-gray-100">
+    <div className="flex flex-col sm:flex-row flex-wrap gap-6 justify-center items-center p-6 bg-white-100">
       <div className="overflow-y-auto max-h-[600px] w-full flex flex-wrap justify-center gap-6 p-4">
         
         {/* Color Transfer Card */}

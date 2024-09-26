@@ -1,8 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faSignOutAlt, faHeart, faSearch, faBell, faSignInAlt, faUserPlus } from '@fortawesome/free-solid-svg-icons';
-import logo from "../image/logoa.png";
+import {
+  faBars,
+  faTimes,
+  faSignOutAlt,
+  faHeart,
+  faBell,
+  faSignInAlt,
+  faUserPlus,
+  faMapMarkerAlt,
+  faChevronDown,
+} from '@fortawesome/free-solid-svg-icons';
+import logo from "../image/logoa.png"; // Ensure the path is correct
+import axios from 'axios';
 
 interface User {
   username: string;
@@ -14,43 +25,136 @@ interface HorizontalNavbarProps {
   onLogout: () => void;
   onSignInClick: () => void;
   onSignUpClick: () => void;
+  onFavoritesToggle: () => void;
+  showFavorites: boolean;
+  onFilterChange: (filter: { location?: string; typeOfHousing?: string }) => void; // Added onFilterChange
+  onLocationSelect: (location: { location: string; lat: number; lon: number }) => void; // Added onLocationSelect
 }
 
-const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onSignInClick, onSignUpClick }) => {
+interface Suggestion {
+  label: string;
+  lat: string;
+  lon: string;
+}
+
+const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
+  user,
+  onLogout,
+  onSignInClick,
+  onSignUpClick,
+  onFavoritesToggle,
+  showFavorites,
+  onFilterChange,
+  onLocationSelect
+}) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [locationSearch, setLocationSearch] = useState('');
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleFavoritesClick = () => {
-    console.log('Afficher les annonces favorites');
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
   };
+
+  const closeDropdown = () => {
+    setShowDropdown(false);
+  };
+
+  const handleLogoutClick = () => {
+    closeDropdown();
+    onLogout();
+  };
+
+  const handleLocationChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLocationSearch(value); // Update local state
+    onFilterChange({ location: value }); // Update location filter
+
+    if (value.length > 2) {
+      try {
+        const response = await axios.get(`https://api-adresse.data.gouv.fr/search/`, {
+          params: {
+            q: value,
+            limit: 5,
+          },
+        });
+        const formattedSuggestions = response.data.features.map((item: any) => ({
+          label: item.properties.label,
+          lat: item.geometry.coordinates[1],
+          lon: item.geometry.coordinates[0],
+        }));
+        setSuggestions(formattedSuggestions);
+        setShowSuggestions(true);
+      } catch (error) {
+        console.error('Error fetching location suggestions:', error);
+      }
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      // Trigger search on Enter key
+      if (locationSearch) {
+        onFilterChange({ location: locationSearch });
+        setShowSuggestions(false);
+      }
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: Suggestion) => {
+    onFilterChange({ location: suggestion.label }); // Update location filter
+    onLocationSelect({
+      location: suggestion.label,
+      lat: parseFloat(suggestion.lat),
+      lon: parseFloat(suggestion.lon),
+    });
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setLocationSearch(suggestion.label); // Update the search field with selected suggestion
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const NavLinks = () => (
     <>
       <Link to="/" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Accueil
+        Home
       </Link>
       <Link to="/publish" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Créer une annonce
+        Publish
       </Link>
       <Link to="/manage-items" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Mes annonces
+        My items
       </Link>
       <Link to="/search" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Recherche
+        Search
       </Link>
       <Link to="/matching" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Colocation
-      </Link>
-      <Link to="/settings" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Paramètres
+        Matching
       </Link>
     </>
   );
 
-  // Mobile navbar for non-logged in users
   const MobileNavbar = () => (
     <header className="bg-white shadow-md sticky top-0 left-0 w-full z-50 lg:hidden">
       <div className="container mx-auto px-4">
@@ -90,7 +194,6 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
     </header>
   );
 
-  // Full navbar for logged in users (both mobile and PC)
   const FullNavbar = () => (
     <header className="bg-white shadow-md sticky top-0 left-0 w-full z-50">
       <div className="container mx-auto px-4">
@@ -103,81 +206,95 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ user, onLogout, onS
           </div>
 
           <div className="hidden lg:flex flex-grow justify-center mx-4">
-            <div className="flex items-center bg-gray-100 rounded-lg w-full max-w-md h-10 px-3">
-              <FontAwesomeIcon icon={faSearch} className="text-gray-500 text-lg mr-2" />
+            <div className="relative">
               <input
                 type="text"
-                placeholder="Recherche..."
-                className="bg-transparent outline-none w-full text-gray-500 text-sm"
+                value={locationSearch}
+                onChange={handleLocationChange}
+                onKeyPress={handleKeyPress} // Add key press event
+                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#006845]"
+                placeholder="Rechercher une ville ou une adresse"
+                style={{ borderRadius: '7px' }}
+                onFocus={() => setShowSuggestions(true)} // Show suggestions on focus
               />
+              <FontAwesomeIcon
+                icon={faMapMarkerAlt}
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              />
+              {showSuggestions && suggestions.length > 0 && (
+                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-60 overflow-auto">
+                  {suggestions.map((suggestion, index) => (
+                    <li
+                      key={index}
+                      className="p-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleSuggestionClick(suggestion)}
+                    >
+                      {suggestion.label}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center space-x-4">
-            <button
-              onClick={handleFavoritesClick}
-              className="text-gray-500 hover:text-red-500 p-2 rounded flex items-center justify-center"
-              aria-label="Favorites"
-            >
-              <FontAwesomeIcon icon={faHeart} className="text-[#095550]" />
-            </button>
-            <FontAwesomeIcon icon={faBell} className="text-gray-500 text-xl cursor-pointer" />
-            <img src={user?.profilePhotoPath || '/default-avatar.png'} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
-            <button
-              onClick={onLogout}
-              className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm"
-            >
-              <FontAwesomeIcon icon={faSignOutAlt} className="mr-1 text-[#095550]" />
-              Se déconnecter
-            </button>
-          </div>
-
-          <div className="lg:hidden flex items-center">
-            <button
-              onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-800 hover:text-blue-600 focus:outline-none"
-            >
-              <FontAwesomeIcon icon={isOpen ? faTimes : faBars} />
-            </button>
+          <div className="flex items-center">
+            {user ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={toggleDropdown}
+                  className="flex items-center text-gray-800 hover:text-blue-600 focus:outline-none"
+                >
+                  <FontAwesomeIcon icon={faBell} className="mr-2" />
+                  <FontAwesomeIcon icon={faChevronDown} />
+                </button>
+                {showDropdown && (
+                  <div className="absolute right-0 z-10 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg">
+                    <button
+                      onClick={onFavoritesToggle}
+                      className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
+                    >
+                      {showFavorites ? 'Hide Favorites' : 'Show Favorites'}
+                    </button>
+                    <button
+                      onClick={handleLogoutClick}
+                      className="block px-4 py-2 text-gray-800 hover:bg-gray-100 w-full text-left"
+                    >
+                      <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex space-x-4">
+                <button
+                  onClick={onSignInClick}
+                  className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm"
+                >
+                  <FontAwesomeIcon icon={faSignInAlt} className="mr-1 text-[#095550]" />
+                  Sign In
+                </button>
+                <button
+                  onClick={onSignUpClick}
+                  className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm"
+                >
+                  <FontAwesomeIcon icon={faUserPlus} className="mr-1 text-[#095550]" />
+                  Sign Up
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {isOpen && (
-        <div className="lg:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <NavLinks />
-          <div className="flex items-center bg-gray-100 rounded-lg w-full h-10 px-3 mt-2">
-            <FontAwesomeIcon icon={faSearch} className="text-gray-500 text-lg mr-2" />
-            <input
-              type="text"
-              placeholder="Recherche..."
-              className="bg-transparent outline-none w-full text-gray-500 text-sm"
-            />
-          </div>
-          <div className="flex justify-between items-center mt-2">
-            <button
-              onClick={handleFavoritesClick}
-              className="text-gray-500 hover:text-red-500 p-2 rounded flex items-center justify-center"
-              aria-label="Favorites"
-            >
-              <FontAwesomeIcon icon={faHeart} className="text-[#095550]" />
-            </button>
-            <FontAwesomeIcon icon={faBell} className="text-gray-500 text-xl cursor-pointer" />
-            <img src={user?.profilePhotoPath || '/default-avatar.png'} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
-            <button
-              onClick={onLogout}
-              className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm"
-            >
-              <FontAwesomeIcon icon={faSignOutAlt} className="mr-1 text-[#095550]" />
-              Logout
-            </button>
-          </div>
-        </div>
-      )}
     </header>
   );
 
-  return user ? <FullNavbar /> : <MobileNavbar />;
+  return (
+    <>
+      <MobileNavbar />
+      <FullNavbar />
+    </>
+  );
 };
 
 export default HorizontalNavbar;

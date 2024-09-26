@@ -20,6 +20,7 @@ import SearchArticle from './IA/searchArticle';
 import EmptyRoom from './IA/EmptyRoom';
 import FurniturePlacement from './IA/FurniturePlacement';
 import ColorChange from './IA/ColorChange';
+import Contact from './Pages/Contact';
 
 interface User {
   username: string;
@@ -95,7 +96,8 @@ const App: React.FC = () => {
           <Route path="/furniture-placement" element={<FurniturePlacement />} />
           <Route path="/empty-room" element={<EmptyRoom />} />
           <Route path="/color-transfer" element={<ColorChange />}/>
-    
+          <Route path="/contact" element={<Contact />}/>
+
                 {/* Protected Routes */}
                 <Route path="/publish" element={
                   <ProtectedRoute>

@@ -14,6 +14,16 @@ export class FilterController {
     return this.filterService.filterByPrice(minPrice, maxPrice);
   }
 
+  @Get('price-ascending')
+  async filterByPriceAscending(): Promise<Item[]> {
+    return this.filterService.filterByPriceAscending();
+  }
+
+  @Get('price-descending')
+  async filterByPriceDescending(): Promise<Item[]> {
+    return this.filterService.filterByPriceDescending();
+  }
+
   @Get('size')
   async filterBySize(
     @Query('minSize') minSize?: number,
@@ -89,12 +99,11 @@ export class FilterController {
   }
 
   @Get('exposure')
-async filterByExposure(
-  @Query('exposure') exposure?: string,
-): Promise<Item[]> {
-  return this.filterService.filterByExposure(exposure);
-}
-
+  async filterByExposure(
+    @Query('exposure') exposure?: string,
+  ): Promise<Item[]> {
+    return this.filterService.filterByExposure(exposure);
+  }
 
   @Get('furnished')
   async filterByFurnished(

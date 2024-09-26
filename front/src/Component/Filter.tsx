@@ -87,6 +87,14 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
     });
   };
 
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // État pour l'ordre de tri
+
+  const handleSortPrice = (order: 'asc' | 'desc') => {
+    setSortOrder(order); // Mettre à jour l'état de l'ordre de tri
+    onFilterChange({ sortPrice: order }); // Appeler la fonction de filtre avec le nouvel ordre
+};
+
+
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFilterChange({ maxPrice: parseInt(e.target.value) });
   };
@@ -128,6 +136,8 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
           </button>
         </div>
       )}
+
+
 
       <div className={`
         ${onToggle ? '' : 'fixed inset-0 bg-white z-40'}
@@ -175,47 +185,62 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
         </div>
 
         <div className="p-4">
-          <h3 className="text-sm font-semibold text-gray-500 mb-2">Type de logement</h3>
-          <ul>
-            {[
-              { label: 'Tous', value: '' },
-              { label: 'Studio', value: 'studio' },
-              { label: 'Appartement', value: 'appartement' },
-              { label: 'Maison', value: 'maison' }
-            ].map((type) => (
-              <li key={type.value}>
-                <label className="flex items-center py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={type.value === '' ? filterCriteria.typeOfHousing === '' : filterCriteria.typeOfHousing === type.value}
-                    onChange={() => handleTypeOfPlaceChange(type.value as FilterCriteria['typeOfHousing'])}
-                    className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]" style={{ accentColor: '#095550', borderRadius: '7px' }}
-                  />
-                  <span className="ml-3">{type.label}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className="p-4">
-          <h3 className="text-sm font-semibold text-gray-500 mb-2">Fourchette de prix</h3>
+  <h3 className="text-sm font-semibold text-gray-500 mb-2">Type de logement</h3>
+  <ul>
+    {[
+      { label: 'Tous', value: '' },
+      { label: 'Studio', value: 'studio' },
+      { label: 'Appartement', value: 'appartement' },
+      { label: 'Maison', value: 'maison' }
+    ].map((type) => (
+      <li key={type.value}>
+        <label className="flex items-center py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
           <input
-            type="range"
-            min="100"
-            max="200000"
-            value={filterCriteria.maxPrice}
-            onChange={handlePriceChange}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            style={{
-              accentColor: '#095550',
-            }}
+            type="checkbox"
+            checked={type.value === '' ? filterCriteria.typeOfHousing === '' : filterCriteria.typeOfHousing === type.value}
+            onChange={() => handleTypeOfPlaceChange(type.value as FilterCriteria['typeOfHousing'])}
+            className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]"
+            style={{ accentColor: '#095550', borderRadius: '7px' }}
           />
-          <div className="flex justify-between mt-2 text-sm text-gray-600">
-            <span>100€</span>
-            <span>{filterCriteria.maxPrice}€</span>
-          </div>
-        </div>
+          <span className="ml-3">{type.label}</span>
+        </label>
+      </li>
+    ))}
+
+ 
+
+
+    <li className="mt-4">  
+      <h3 className="text-sm font-semibold text-gray-500 mb-2">Trier par Prix</h3>
+      <div className="flex flex-col">
+        <label className="flex items-center py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={sortOrder === 'asc'}
+            onChange={() => handleSortPrice('asc')}
+            className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]"
+            style={{ accentColor: '#095550', borderRadius: '7px' }}
+          />
+          <span className="ml-3">Prix Croissant</span>
+        </label>
+
+  
+        <label className="flex items-center py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={sortOrder === 'desc'}
+            onChange={() => handleSortPrice('desc')}
+            className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]"
+            style={{ accentColor: '#095550', borderRadius: '7px' }}
+          />
+          <span className="ml-3">Prix Décroissant</span>  
+        </label>
+      </div>
+    </li>
+  </ul>
+</div>
+
+
 
         <div className="p-4">
           <h3 className="text-sm font-semibold text-gray-500 mb-2">Surface habitable (m²)</h3>

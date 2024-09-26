@@ -73,21 +73,22 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
       style={{ maxHeight: '300px' }}
     >
       <div className="relative w-full h-48 sm:w-40 sm:h-40 m-2">
-        <div
-          className="w-full h-full rounded-xl bg-center bg-cover bg-no-repeat"
-          style={{ backgroundImage: `url(${imageUrl})` }}
-        />
-         <button
-          onClick={handleLikeToggle}
-          className="absolute top-2 right-2 bg-white bg-opacity-70 rounded-full p-2 flex items-center space-x-1 z-10"
-        >
-          <FontAwesomeIcon 
-            icon={faHeart} 
-            className={`text-xl ${isLiked ? 'text-red-500' : 'text-gray-500'}`} 
-          />
-          <span className="text-sm font-semibold">{likeCount}</span>
-        </button>
-      </div>
+      <div
+    className="w-full h-full rounded-xl bg-center bg-cover bg-no-repeat"
+    style={{ backgroundImage: `url(${imageUrl})` }}
+  />
+  {/* Bouton de like encore plus petit */}
+  <button
+    onClick={handleLikeToggle}
+    className="absolute top-1 right-1 bg-[#095550] rounded-full p-1 flex flex-col items-center justify-center space-y-1 text-white"
+  >
+    <FontAwesomeIcon 
+      icon={faHeart} 
+      className={`text-base ${isLiked ? 'text-red-500' : 'text-gray-200'} transition-colors duration-300`} 
+      />
+    <span className="text-xs font-semibold">{likeCount}</span>
+  </button>
+</div>
       <div className="flex-1 p-4 flex flex-col justify-between">
         <div>
           <h3 className="text-lg font-medium text-gray-800 mb-1">{house.title}</h3>

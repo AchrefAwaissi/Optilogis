@@ -5,8 +5,7 @@ import {
   faRulerCombined, faCompass, faWheelchair, faBuilding,
   faWarehouse, faCar, faBox, faWineBottle, faTree,
   faShare, faHeart, faExpand, faPlus, faCheckCircle,
-  faEnvelope,
-
+  faEnvelope, faTimes
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebookF, faTwitter, faLinkedinIn
@@ -88,7 +87,14 @@ interface IconButtonProps {
   onClick?: () => void;
   isLiked?: boolean;
 }
-
+interface NeighborhoodInfo {
+  name: string;
+  population: string;
+  amenities: string[];
+  safety: string;
+  transport: string[];
+  imageUrl: string; // Ajoutez cette ligne
+}
 const IconButton: React.FC<IconButtonProps> = ({ icon, onClick, isLiked }) => (
   <button
     className={`w-[46px] h-[46px] bg-gray-100 rounded-full flex items-center justify-center transition-colors duration-200 ${
@@ -132,6 +138,15 @@ const PropertyDetails: React.FC = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [fadeOut, setFadeOut] = useState(false);
   const [showSharePopup, setShowSharePopup] = useState(false);
+  const [showNeighborhoodPopup, setShowNeighborhoodPopup] = useState(false);
+  const [neighborhoodInfo, setNeighborhoodInfo] = useState<NeighborhoodInfo>({
+    name: '',
+    population: '',
+    amenities: [],
+    safety: '',
+    transport: [],
+    imageUrl: '' // Ajoutez cette ligne
+  });
 
   useEffect(() => {
     if (!house) return;
@@ -257,6 +272,9 @@ const PropertyDetails: React.FC = () => {
     setActiveTab(tab);
     if (tab === '3D') {
       setShow3DView(!show3DView);
+    } else if (tab === 'quartier') {
+      setShowNeighborhoodPopup(true);
+      fetchNeighborhoodInfo();
     }
   };
 
@@ -393,6 +411,65 @@ const PropertyDetails: React.FC = () => {
     setShowSharePopup(false);
   };
 
+  const fetchNeighborhoodInfo = async () => {
+    try {
+      // Récupérer les coordonnées de la ville depuis l'API Géo
+      const geoResponse = await axios.get(`https://api-adresse.data.gouv.fr/search/?q=${house.city}&type=municipality&limit=1`);
+      if (geoResponse.data.features.length > 0) {
+        const [lon, lat] = geoResponse.data.features[0].geometry.coordinates;
+        
+        // Construire l'URL de l'image statique Google Maps
+        const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+        const imageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=12&size=100x100&maptype=satellite&key=${googleMapsApiKey}`;
+        
+        setNeighborhoodInfo({
+          name: `${house.city} Centre`,
+          population: 'Environ 50,000 habitants',
+          amenities: [
+            'Plusieurs parcs et espaces verts',
+            'Nombreux restaurants et cafés',
+            'Écoles primaires et secondaires à proximité',
+            'Centre commercial à 10 minutes à pied'
+          ],
+          safety: 'Taux de criminalité bas, patrouilles de police régulières',
+          transport: [
+            'Station de métro à 5 minutes à pied',
+            'Arrêts de bus fréquents'
+          ],
+          imageUrl: imageUrl
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération des informations du quartier:', error);
+    }
+  };
+  const NeighborhoodPopup = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-8 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+        <div className="flex justify-between items-start mb-4">
+          <h2 className="text-2xl font-bold">{neighborhoodInfo.name}</h2>
+          <button onClick={() => setShowNeighborhoodPopup(false)} className="text-gray-500 hover:text-gray-700">
+            <FontAwesomeIcon icon={faTimes} />
+          </button>
+        </div>
+        <p className="mb-4"><strong>Population:</strong> {neighborhoodInfo.population}</p>
+        <h3 className="text-xl font-semibold mb-2">Commodités</h3>
+        <ul className="list-disc pl-5 mb-4">
+          {neighborhoodInfo.amenities.map((amenity, index) => (
+            <li key={index}>{amenity}</li>
+          ))}
+        </ul>
+        <h3 className="text-xl font-semibold mb-2">Transports</h3>
+        <ul className="list-disc pl-5 mb-4">
+          {neighborhoodInfo.transport.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+        <p className="mb-4"><strong>Sécurité:</strong> {neighborhoodInfo.safety}</p>
+      </div>
+    </div>
+  );
+
   if (!house) {
     return <div className="p-4">No property details available.</div>;
   }
@@ -453,12 +530,6 @@ const PropertyDetails: React.FC = () => {
             >
               Voir quartier
             </button>
-            <button
-              className={`px-4 py-2 text-sm font-medium rounded-md ${activeTab === 'infos' ? 'bg-teal-700 text-white' : 'bg-gray-200 text-gray-700'}`}
-              onClick={() => handleTabChange('infos')}
-            >
-              Informations
-            </button>
           </div>
           <div className="h-64 md:h-80 relative">
             {activeTab === 'quartier' || activeTab === '3D' ? (
@@ -466,18 +537,11 @@ const PropertyDetails: React.FC = () => {
                 <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
                 {activeTab === 'quartier' && (
                   <div className="absolute top-4 right-4 z-10 bg-white p-2 rounded shadow">
-                    <h3 className="text-sm font-semibold mb-2">Temps de trajet entre ce bien et d'autres adresses (travail, école...)</h3>
-                    <button className="bg-red-500 text-white px-4 py-2 rounded text-sm">
-                      Calculer un temps de trajet
-                    </button>
+                   
                   </div>
                 )}
               </>
-            ) : (
-              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-                <p>Additional Information Placeholder</p>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
@@ -552,7 +616,7 @@ const PropertyDetails: React.FC = () => {
               <div className="text-center">
                 <FontAwesomeIcon icon={faCheckCircle} className="text-5xl text-green-500 mb-4" />
                 <h2 className="text-2xl font-bold mb-2">Paiement réussi !</h2>
-                <p>Vous êtes maintenant un utilisateur premium. Redirection vers le formulaire de candidature...</p>
+                <p>Vous êtes maintenant un utilisateur premium. Redirection vers le formulaire de candidature..</p>
               </div>
             ) : (
               <>
@@ -572,7 +636,7 @@ const PropertyDetails: React.FC = () => {
         </div>
       )}
 
-      {showSharePopup && (
+{showSharePopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg">
             <h2 className="text-2xl font-bold mb-4">Partager</h2>
@@ -596,6 +660,56 @@ const PropertyDetails: React.FC = () => {
             >
               Fermer
             </button>
+          </div>
+        </div>
+      )}
+
+{showNeighborhoodPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center">
+                <img
+                  src={neighborhoodInfo.imageUrl || 'https://via.placeholder.com/40'}
+                  alt={neighborhoodInfo.name}
+                  className="w-10 h-10 rounded-full object-cover mr-3"
+                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = 'https://via.placeholder.com/40';
+                  }}
+                />
+                <h2 className="text-2xl font-bold text-[#095550]">{neighborhoodInfo.name}</h2>
+              </div>
+              <button onClick={() => setShowNeighborhoodPopup(false)} className="text-gray-500 hover:text-gray-700">
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </div>
+            
+            <p className="mb-4 text-sm text-gray-600"><strong>Population:</strong> {neighborhoodInfo.population}</p>
+            
+            <details className="mb-3">
+              <summary className="font-semibold text-[#095550] cursor-pointer">Commodités</summary>
+              <ul className="mt-2 pl-5 text-sm text-gray-600">
+                {neighborhoodInfo.amenities.map((amenity, index) => (
+                  <li key={index}>{amenity}</li>
+                ))}
+              </ul>
+            </details>
+            
+            <details className="mb-3">
+              <summary className="font-semibold text-[#095550] cursor-pointer">Transports</summary>
+              <ul className="mt-2 pl-5 text-sm text-gray-600">
+                {neighborhoodInfo.transport.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </details>
+            
+            <details className="mb-3">
+              <summary className="font-semibold text-[#095550] cursor-pointer">Sécurité</summary>
+              <p className="mt-2 text-sm text-gray-600">{neighborhoodInfo.safety}</p>
+            </details>
           </div>
         </div>
       )}

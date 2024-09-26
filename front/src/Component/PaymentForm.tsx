@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useAuth } from "../contexts/AuthContext";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser, faCreditCard, faSpinner, faExclamationTriangle, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 
 interface PaymentFormProps {
   onSuccess: () => void;
@@ -40,7 +42,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess }) => {
         if (error) {
           setError(error.message || "Une erreur est survenue lors du traitement de votre carte.");
         } else {
-          // Mise à jour du statut premium de l'utilisateur
           await upgradeToPremium();
           onSuccess();
         }
@@ -53,47 +54,83 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="mb-4">
-        <label htmlFor="firstName" className="block text-sm font-medium text-gray-700">Prénom</label>
-        <input
-          type="text"
-          id="firstName"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-          required
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        />
+    <div className="flex justify-center items-center bg-gray-100 py-8">
+      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h1 className="text-3xl font-bold text-[#095550] mb-6 text-center">Paiement Premium</h1>
+        
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+              <FontAwesomeIcon icon={faUser} className="mr-2 text-[#095550]" />
+              Prénom
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#095550] border-gray-300"
+              placeholder="Votre prénom"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+              <FontAwesomeIcon icon={faUser} className="mr-2 text-[#095550]" />
+              Nom
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#095550] border-gray-300"
+              placeholder="Votre nom"
+            />
+          </div>
+
+          <div className="mb-6">
+            <label htmlFor="card-element" className="block text-sm font-medium text-gray-700 mb-2">
+              <FontAwesomeIcon icon={faCreditCard} className="mr-2 text-[#095550]" />
+              Carte de crédit
+            </label>
+            <div className="p-3 border border-gray-300 rounded-md focus-within:ring-2 focus-within:ring-[#095550]">
+              <CardElement id="card-element" />
+            </div>
+          </div>
+
+          <p className="text-sm text-gray-600 mb-6 bg-blue-50 border-l-4 border-blue-500 p-4">
+            <FontAwesomeIcon icon={faCheckCircle} className="mr-2 text-blue-500" />
+            Aucun frais ne sera prélevé. Votre carte est requise pour validation uniquement.
+          </p>
+
+          {error && (
+            <div className="text-red-500 mb-4 flex items-center">
+              <FontAwesomeIcon icon={faExclamationTriangle} className="mr-2" />
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={!stripe || processing}
+            className={`w-full py-2 px-4 rounded transition duration-300 ${
+              processing || !stripe
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-[#095550] hover:bg-[#074440] text-white font-bold'
+            }`}
+          >
+            {processing ? (
+              <><FontAwesomeIcon icon={faSpinner} spin className="mr-2" /> Traitement en cours...</>
+            ) : (
+              'Valider le paiement'
+            )}
+          </button>
+        </form>
       </div>
-      <div className="mb-4">
-        <label htmlFor="lastName" className="block text-sm font-medium text-gray-700">Nom</label>
-        <input
-          type="text"
-          id="lastName"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-          required
-          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="card-element" className="block text-sm font-medium text-gray-700">Carte de crédit</label>
-        <div className="mt-1 p-3 border border-gray-300 rounded-md shadow-sm">
-          <CardElement id="card-element" />
-        </div>
-      </div>
-      <p className="text-sm text-gray-600 mb-4">
-        Aucun frais ne sera prélevé. Votre carte est requise pour validation uniquement.
-      </p>
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-      <button
-        type="submit"
-        disabled={!stripe || processing}
-        className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-      >
-        {processing ? 'Traitement...' : 'Déposer ma candidature'}
-      </button>
-    </form>
+    </div>
   );
 };
 

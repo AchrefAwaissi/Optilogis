@@ -6,12 +6,14 @@ import { Model } from 'mongoose';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import axios from 'axios';
 
+// Mock axios
 jest.mock('axios');
 
 describe('DossierService', () => {
   let service: DossierService;
   let model: Model<Dossier>;
 
+  // Mock data
   const mockUser = { _id: 'user_id' };
   const mockOwner1 = { _id: 'owner1_id' };
   const mockOwner2 = { _id: 'owner2_id' };
@@ -59,8 +61,9 @@ describe('DossierService', () => {
       const createDossierDto = {
         dossierFacileUrl: 'https://example.com/dossier',
         ownerIds: [mockOwner1._id, mockOwner2._id],
+        userId: mockUser._id, // Added userId here
       };
-      
+
       (axios.head as jest.Mock).mockResolvedValue({ status: 200 });
       (model.create as jest.Mock).mockResolvedValue(mockDossier);
 
@@ -81,6 +84,7 @@ describe('DossierService', () => {
       const createDossierDto = {
         dossierFacileUrl: 'invalid-url',
         ownerIds: [mockOwner1._id],
+        userId: mockUser._id, // Added userId here
       };
 
       (axios.head as jest.Mock).mockRejectedValue(new Error('Invalid URL'));

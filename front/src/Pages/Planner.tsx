@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const Planner: React.FC = () => {
   return (
-    <div className="flex flex-col sm:flex-row flex-wrap gap-6 justify-center items-center p-6 bg-gray-100">
+    <div className="flex flex-col sm:flex-row flex-wrap gap-6 justify-center items-center p-6 bg-white-100">
       <div className="overflow-y-auto max-h-[600px] w-full flex flex-wrap justify-center gap-6 p-4">
         
         {/* Color Transfer Card */}
@@ -19,7 +19,7 @@ const Planner: React.FC = () => {
               Change the color of your room to your preferred shade.
             </div>
             <Link to="/color-transfer">
-              <button className="w-full h-[40px] bg-[#286e34] text-white text-lg font-bold rounded-lg hover:bg-green-700 transition duration-200">
+              <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
                 Start
               </button>
             </Link>
@@ -39,7 +39,7 @@ const Planner: React.FC = () => {
               Redesign and render your space based on a reference image.
             </div>
             <Link to="/style-transfer">
-              <button className="w-full h-[40px] bg-[#286e34] text-white text-lg font-bold rounded-lg hover:bg-green-700 transition duration-200">
+              <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
                 Start
               </button>
             </Link>
@@ -59,7 +59,7 @@ const Planner: React.FC = () => {
               Product discovery with our Home Product Search API.
             </div>
             <Link to="/search-article">
-              <button className="w-full h-[40px] bg-[#286e34] text-white text-lg font-bold rounded-lg hover:bg-green-700 transition duration-200">
+              <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
                 Start
               </button>
             </Link>
@@ -79,7 +79,7 @@ const Planner: React.FC = () => {
               Furnish your empty space with furniture, Furniture Placement. Paste your preferred furniture within the room.
             </div>
             <Link to="/empty-room">
-              <button className="w-full h-[40px] bg-[#286e34] text-white text-lg font-bold rounded-lg hover:bg-green-700 transition duration-200">
+              <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
                 Start
               </button>
             </Link>
@@ -99,7 +99,7 @@ const Planner: React.FC = () => {
               Paste your preferred furniture within the room.
             </div>
             <Link to="/furniture-placement">
-              <button className="w-full h-[40px] bg-[#286e34] text-white text-lg font-bold rounded-lg hover:bg-green-700 transition duration-200">
+              <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
                 Start
               </button>
             </Link>

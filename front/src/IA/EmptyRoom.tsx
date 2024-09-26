@@ -1,9 +1,21 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
+import { Cloudinary } from "@cloudinary/url-gen";
+import { AdvancedImage } from "@cloudinary/react";
+import { fill } from "@cloudinary/url-gen/actions/resize";
+
+const CLOUD_NAME = 'dxynfkwzx';
+// Configure Cloudinary
+const cld = new Cloudinary({
+  cloud: {
+    cloudName: CLOUD_NAME
+  }
+});
 
 const EmptyRoom: React.FC = () => {
-  const [apiKey, setApiKey] = useState<string>('sk-iYiywwNzEzcDy-ZarW4fwNWscUs');
+  const [apiKey] = useState<string>('sk-iYiywwNzEzcDy-ZarW4fwNWscUs');
   const [image, setImage] = useState<File | null>(null);
+  const [imagePublicId, setImagePublicId] = useState<string>('');
   const [spaceType, setSpaceType] = useState<string>('bedroom');
   const [spaceStyle, setSpaceStyle] = useState<string>('modern');
   const [renovateType, setRenovateType] = useState<string>('residential');
@@ -42,9 +54,35 @@ const EmptyRoom: React.FC = () => {
     'sand_stone', 'quarry_tile', 'vinyl_composition_tile', 'concrete'
   ];
 
+  useEffect(() => {
+    if (imagePublicId) {
+      // Vous pouvez ajouter ici une logique supplémentaire lorsque l'image est téléchargée
+    }
+  }, [imagePublicId]);
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ml_default');
+
+      const response = await axios.post<{ public_id: string }>(
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+        formData
+      );
+
+      setImagePublicId(response.data.public_id);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      setError('Error uploading the image. Please try again.');
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
+      const file = e.target.files[0];
+      setImage(file);
+      handleImageUpload(file);
     }
   };
 
@@ -63,7 +101,7 @@ const EmptyRoom: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!image) {
+    if (!imagePublicId) {
       setError("Please upload an image first");
       return;
     }
@@ -73,21 +111,20 @@ const EmptyRoom: React.FC = () => {
     setResult([]);
 
     try {
-      const formData = new FormData();
-      formData.append('image', image);
-      formData.append('spaceType', spaceType);
-      formData.append('spaceStyle', spaceStyle);
-      formData.append('renovateType', renovateType);
-      formData.append('spaceColor', spaceColor);
-      materialsIds.forEach(material => formData.append('materialsIds[]', material));
-
       const response = await axios.post(
         'https://api.spacely.ai/api/v1/generate/empty-room',
-        formData,
+        {
+          imageUrl: cld.image(imagePublicId).toURL(),
+          spaceType,
+          spaceStyle,
+          renovateType,
+          spaceColor,
+          materialsIds
+        },
         {
           headers: {
             'X-API-KEY': apiKey,
-            'Content-Type': 'multipart/form-data'
+            'Content-Type': 'application/json'
           }
         }
       );
@@ -103,6 +140,7 @@ const EmptyRoom: React.FC = () => {
 
   const handleReset = () => {
     setImage(null);
+    setImagePublicId('');
     setSpaceType('bedroom');
     setSpaceStyle('modern');
     setRenovateType('residential');
@@ -126,7 +164,14 @@ const EmptyRoom: React.FC = () => {
             className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors"
             onClick={handleUpload}
           >
-            {image ? image.name : "Click to upload image"}
+            {imagePublicId ? (
+              <AdvancedImage
+                cldImg={cld.image(imagePublicId).resize(fill().width(300).height(200))}
+                className="max-w-full max-h-64 object-contain mx-auto"
+              />
+            ) : (
+              "Click to upload image"
+            )}
           </div>
           <input 
             type="file" 
@@ -217,8 +262,8 @@ const EmptyRoom: React.FC = () => {
           </button>
           <button 
             onClick={handleSubmit}
-            disabled={loading}
-            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-gray-400"
+            disabled={loading || !imagePublicId}
+            className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Generate
           </button>
@@ -244,7 +289,3 @@ const EmptyRoom: React.FC = () => {
 }
 
 export default EmptyRoom;
-
-
-
-

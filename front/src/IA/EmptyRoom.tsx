@@ -263,7 +263,7 @@ const EmptyRoom: React.FC = () => {
           <button 
             onClick={handleSubmit}
             disabled={loading || !imagePublicId}
-            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-gray-400"
+            className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Generate
           </button>

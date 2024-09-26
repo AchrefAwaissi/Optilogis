@@ -59,7 +59,7 @@ export class ContactService {
       userData.lastReset = now;
     }
 
-    if (userData.count >= 5) {
+    if (userData.count >= 2) {
       return false;
     }
 

@@ -73,13 +73,12 @@ export class ContactService {
     if (!this.checkRateLimit(email)) {
       return {
         success: false,
-        message:
-          'Limite de 5 messages par 24 heures atteinte. Veuillez réessayer plus tard.',
+        message: 'Limite de 2 messages par 24 heures atteinte. Veuillez réessayer plus tard.',
       };
     }
 
     const mailOptions = {
-      from: '"Service de Contact Optilogis"',
+      from: '"Service de Contact Optilogis" <vetswyt673@gmail.com>',
       to: 'Achrefawaissi@gmail.com',
       replyTo: email,
       subject: `Nouveau message de contact de ${name} (${email})`,

@@ -39,22 +39,23 @@ const ContactForm: React.FC = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.message.includes('Limite de 2 messages')) {
+          throw new Error('Vous pouvez envoyer 2 messages en 24h');
+        }
         throw new Error(data.message || 'Une erreur est survenue');
       }
 
       setStatus({ type: 'success', message: 'Message envoyé avec succès !' });
       setFormData({ name: '', email: '', message: '' });
-
-      setTimeout(() => setStatus({ type: 'idle', message: '' }), 5000);
     } catch (error) {
       console.error('Erreur lors de l\'envoi du formulaire:', error);
       setStatus({ 
         type: 'error', 
         message: error instanceof Error ? error.message : 'Erreur lors de l\'envoi du message. Veuillez réessayer.' 
       });
-
-      setTimeout(() => setStatus({ type: 'idle', message: '' }), 5000);
     }
+
+    setTimeout(() => setStatus({ type: 'idle', message: '' }), 5000);
   };
 
   const fields: FieldConfig[] = [
@@ -123,7 +124,7 @@ const ContactForm: React.FC = () => {
 
           <button 
             type="submit" 
-            className="mt-6 w-full bg-[#095550] text-white text-lg font-poppins py-3 px-4 rounded-lg hover:bg-[#074440] focus:outline-none focus:ring-2 focus:ring-[#095550] focus:ring-opacity-50 transition duration-300 ease-in-out disabled:bg-[#0955507a]"
+            className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
             disabled={status.type === 'loading'}
           >
             {status.type === 'loading' ? 'Envoi en cours...' : 'Envoyer le message'}

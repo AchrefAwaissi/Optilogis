@@ -24,7 +24,7 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
   const truncatedAddress = truncateAddress(house.address, 30);
 
   const imageUrl = house.images && house.images.length > 0
-    ? `http://localhost:5000/uploads/${house.images[0]}`
+    ? `http://13.49.240.163/uploads/${house.images[0]}`
     : 'https://via.placeholder.com/165x155';
 
 
@@ -44,7 +44,7 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
     }
 
     try {
-      const endpoint = `http://localhost:5000/item/${house._id}/like`;
+      const endpoint = `http://13.49.240.163/item/${house._id}/like`;
       const method = isLiked ? 'delete' : 'post';
       
       const response = await axios({

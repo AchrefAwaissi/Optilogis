@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes, faSignOutAlt, faHeart, faSearch, faBell, faSignInAlt, faUserPlus, faCog } from '@fortawesome/free-solid-svg-icons';
 import logo from "../image/logoa.png";
+import { getApiUrl } from '../utils/url';
 
 interface User {
   username: string;
@@ -217,7 +218,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
               <FontAwesomeIcon icon={faHeart} className="text-[#095550]" />
             </button>
             <FontAwesomeIcon icon={faBell} className="text-gray-500 text-xl cursor-pointer" />
-            <img src={user?.profilePhotoPath || '/default-avatar.png'} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
+            <img src={getApiUrl(user?.profilePhotoPath) || '/default-avatar.png'} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
             <button
               onClick={handleSettingsClick}
               className="text-gray-500 hover:text-blue-600"

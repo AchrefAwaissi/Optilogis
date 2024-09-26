@@ -44,7 +44,7 @@ const Candidature: React.FC = () => {
         if (!token) {
           throw new Error('Token d\'authentification non trouvé');
         }
-        const response = await axios.get<Item>(`http://localhost:5000/item/${itemId}`, {
+        const response = await axios.get<Item>(`http://13.49.240.163/item/${itemId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setItem(response.data);
@@ -113,7 +113,7 @@ const Candidature: React.FC = () => {
       };
 
       await axios.post(
-        'http://localhost:5000/dossiers', 
+        'http://13.49.240.163/dossiers', 
         payload,
         {
           headers: {

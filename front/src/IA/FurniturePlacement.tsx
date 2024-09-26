@@ -188,7 +188,7 @@ const FurniturePlacement: React.FC = () => {
 
   const checkResult = async (refId: string) => {
     const maxAttempts = 10;
-    const delayBetweenAttempts = 3000; // 3 secondes
+    const delayBetweenAttempts = 10000; // 10 secondes
   
     const pollResult = async (attemptCount: number): Promise<void> => {
       if (attemptCount >= maxAttempts) {

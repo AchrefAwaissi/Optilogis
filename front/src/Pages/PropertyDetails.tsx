@@ -125,7 +125,7 @@ const PropertyDetails: React.FC = () => {
   const [visibleImages, setVisibleImages] = useState(4);
   const [selectedImage, setSelectedImage] = useState<string>(
     house?.images.length > 0
-      ? `http://localhost:5000/uploads/${house.images[0]}`
+      ? `http://13.49.240.163/uploads/${house.images[0]}`
       : 'https://via.placeholder.com/800x400'
   );
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -330,7 +330,7 @@ const PropertyDetails: React.FC = () => {
     }
 
     try {
-      const endpoint = `http://localhost:5000/item/${house._id}/like`;
+      const endpoint = `http://13.49.240.163/item/${house._id}/like`;
       const method = isLiked ? 'delete' : 'post';
       console.log(`Sending ${method.toUpperCase()} request to ${endpoint}`);
       
@@ -420,10 +420,10 @@ const PropertyDetails: React.FC = () => {
             {house.images.slice(0, visibleImages).map((image, index) => (
               <img
                 key={index}
-                src={`http://localhost:5000/uploads/${image}`}
+                src={`http://13.49.240.163/uploads/${image}`}
                 alt={`${house.title} view ${index + 1}`}
                 className="w-20 h-20 md:w-24 md:h-24 object-cover rounded-md flex-shrink-0 cursor-pointer"
-                onClick={() => setSelectedImage(`http://localhost:5000/uploads/${image}`)}
+                onClick={() => setSelectedImage(`http://13.49.240.163/uploads/${image}`)}
               />
             ))}
             {house.images.length > visibleImages && (

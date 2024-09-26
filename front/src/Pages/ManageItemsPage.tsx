@@ -13,7 +13,7 @@ const PropertyCard: React.FC<{ house: House; onEdit: () => void; onDelete: () =>
     const truncatedAddress = truncateAddress(house.address, 30);
 
     const imageUrl = house.images && house.images.length > 0
-        ? `http://localhost:5000/uploads/${house.images[0]}`
+        ? `http://13.49.240.163/uploads/${house.images[0]}`
         : 'https://via.placeholder.com/165x155';
 
     return (
@@ -78,7 +78,7 @@ const ManageItems: React.FC = () => {
                 throw new Error('Authentication token is missing');
             }
 
-            const url = 'http://localhost:5000/item';
+            const url = 'http://13.49.240.163/item';
             console.log('Fetching houses from:', url);
 
             const response = await fetch(url, {
@@ -111,7 +111,7 @@ const ManageItems: React.FC = () => {
                 throw new Error('Authentication token is missing');
             }
 
-            const response = await fetch(`http://localhost:5000/item/${houseId}`, {
+            const response = await fetch(`http://13.49.240.163/item/${houseId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`,

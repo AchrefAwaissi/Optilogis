@@ -31,7 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchUser = async (token: string) => {
     try {
-      const response = await axios.get('http://localhost:5000/auth/me', {
+      const response = await axios.get('http://13.49.240.163/auth/me', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUser({
@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signin = async (username: string, password: string) => {
     try {
-      const response = await axios.post('http://localhost:5000/auth/signin', { username, password });
+      const response = await axios.post('http://13.49.240.163/auth/signin', { username, password });
       localStorage.setItem('token', response.data.access_token);
       await fetchUser(response.data.access_token);
     } catch (error) {
@@ -67,14 +67,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = localStorage.getItem('token');
       let response;
       if (userData instanceof FormData) {
-        response = await axios.put('http://localhost:5000/auth/update', userData, {
+        response = await axios.put('http://13.49.240.163/auth/update', userData, {
           headers: { 
             Authorization: `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'
           }
         });
       } else {
-        response = await axios.put('http://localhost:5000/auth/update', userData, {
+        response = await axios.put('http://13.49.240.163/auth/update', userData, {
           headers: { Authorization: `Bearer ${token}` }
         });
       }
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const token = localStorage.getItem('token');
       if (!user) throw new Error('User not found');
-      const response = await axios.patch(`http://localhost:5000/auth/users/${user.id}/premium`, 
+      const response = await axios.patch(`http://13.49.240.163/auth/users/${user.id}/premium`, 
         { isPremium: true },
         { headers: { Authorization: `Bearer ${token}` } }
       );

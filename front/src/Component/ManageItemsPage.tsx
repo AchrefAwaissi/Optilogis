@@ -31,7 +31,7 @@ const PropertyCard: React.FC<{ item: Item; onEdit: () => void; onDelete: () => v
   const truncatedAddress = truncateAddress(`${item.address}, ${item.city}, ${item.country}`, 30);
 
   const imageUrl = item.images && item.images.length > 0
-    ? `http://localhost:5000/uploads/${item.images[0]}`
+    ? `http://13.49.240.163/uploads/${item.images[0]}`
     : 'https://via.placeholder.com/165x155';
 
   return (

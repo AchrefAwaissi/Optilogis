@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { getApiUrl } from '../utils/url';
 
 interface FormData {
   username: string;
@@ -30,7 +31,9 @@ const SettingsPage: React.FC = () => {
         email: user.email || '',
       }));
       if (user.profilePhotoPath) {
-        setPreviewUrl(user.profilePhotoPath);
+        const fullUrl = getApiUrl(user.profilePhotoPath);
+        console.log('Profile photo URL:', fullUrl);
+        setPreviewUrl(fullUrl);
       }
     }
   }, [user]);

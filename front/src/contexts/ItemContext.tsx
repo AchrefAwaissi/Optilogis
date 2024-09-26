@@ -34,7 +34,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
   const getUserItems = async (): Promise<Item[]> => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get<Item[]>('/item', {
+      const response = await axios.get<Item[]>('http://13.49.240.163/item', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -50,7 +50,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
   const updateItem = async (id: string, formData: FormData): Promise<Item> => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.put<Item>(`/item/${id}`, formData, {
+      const response = await axios.put<Item>(`http://13.49.240.163/item/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`,
@@ -82,7 +82,7 @@ export const ItemProvider: React.FC<ItemProviderProps> = ({ children }) => {
   const createItem = async (formData: FormData): Promise<Item> => {
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.post<Item>('/item', formData, {
+      const response = await axios.post<Item>('http://13.49.240.163/item', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${token}`,

@@ -65,7 +65,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
         formDataToSend.append('profilePhoto', profilePhoto);
       }
 
-      const response = await axios.post('http://localhost:5000/auth/signup', formDataToSend, {
+      const response = await axios.post('http://13.49.240.163/auth/signup', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

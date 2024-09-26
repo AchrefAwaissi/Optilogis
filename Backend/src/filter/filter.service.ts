@@ -20,6 +20,16 @@ export class FilterService {
     return this.itemModel.find(filter).exec();
   }
 
+  // Ajout du tri par prix croissant
+  async filterByPriceAscending(): Promise<Item[]> {
+    return this.itemModel.find().sort({ price: 1 }).exec(); // 1 pour tri croissant
+  }
+
+  // Ajout du tri par prix décroissant
+  async filterByPriceDescending(): Promise<Item[]> {
+    return this.itemModel.find().sort({ price: -1 }).exec(); // -1 pour tri décroissant
+  }
+
   async filterBySize(minSize?: number, maxSize?: number): Promise<Item[]> {
     const filter: any = {};
 

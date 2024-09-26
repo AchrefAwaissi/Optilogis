@@ -45,7 +45,6 @@ const App: React.FC = () => {
   const { user, signout } = useAuth();
 
   const handleAuthSuccess = (userData: User) => {
-    // This might not be necessary if your AuthContext handles user state
     setShowAuthModal(false);
   };
 
@@ -69,68 +68,71 @@ const App: React.FC = () => {
   return (
     <Router>
       <ItemProvider>
-        <div className="flex h-screen overflow-hidden">
-          <CombinedNavbar
-            onAuthClick={() => handleAuthClick(false)}
-            isAuthenticated={!!user}
-          />
-          <div className="flex-1 flex flex-col overflow-hidden">
-            <HorizontalNavbar
-              user={user}
-              onLogout={handleLogout}
-              onSignInClick={() => handleAuthClick(false)}
-              onSignUpClick={() => handleAuthClick(true)}
-              onFavoritesToggle={handleFavoritesToggle}
-              showFavorites={showFavorites}
-            />
+        <div className="flex justify-center items-center min-h-screen bg-gray-100">
+          <div className="w-full max-w-[1920px] h-full max-h-[1080px] bg-white shadow-xl overflow-hidden">
+            <div className="flex h-full">
+              <CombinedNavbar
+                onAuthClick={() => handleAuthClick(false)}
+                isAuthenticated={!!user}
+              />
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <HorizontalNavbar
+                  user={user}
+                  onLogout={handleLogout}
+                  onSignInClick={() => handleAuthClick(false)}
+                  onSignUpClick={() => handleAuthClick(true)}
+                  onFavoritesToggle={handleFavoritesToggle}
+                  showFavorites={showFavorites}
+                />
 
-            <main className="flex-1 overflow-hidden">
-              <Routes>
-                <Route path="/" element={<HomePage showFavorites={showFavorites} />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/property-details" element={<PropertyDetails />} />
-            
-                <Route path="/Planner" element={<Planner />} />
-                <Route path="/style-transfer" element={<StyleTransfer />} />
-          <Route path="/search-article" element={<SearchArticle />} />
-          <Route path="/furniture-placement" element={<FurniturePlacement />} />
-          <Route path="/empty-room" element={<EmptyRoom />} />
-          <Route path="/color-transfer" element={<ColorChange />}/>
-          <Route path="/contact" element={<Contact />}/>
+                <main className="flex-1 overflow-hidden">
+                  <Routes>
+                    <Route path="/" element={<HomePage showFavorites={showFavorites} />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/property-details" element={<PropertyDetails />} />
+                    <Route path="/Planner" element={<Planner />} />
+                    <Route path="/style-transfer" element={<StyleTransfer />} />
+                    <Route path="/search-article" element={<SearchArticle />} />
+                    <Route path="/furniture-placement" element={<FurniturePlacement />} />
+                    <Route path="/empty-room" element={<EmptyRoom />} />
+                    <Route path="/color-transfer" element={<ColorChange />}/>
+                    <Route path="/contact" element={<Contact />}/>
 
-                {/* Protected Routes */}
-                <Route path="/publish" element={
-                  <ProtectedRoute>
-                    <PublishPropertyPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/matching" element={
-                  <ProtectedRoute>
-                    <MatchingProfilePage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <SettingsPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/candidature/:itemId" element={
-                  <ProtectedRoute>
-                    <Candidature />
-                  </ProtectedRoute>
-                } />
-                <Route path="/Planner" element={
-                  <ProtectedRoute>
-                    <Planner />
-                  </ProtectedRoute>
-                } />
-                <Route path="/manage-items" element={
-                  <ProtectedRoute>
-                    <ManageItems />
-                  </ProtectedRoute>
-                } />
-              </Routes>
-            </main>
+                    {/* Protected Routes */}
+                    <Route path="/publish" element={
+                      <ProtectedRoute>
+                        <PublishPropertyPage />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/matching" element={
+                      <ProtectedRoute>
+                        <MatchingProfilePage />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/settings" element={
+                      <ProtectedRoute>
+                        <SettingsPage />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/candidature/:itemId" element={
+                      <ProtectedRoute>
+                        <Candidature />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/Planner" element={
+                      <ProtectedRoute>
+                        <Planner />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="/manage-items" element={
+                      <ProtectedRoute>
+                        <ManageItems />
+                      </ProtectedRoute>
+                    } />
+                  </Routes>
+                </main>
+              </div>
+            </div>
           </div>
         </div>
         {showAuthModal && (

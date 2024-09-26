@@ -40,6 +40,8 @@ export interface FilterCriteria {
   maxFloor?: number;
   minAnnexArea?: number;
   maxAnnexArea?: number;
+  sortPrice?: 'asc' | 'desc';  
+
 }
 
 export interface Location {

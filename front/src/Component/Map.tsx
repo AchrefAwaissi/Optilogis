@@ -349,131 +349,137 @@ const MapComponent: React.FC<UpdatedMapProps> = ({
       )}
     </button>
   </div>
-        {showFilters && selectedHouse && (
-          <>
-            <p className="mb-2">Selected: {selectedHouse.title}</p>
-            <div className="mb-2">
-              <label className="block text-sm font-medium text-gray-700">Rayon</label>
-              <select 
-                value={searchRadius} 
-                onChange={(e) => setSearchRadius(parseInt(e.target.value))}
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              >
-                <option value={1000}>1 km</option>
-                <option value={2000}>2 km</option>
-                <option value={3000}>3 km</option>
-                <option value={5000}>5 km</option>
-                <option value={10000}>10 km</option>
-              </select>
-            </div>
-            <div className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                id="showSchools"
-                checked={showPois.school}
-                onChange={() => setShowPois(prev => ({ ...prev, school: !prev.school }))}
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label htmlFor="showSchools" className="flex items-center">
-                <School className="mr-2 text-blue-500" />
-                <span>Écoles ({pois.filter(poi => poi.type === 'school').length})</span>
-              </label>
-            </div>
-            <div className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                id="showHospitals"
-                checked={showPois.hospital}
-                onChange={() => setShowPois(prev => ({ ...prev, hospital: !prev.hospital }))}
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label htmlFor="showHospitals" className="flex items-center">
-                <Hospital className="mr-2 text-red-500" />
-                <span>Hopitaux ({pois.filter(poi => poi.type === 'hospital').length})</span>
-              </label>
-            </div>
-            <div className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                id="showSupermarkets"
-                checked={showPois.supermarket}
-                onChange={() => setShowPois(prev => ({ ...prev, supermarket: !prev.supermarket }))}
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label htmlFor="showSupermarkets" className="flex items-center">
-                <ShoppingCart className="mr-2 text-green-500" />
-                <span>Supermarchés ({pois.filter(poi => poi.type === 'supermarket').length})</span>
-              </label>
-            </div>
-            <div className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                id="showRestaurants"
-                checked={showPois.restaurant}
-                onChange={() => setShowPois(prev => ({ ...prev, restaurant: !prev.restaurant }))}
-                className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label htmlFor="showRestaurants" className="flex items-center">
-                <Utensils className="mr-2 text-yellow-500" />
-                <span>Restaurants ({pois.filter(poi => poi.type === 'restaurant').length})</span>
-              </label>
-            </div>
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700">Itinéraire</label>
-              <input
-                type="text"
-                value={transitAddress}
-                onChange={(e) => setTransitAddress(e.target.value)}
-                placeholder="Enter destination"
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              />
-              <div className="mt-2 grid grid-cols-3 gap-2">
-                <button
-                  onClick={() => handleRouteSearch(google.maps.TravelMode.TRANSIT)}
-                  className="inline-flex flex-col justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  <Bus size={16} className="mb-1" />
-                  Transport
-                  {routeDetails.transit && (
-                    <div className="text-xs mt-1">
-                      <div>{routeDetails.transit.distance}</div>
-                      <div>{routeDetails.transit.duration}</div>
-                    </div>
-                  )}
-                </button>
-                <button
-                  onClick={() => handleRouteSearch(google.maps.TravelMode.DRIVING)}
-                  className="inline-flex flex-col justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  <Car size={16} className="mb-1" />
-                  Voiture
-                  {routeDetails.driving && (
-                    <div className="text-xs mt-1">
-                      <div>{routeDetails.driving.distance}</div>
-                      <div>{routeDetails.driving.duration}</div>
-                    </div>
-                  )}
-                </button>
-                <button
-                  onClick={() => handleRouteSearch(google.maps.TravelMode.BICYCLING)}
-                  className="inline-flex flex-col justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                >
-                  <Bike size={16} className="mb-1" />
-                  Vélo
-                  {routeDetails.bicycling && (
-                    <div className="text-xs mt-1">
-                      <div>{routeDetails.bicycling.distance}</div>
-                      <div>{routeDetails.bicycling.duration}</div>
-                    </div>
-                  )}
-                </button>
-              </div>
-            </div>
-          </>
-        )}
-        {loading && <p className="mt-2">Chargement...</p>}
-        {error && <p className="mt-2 text-red-500">{error}</p>}
+  {showFilters && selectedHouse && (
+    <>
+      <p className="mb-2">Sélectionné: {selectedHouse.title}</p>
+      <div className="mb-2">
+        <label className="block text-sm font-medium text-gray-700">Rayon</label>
+        <select 
+          value={searchRadius} 
+          onChange={(e) => setSearchRadius(parseInt(e.target.value))}
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+        >
+          <option value={1000}>1 km</option>
+          <option value={2000}>2 km</option>
+          <option value={3000}>3 km</option>
+          <option value={5000}>5 km</option>
+          <option value={10000}>10 km</option>
+        </select>
       </div>
+
+      <div className="flex items-center mb-2">
+        <input
+          type="checkbox"
+          id="showSchools"
+          checked={showPois.school}
+          onChange={() => setShowPois(prev => ({ ...prev, school: !prev.school }))}
+          className="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+        />
+        <label htmlFor="showSchools" className="flex items-center">
+          <School className="mr-2 text-green-600" />
+          <span>Écoles ({pois.filter(poi => poi.type === 'school').length})</span>
+        </label>
+      </div>
+
+      <div className="flex items-center mb-2">
+        <input
+          type="checkbox"
+          id="showHospitals"
+          checked={showPois.hospital}
+          onChange={() => setShowPois(prev => ({ ...prev, hospital: !prev.hospital }))}
+          className="mr-2 h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+        />
+        <label htmlFor="showHospitals" className="flex items-center">
+          <Hospital className="mr-2 text-red-500" />
+          <span>Hopitaux ({pois.filter(poi => poi.type === 'hospital').length})</span>
+        </label>
+      </div>
+
+      <div className="flex items-center mb-2">
+        <input
+          type="checkbox"
+          id="showSupermarkets"
+          checked={showPois.supermarket}
+          onChange={() => setShowPois(prev => ({ ...prev, supermarket: !prev.supermarket }))}
+          className="mr-2 h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
+        />
+        <label htmlFor="showSupermarkets" className="flex items-center">
+          <ShoppingCart className="mr-2 text-yellow-600" />
+          <span>Supermarchés ({pois.filter(poi => poi.type === 'supermarket').length})</span>
+        </label>
+      </div>
+
+      <div className="flex items-center mb-2">
+        <input
+          type="checkbox"
+          id="showRestaurants"
+          checked={showPois.restaurant}
+          onChange={() => setShowPois(prev => ({ ...prev, restaurant: !prev.restaurant }))}
+          className="mr-2 h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-gray-300 rounded"
+        />
+        <label htmlFor="showRestaurants" className="flex items-center">
+          <Utensils className="mr-2 text-yellow-600" />
+          <span>Restaurants ({pois.filter(poi => poi.type === 'restaurant').length})</span>
+        </label>
+      </div>
+
+      <div className="mt-4">
+        <label className="block text-sm font-medium text-gray-700">Itinéraire</label>
+        <input
+          type="text"
+          value={transitAddress}
+          onChange={(e) => setTransitAddress(e.target.value)}
+          placeholder="Entrez la destination"
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-green-500 focus:border-green-500 sm:text-sm rounded-md"
+        />
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          <button
+            onClick={() => handleRouteSearch(google.maps.TravelMode.TRANSIT)}
+            className="inline-flex flex-col justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            <Bus size={16} className="mb-1" />
+            Transport
+            {routeDetails.transit && (
+              <div className="text-xs mt-1">
+                <div>{routeDetails.transit.distance}</div>
+                <div>{routeDetails.transit.duration}</div>
+              </div>
+            )}
+          </button>
+          <button
+            onClick={() => handleRouteSearch(google.maps.TravelMode.DRIVING)}
+            className="inline-flex flex-col justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <Car size={16} className="mb-1" />
+            Voiture
+            {routeDetails.driving && (
+              <div className="text-xs mt-1">
+                <div>{routeDetails.driving.distance}</div>
+                <div>{routeDetails.driving.duration}</div>
+              </div>
+            )}
+          </button>
+          <button
+            onClick={() => handleRouteSearch(google.maps.TravelMode.BICYCLING)}
+            className="inline-flex flex-col justify-center items-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
+            <Bike size={16} className="mb-1" />
+            Vélo
+            {routeDetails.bicycling && (
+              <div className="text-xs mt-1">
+                <div>{routeDetails.bicycling.distance}</div>
+                <div>{routeDetails.bicycling.duration}</div>
+              </div>
+            )}
+          </button>
+        </div>
+      </div>
+    </>
+  )}
+  {loading && <p className="mt-2">Chargement...</p>}
+  {error && <p className="mt-2 text-red-500">{error}</p>}
+</div>
+
     </div>
   ) : <></>;
 };

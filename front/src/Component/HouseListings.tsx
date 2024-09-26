@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { House } from "../types";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBed, faBath, faRulerCombined, faHeart } from '@fortawesome/free-solid-svg-icons';
@@ -9,6 +9,7 @@ interface HouseListingsProps {
   houses: House[];
   onHouseSelect: (house: House) => void;
   city: string;
+  showFavorites: boolean; // New prop to control whether to show all items or only favorites
 }
 
 const truncateAddress = (address: string, maxLength: number) => {
@@ -25,7 +26,6 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
   const imageUrl = house.images && house.images.length > 0
     ? `http://localhost:5000/uploads/${house.images[0]}`
     : 'https://via.placeholder.com/165x155';
-
 
   const handleLikeToggle = async (e: React.MouseEvent) => {
     e.preventDefault();  // Empêche la propagation de l'événement
@@ -114,21 +114,71 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
   );
 };
 
-const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect, city }) => {
-  console.log("Liste des logement reçue:", houses.length);
+const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect, city, showFavorites }) => {
+  const { user } = useAuth();
+  const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // State for sort order
+
+  useEffect(() => {
+    let housesToDisplay = showFavorites && user 
+      ? houses.filter(house => house.likes?.includes(user.id)) 
+      : houses;
+
+    // Sort houses based on the selected order
+    housesToDisplay = housesToDisplay.sort((a, b) => {
+      return sortOrder === 'asc' 
+        ? a.price - b.price 
+        : b.price - a.price;
+    });
+
+    setFilteredHouses(housesToDisplay);
+  }, [houses, showFavorites, user, sortOrder]);
+
+  const handleSortPrice = (order: 'asc' | 'desc') => {
+    setSortOrder(order);
+  };
 
   return (
     <div className="flex flex-col items-center space-y-4 p-4 pb-20">
       <h2 className="text-2xl font-bold mb-4 self-start w-full">
-        {houses.length} Résultats {city || "toutes les villes"}
+        {filteredHouses.length} Résultats {showFavorites ? "favoris" : ""} {city ? `à ${city}` : "toutes les villes"}
       </h2>
-      {houses.map((house) => (
+      <li className="mt-4">  
+        <h3 className="text-sm font-semibold text-gray-500 mb-2">Trier par Prix</h3>
+        <div className="flex flex-col">
+          <label className="flex items-center py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={sortOrder === 'asc'}
+              onChange={() => handleSortPrice('asc')}
+              className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]"
+              style={{ accentColor: '#095550', borderRadius: '7px' }}
+            />
+            <span className="ml-3">Prix Déroissant</span>
+          </label>
+
+          <label className="flex items-center py-2 text-gray-600 hover:bg-gray-100 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={sortOrder === 'desc'}
+              onChange={() => handleSortPrice('desc')}
+              className="form-checkbox h-5 w-5 rounded focus:ring-[#095550]"
+              style={{ accentColor: '#095550', borderRadius: '7px' }}
+            />
+            <span className="ml-3">Prix Croissant</span>  
+          </label>
+        </div>
+      </li>
+      {filteredHouses.map((house) => (
         <PropertyCard
           key={house._id} 
           house={house}
           onClick={() => onHouseSelect(house)}
         />
       ))}
+      {showFavorites && filteredHouses.length === 0 && (
+        <p className="text-gray-500">Vous n'avez pas encore de favoris.</p>
+      )}
     </div>
   );
 };

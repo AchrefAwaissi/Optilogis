@@ -13,14 +13,13 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Color Transfer
+              Transfert de Couleur
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Change the color of your room to your preferred shade.
-            </div>
+            Changez la couleur de votre chambre selon votre teinte préférée.</div>
             <Link to="/color-transfer">
               <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                Start
+                Commencez
               </button>
             </Link>
           </div>
@@ -33,14 +32,14 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Style Transfer
+              Changement de style
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Redesign and render your space based on a reference image.
+            Redessinez et rendez votre espace en vous basant sur une image de référence.
             </div>
             <Link to="/style-transfer">
               <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                Start
+              Commencez
               </button>
             </Link>
           </div>
@@ -53,14 +52,14 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Furniture Search API
+              API de recherche de meubles
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Product discovery with our Home Product Search API.
+              Recherchez des meubles à partir de notre base de données d'articles
             </div>
             <Link to="/search-article">
               <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                Start
+              Commencez
               </button>
             </Link>
           </div>
@@ -73,14 +72,14 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Empty Room
+              Chambre vide
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Furnish your empty space with furniture, Furniture Placement. Paste your preferred furniture within the room.
+              Créez une chambre vide et ajoutez des meubles à votre guise.
             </div>
             <Link to="/empty-room">
               <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                Start
+              Commencez
               </button>
             </Link>
           </div>
@@ -93,14 +92,14 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Furniture Placement
+              Placement de meubles
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Paste your preferred furniture within the room.
+              Placez des meubles dans une pièce vide et visualisez le résultat.
             </div>
             <Link to="/furniture-placement">
               <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                Start
+              Commencez
               </button>
             </Link>
           </div>

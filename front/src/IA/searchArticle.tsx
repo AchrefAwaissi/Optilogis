@@ -102,17 +102,17 @@ const SearchArticle: React.FC = () => {
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Spacely AI Furniture Search</h2>
+      <h2 className="text-2xl font-bold mb-4">Spacely IA Recherche de Meubles</h2>
       
       <div className="mb-4">
-        <label className="block mb-2">Image Upload</label>
-        <p className="text-sm text-gray-600 mb-2">Upload JPG / PNG file for the room that you want to use as a template.</p>
+        <label className="block mb-2">Charger une image</label>
+        <p className="text-sm text-gray-600 mb-2">Chargez un fichier JPG/PNG de la pièce que vous souhaitez utiliser comme modèle.</p>
         <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
           <button 
             onClick={handleUpload}
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
           >
-            Upload
+            Publier
           </button>
           <input 
             type="file"
@@ -129,7 +129,7 @@ const SearchArticle: React.FC = () => {
               />
             </div>
           )}
-          <p className="text-sm text-gray-500 mt-2">JPG, PNG formats</p>
+          <p className="text-sm text-gray-500 mt-2">Formats JPG et PNG</p>
         </div>
       </div>
 
@@ -138,18 +138,18 @@ const SearchArticle: React.FC = () => {
           onClick={handleReset}
           className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition-colors"
         >
-          Reset All
+          Par défaut
         </button>
         <button 
           onClick={handleGenerate}
           disabled={loading || !imagePublicId}
           className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-gray-400"
         >
-          Generate
+          Générer
         </button>
       </div>
       
-      {loading && <p className="mt-4">Loading...</p>}
+      {loading && <p className="mt-4">Chargement...</p>}
       
       {error && <p className="mt-4 text-red-500">{error}</p>}
 

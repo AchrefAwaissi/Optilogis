@@ -84,8 +84,8 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
   >
     <FontAwesomeIcon 
       icon={faHeart} 
-      className={`text-base ${isLiked ? 'text-white' : 'text-gray-200'}`} 
-    />
+      className={`text-base ${isLiked ? 'text-red-500' : 'text-gray-200'} transition-colors duration-300`} 
+      />
     <span className="text-xs font-semibold">{likeCount}</span>
   </button>
 </div>

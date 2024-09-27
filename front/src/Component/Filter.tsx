@@ -100,9 +100,20 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
     value: number,
     isMin: boolean
   ) => {
+    if (value < 0) {
+      return; 
+    }
+  
+    const maxLimit = 10000; 
+    if (value > maxLimit) {
+      return; 
+    }
+  
     const fieldName = isMin ? `min${field}` : `max${field}`;
     onFilterChange({ [fieldName]: value });
   };
+  
+  
 
   const handleCheckboxChange = (field: keyof FilterCriteria) => {
     onFilterChange({ [field]: !filterCriteria[field] });
@@ -252,83 +263,95 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
         </div>
 
         <div className="p-4">
-          <h3 className="text-sm font-semibold text-gray-500 mb-2">Nombre de pièces</h3>
-          <div className="flex space-x-2">
-            <input
-              type="number"
-              value={filterCriteria.minRooms}
-              onChange={(e) => handleRangeChange('Rooms', parseInt(e.target.value) || 0, true)}
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
-              placeholder="Min"
-            />
-            <input
-              type="number"
-              value={filterCriteria.maxRooms}
-              onChange={(e) => handleRangeChange('Rooms', parseInt(e.target.value) || 0, false)}
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
-              placeholder="Max"
-            />
-          </div>
+        <h3 className="text-sm font-semibold text-gray-500 mb-2">Nombre de pièces</h3>
+<div className="flex space-x-2">
+  <input
+    type="number"
+    min="0" // Limiter à 0
+    value={filterCriteria.minRooms || 0} 
+    onChange={(e) => handleRangeChange('Rooms', parseInt(e.target.value) || 0, true)}
+    className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+    placeholder="Min"
+  />
+  <input
+    type="number"
+    min="0" 
+    value={filterCriteria.maxRooms || 0} 
+    onChange={(e) => handleRangeChange('Rooms', parseInt(e.target.value) || 0, false)}
+    className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+    placeholder="Max"
+  />
+</div>
+
         </div>
 
         <div className="p-4">
-          <h3 className="text-sm font-semibold text-gray-500 mb-2">Nombre de chambres</h3>
-          <div className="flex space-x-2">
-            <input
-              type="number"
-              value={filterCriteria.minBedrooms}
-              onChange={(e) => handleRangeChange('Bedrooms', parseInt(e.target.value) || 0, true)}
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
-              placeholder="Min"
-            />
-            <input
-              type="number"
-              value={filterCriteria.maxBedrooms}
-              onChange={(e) => handleRangeChange('Bedrooms', parseInt(e.target.value) || 0, false)}
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
-              placeholder="Max"
-            />
-          </div>
+        <h3 className="text-sm font-semibold text-gray-500 mb-2">Nombre de chambres</h3>
+<div className="flex space-x-2">
+  <input
+    type="number"
+    min="0" // Limiter à 0 pour éviter les valeurs négatives
+    value={filterCriteria.minBedrooms || 0} // Assurez-vous que la valeur par défaut est 0
+    onChange={(e) => handleRangeChange('Bedrooms', parseInt(e.target.value) || 0, true)}
+    className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+    placeholder="Min"
+  />
+  <input
+    type="number"
+    min="0" // Limiter à 0 pour éviter les valeurs négatives
+    value={filterCriteria.maxBedrooms || 0} // Assurez-vous que la valeur par défaut est 0
+    onChange={(e) => handleRangeChange('Bedrooms', parseInt(e.target.value) || 0, false)}
+    className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+    placeholder="Max"
+  />
+</div>
+
         </div>
 
         <div className="p-4">
-          <h3 className="text-sm font-semibold text-gray-500 mb-2">Étage</h3>
-          <div className="flex space-x-2">
-            <input
-              type="number"
-              value={filterCriteria.minFloor}
-              onChange={(e) => handleRangeChange('Floor', parseInt(e.target.value) || 0, true)}
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
-              placeholder="Min"
-            />
-            <input
-              type="number"
-              value={filterCriteria.maxFloor}
-              onChange={(e) => handleRangeChange('Floor', parseInt(e.target.value) || 0, false)}
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
-              placeholder="Max"
-            />
-          </div>
+        <h3 className="text-sm font-semibold text-gray-500 mb-2">Étage</h3>
+<div className="flex space-x-2">
+  <input
+    type="number"
+    min="0" // Limiter à 0 pour éviter les valeurs négatives
+    value={filterCriteria.minFloor || 0} // Assurez-vous que la valeur par défaut est 0
+    onChange={(e) => handleRangeChange('Floor', parseInt(e.target.value) || 0, true)}
+    className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+    placeholder="Min"
+  />
+  <input
+    type="number"
+    min="0" // Limiter à 0 pour éviter les valeurs négatives
+    value={filterCriteria.maxFloor || 0} // Assurez-vous que la valeur par défaut est 0
+    onChange={(e) => handleRangeChange('Floor', parseInt(e.target.value) || 0, false)}
+    className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+    placeholder="Max"
+  />
+</div>
+
         </div>
 
         <div className="p-4">
-          <h3 className="text-sm font-semibold text-gray-500 mb-2">Surface annexe (m²)</h3>
-          <div className="flex space-x-2">
-            <input
-              type="number"
-              value={filterCriteria.minAnnexArea}
-              onChange={(e) => handleRangeChange('AnnexArea', parseInt(e.target.value) || 0, true)}
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
-              placeholder="Min"
-            />
-            <input
-              type="number"
-              value={filterCriteria.maxAnnexArea}
-              onChange={(e) => handleRangeChange('AnnexArea', parseInt(e.target.value) || 0, false)}
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
-              placeholder="Max"
-            />
-          </div>
+        <h3 className="text-sm font-semibold text-gray-500 mb-2">Surface annexe (m²)</h3>
+<div className="flex space-x-2">
+  <input
+    type="number"
+    min="0" // Limiter à 0 pour éviter les valeurs négatives
+    value={filterCriteria.minAnnexArea || 0} // Assurez-vous que la valeur par défaut est 0
+    onChange={(e) => handleRangeChange('AnnexArea', parseInt(e.target.value) || 0, true)}
+    className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+    placeholder="Min"
+  />
+  <input
+    type="number"
+    min="0" // Limiter à 0 pour éviter les valeurs négatives
+    value={filterCriteria.maxAnnexArea || 0} // Assurez-vous que la valeur par défaut est 0
+    onChange={(e) => handleRangeChange('AnnexArea', parseInt(e.target.value) || 0, false)}
+    className="w-1/2 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#006845]"
+    placeholder="Max"
+  />
+</div>
+
         </div>
 
         <div className="p-4">

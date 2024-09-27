@@ -24,9 +24,9 @@ const HomePage: React.FC<HomePageProps> = ({ showFavorites }) => {
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
     location: "",
     minPrice: 0,
-    maxPrice: Number.MAX_SAFE_INTEGER,
+    maxPrice:15000,
     minSize: 0,
-    maxSize: Number.MAX_SAFE_INTEGER,
+    maxSize: 1000,
     typeOfHousing: "",
     minRooms: undefined,
     maxRooms: undefined,

@@ -28,31 +28,32 @@ const EmptyRoom: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const spaceTypes = [
-    'bedroom', 'bathroom', 'living_room', 'dining_room', 'kitchen', 'bed_and_living_room',
-    'living_and_dining_room', 'dining_and_kitchen', 'working_room', 'home_gym', 'home_office',
-    'kids_room', 'living_dining', 'small_kitchen', 'small_living_room', 'toilet', 'walk_in_closet',
-    'patio', 'small_garden'
-  ];
+    'chambre', 'salle_de_bain', 'salon', 'salle_à_manger', 'cuisine', 'chambre_et_salon',
+    'salon_et_salle_à_manger', 'salle_à_manger_et_cuisine', 'bureau', 'salle_de_sport', 'bureau_à_domicile',
+    'chambre_d_enfant', 'salon_salle_à_manger', 'petite_cuisine', 'petit_salon', 'toilettes', 'dressing',
+    'patio', 'petit_jardin'
+];
 
-  const spaceStyles = [
-    'modern', 'minimalist', 'contemporary', 'halloween', 'wes_anderson', 'traditional', 'rustic',
-    'industrial_loft', 'scandinavian', 'mid_century', 'zen', 'modern_chinese', 'coastal', 'tropical',
-    'y2k', 'modern_thai_style', 'famous_wizard_movie', 'ryokan', 'space'
-  ];
+const spaceStyles = [
+    'moderne', 'minimaliste', 'contemporain', 'halloween', 'wes_anderson', 'traditionnel', 'rustique',
+    'loft_industriel', 'scandinave', 'milieu_de_siècle', 'zen', 'moderne_chinois', 'côtier', 'tropical',
+    'y2k', 'style_thaï_moderne', 'film_de_magicien_célèbre', 'ryokan', 'espace'
+];
 
   const spaceColors = Array.from({ length: 40 }, (_, i) => `set_${i + 1}`);
-
   const materials = [
-    'paper_wallpaper', 'vinyl_wallpaper', 'fabric_wallpaper', 'grass_cloth_wallpaper',
-    'aluminum', 'gold', 'bronze', 'copper', 'nickle', 'tin', 'iron', 'steel', 'cadmium',
-    'zinc', 'laminate', 'veneer', 'ply_board', 'mdf', 'hdf', 'particle_board', 'cork',
-    'teck_wood', 'oak', 'pine', 'cherry', 'maple', 'walnut', 'birch', 'cedar', 'ash',
-    'alder', 'larch', 'fabric', 'silk', 'leather', 'rayon', 'cotton', 'polyester', 'velvet',
-    'microfiber', 'clay_bricks', 'concrete_bricks', 'engineering_bricks', 'sand_lime_bricks',
-    'fly_ash_bricks', 'firebricks', 'marble', 'mosaic', 'cement_tile', 'stone_tile', 'granite_tile',
-    'teracotta', 'porceline_tile', 'slate', 'glass_tile', 'lime_stone_tile', 'resin_tile',
-    'sand_stone', 'quarry_tile', 'vinyl_composition_tile', 'concrete'
-  ];
+    'papier_poster', 'papier_vinyle', 'tissu_poster', 'tissu_en_herbe',
+    'aluminium', 'or', 'bronze', 'cuivre', 'nickel', 'étain', 'fer', 'acier', 'cadmium',
+    'zinc', 'stratifié', 'placage', 'panneau_de_particules', 'mdf', 'hdf', 'panneau_de_particules', 'liège',
+    'teck', 'chêne', 'pin', 'cerisier', 'érable', 'noyer', 'bouleau', 'cèdre', 'frêne',
+    'aulne', 'mélèze', 'tissu', 'soie', 'cuir', 'rayonne', 'coton', 'polyester', 'velours',
+    'microfibre', 'briques_en_argile', 'briques_en_béton', 'briques_de_construction', 'briques_sable_chaux',
+    'briques_en_cendres_volantes', 'briques_résistantes_au_feu', 'marbre', 'mosaïque', 'carrelage_en_béton', 
+    'carrelage_en_pierre', 'carrelage_en_granit', 'terracotta', 'carrelage_en_porcelain', 'ardoise', 
+    'carrelage_en_verre', 'carrelage_en_calcaire', 'carrelage_en_résine', 'grès', 'carrelage_de_carière', 
+    'carrelage_en_vinyle', 'béton'
+];
+
 
   useEffect(() => {
     if (imagePublicId) {
@@ -156,10 +157,10 @@ const EmptyRoom: React.FC = () => {
   return (
     <div className="h-screen overflow-y-auto">
       <div className="p-4 max-w-4xl mx-auto mb-10">
-        <h2 className="text-2xl font-bold mb-4">Spacely AI Empty Room</h2>    
+        <h2 className="text-2xl font-bold mb-4">Spacely IA : Pièce Vide</h2>    
   
         <div className="mb-4">
-          <label className="block mb-2">Room Image:</label>
+          <label className="block mb-2">Image de la pièce</label>
           <div 
             className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors"
             onClick={handleUpload}
@@ -170,7 +171,7 @@ const EmptyRoom: React.FC = () => {
                 className="max-w-full max-h-64 object-contain mx-auto"
               />
             ) : (
-              "Click to upload image"
+              "Cliquer pour télécharger l'image"
             )}
           </div>
           <input 
@@ -183,7 +184,7 @@ const EmptyRoom: React.FC = () => {
         </div>
   
         <div className="mb-4">
-          <label className="block mb-2">Space Type:</label>
+          <label className="block mb-2">Type d'espace</label>
           <select 
             value={spaceType} 
             onChange={(e) => setSpaceType(e.target.value)}
@@ -196,7 +197,7 @@ const EmptyRoom: React.FC = () => {
         </div>
   
         <div className="mb-4">
-          <label className="block mb-2">Space Style:</label>
+          <label className="block mb-2">Style d'espace</label>
           <select 
             value={spaceStyle} 
             onChange={(e) => setSpaceStyle(e.target.value)}
@@ -209,20 +210,20 @@ const EmptyRoom: React.FC = () => {
         </div>
   
         <div className="mb-4">
-          <label className="block mb-2">Renovate Type:</label>
+          <label className="block mb-2">Type de rénovation</label>
           <select 
             value={renovateType} 
             onChange={(e) => setRenovateType(e.target.value)}
             className="w-full p-2 border rounded"
           >
-            <option value="residential">Residential</option>
+            <option value="residential">Résidentiel</option>
             <option value="commercial">Commercial</option>
-            <option value="exterior">Exterior</option>
+            <option value="exterior">Extérieur</option>
           </select>
         </div>
   
         <div className="mb-4">
-          <label className="block mb-2">Space Color:</label>
+          <label className="block mb-2">Couleurs</label>
           <select 
             value={spaceColor} 
             onChange={(e) => setSpaceColor(e.target.value)}
@@ -235,7 +236,7 @@ const EmptyRoom: React.FC = () => {
         </div>
   
         <div className="mb-4">
-          <label className="block mb-2">Materials:</label>
+          <label className="block mb-2">Matériaux</label>
           <div className="flex flex-wrap gap-2 overflow-y-scroll max-h-48">
             {materials.map(material => (
               <button
@@ -258,24 +259,24 @@ const EmptyRoom: React.FC = () => {
             onClick={handleReset}
             className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition-colors"
           >
-            Reset All
+            Par défaut
           </button>
           <button 
             onClick={handleSubmit}
             disabled={loading || !imagePublicId}
             className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            Generate
+            Générer
           </button>
         </div>
   
-        {loading && <p className="text-center mt-4">Processing...</p>}
+        {loading && <p className="text-center mt-4">Chargement...</p>}
         
         {error && <p className="text-red-500 mt-4">{error}</p>}
   
         {result.length > 0 && (
           <div className="mt-8">
-            <h3 className="text-xl font-bold mb-4">Results:</h3>
+            <h3 className="text-xl font-bold mb-4">Résultat</h3>
             <div className="grid grid-cols-2 gap-4">
               {result.map((imageUrl, index) => (
                 <img key={index} src={imageUrl} alt={`Result ${index + 1}`} className="w-full rounded-lg shadow-md" />

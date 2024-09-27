@@ -13,14 +13,14 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Furniture Placement
+              Ameublement
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Paste your preferred furniture within the room.
+              Placer des meubles dans votre espace pour voir comment ils s'intègrent.
             </div>
             <Link to="/furniture-placement">
               <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300">
-                Start
+                Démarrer
               </button>
             </Link>
           </div>
@@ -33,14 +33,14 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Color Transfer
+              Modification de couleur
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Change the color of your room to your preferred shade.
+              Changer la couleur de votre pièce
             </div>
             <Link to="/color-transfer">
               <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300">
-                Start
+                Démarrer
               </button>
             </Link>
           </div>
@@ -53,16 +53,16 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Style Transfer
+              Changement de style
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Redesign and render your space based on a reference image.
+            Redessinez et rendez votre espace en fonction d'une image de référence.
             </div>
             <button 
               className="bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed"
               disabled
             >
-              Coming Soon
+              Bientôt disponible
             </button>
           </div>
         </div>
@@ -74,16 +74,16 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Furniture Search API
+            Recherche de Meubles
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Product discovery with our Home Product Search API.
+            Découvrez des produits avec notre API de Recherche de Meubles
             </div>
             <button 
               className="bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed"
               disabled
             >
-              Coming Soon
+              Bientôt disponible
             </button>
           </div>
         </div>
@@ -95,16 +95,16 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Empty Room
+            Meublez votre espace vide
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Furnish your empty space with furniture, Furniture Placement. Paste your preferred furniture within the room.
+            Placement de Meubles
             </div>
             <button 
               className="bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed"
               disabled
             >
-              Coming Soon
+              Bientôt disponible
             </button>
           </div>
         </div>

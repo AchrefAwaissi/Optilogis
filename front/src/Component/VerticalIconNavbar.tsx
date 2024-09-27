@@ -61,10 +61,10 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick, is
 
   // Affiche uniquement "Add" et "Settings" si l'utilisateur est connecté
   const menuItems: MenuItem[] = [
-    { icon: faHome, label: "Home", path: "/" },
-    ...(isAuthenticated ? [{ icon: faPlus, label: "Add", path: "/publish" }] : []), // Condition pour afficher "Add"
-    ...(isAuthenticated ? [{ icon: faList, label: "My Items", path: "/manage-items" }] : []), // Condition pour afficher "My items"
-    ...(isAuthenticated ? [{ icon: faCog, label: "Settings", path: "/settings" }] : []), // Condition pour afficher "Settings"
+    { icon: faHome, label: "Accueil", path: "/" },
+    ...(isAuthenticated ? [{ icon: faPlus, label: "Publier une annonce", path: "/publish" }] : []), // Condition pour afficher "Add"
+    ...(isAuthenticated ? [{ icon: faList, label: "Mes annonces", path: "/manage-items" }] : []), // Condition pour afficher "My items"
+    ...(isAuthenticated ? [{ icon: faCog, label: "Paramètres", path: "/settings" }] : []), // Condition pour afficher "Settings"
     ...(isAuthenticated ? [{ icon: faCube, label: "Planification", path: "/Planner" }] : []), // Condition pour afficher "My items"
     { icon: faAddressBook, label: "Contact", path: "/contact" },
   ];
@@ -105,7 +105,7 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick, is
             className="w-full flex items-center justify-center px-4 py-2 bg-[#095550] text-white rounded-lg hover:bg-[#073d3a] transition-colors duration-300"
           >
             <FontAwesomeIcon icon={faSignInAlt} className="mr-2" />
-            <span className={isOpen ? "" : "hidden"}>Sign In</span>
+            <span className={isOpen ? "" : "hidden"}>Se connecter</span>
           </button>
         </div>
       )}

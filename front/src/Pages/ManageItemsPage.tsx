@@ -44,10 +44,10 @@ const PropertyCard: React.FC<{ house: House; onEdit: () => void; onDelete: () =>
                     <p className="text-sm font-medium text-teal-700">€{house.price.toLocaleString()}/ mois</p>
                     <div>
                         <button onClick={onEdit} className="mr-2 px-3 py-2 bg-[#095550] text-white text-sm font-normal rounded-lg hover:bg-[#074440] transition-colors duration-200">
-                            <FontAwesomeIcon icon={faPencilAlt} className="mr-1" /> Edit
+                            <FontAwesomeIcon icon={faPencilAlt} className="mr-1" /> Modifier
                         </button>
                         <button onClick={onDelete} className="px-3 py-2 bg-red-500 text-white text-sm font-normal rounded-lg hover:bg-red-600 transition-colors duration-200">
-                            <FontAwesomeIcon icon={faTrash} className="mr-1" /> Delete
+                            <FontAwesomeIcon icon={faTrash} className="mr-1" /> Supprimer
                         </button>
                     </div>
                 </div>
@@ -153,9 +153,9 @@ const ManageItems: React.FC = () => {
 
     return (
         <div className="container mx-auto px-4 py-8">
-            <h1 className="text-2xl font-bold mb-6">Manage Your Properties</h1>
+            <h1 className="text-2xl font-bold mb-6">Gestion des annonces</h1>
             {houses.length === 0 ? (
-                <p className="text-center py-4">You haven't posted any properties yet.</p>
+                <p className="text-center py-4">Vous n'avez pas encore publié d'annonce.</p>
             ) : (
                 <div className="space-y-4">
                     {houses.map(house => (

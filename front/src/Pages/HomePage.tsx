@@ -187,7 +187,7 @@ const HomePage: React.FC<HomePageProps> = ({ showFavorites, selectedLocation, on
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         <div className={`w-full md:w-[500px] overflow-y-auto p-4 ${showMap ? 'hidden' : 'block'} md:block`}>
           {loading ? (
-            <p>Loading houses...</p>
+            <p>Chargement des annonces...</p>
           ) : error ? (
             <p className="text-red-500">{error}</p>
           ) : (

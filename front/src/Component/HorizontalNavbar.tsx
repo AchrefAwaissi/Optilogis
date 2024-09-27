@@ -74,19 +74,16 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
   const NavLinks = () => (
     <>
       <Link to="/" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Home
+        Accueil
       </Link>
       <Link to="/publish" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Publish
+        Publier
       </Link>
       <Link to="/manage-items" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        My items
+        Mes annonces
       </Link>
-      <Link to="/search" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Search
-      </Link>
-      <Link to="/matching" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
-        Matching
+      <Link to="/Planner" className="block mt-4 lg:inline-block lg:mt-0 text-gray-800 hover:text-blue-600 mr-4">
+        Planification
       </Link>
     </>
   );
@@ -107,7 +104,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
       {isOpen && (
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <Link to="/" className="block mt-4 text-gray-800 hover:text-blue-600 mr-4">
-            Home
+            Accueil
           </Link>
           <div className="flex flex-col mt-2">
             <button
@@ -115,14 +112,14 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
               className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm mb-2"
             >
               <FontAwesomeIcon icon={faSignInAlt} className="mr-1 text-[#095550]" />
-              Sign In
+              Connexion
             </button>
             <button
               onClick={onSignUpClick}
               className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm"
             >
               <FontAwesomeIcon icon={faUserPlus} className="mr-1 text-[#095550]" />
-              Sign Up
+              Inscription
             </button>
           </div>
         </div>
@@ -157,12 +154,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
               />
             </button>
 
-            <FontAwesomeIcon
-              icon={faBell}
-              className="text-xl cursor-pointer"
-              style={{ color: '#095550' }}
-              aria-label="Notifications"
-            />
+            
 
             <div className="relative" ref={dropdownRef}>
               <img 
@@ -178,14 +170,14 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <FontAwesomeIcon icon={faCog} className="mr-2" />
-                    Settings
+                    Paramètres
                   </button>
                   <button
                     onClick={handleLogoutClick}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-                    Logout
+                    Déconnexion
                   </button>
                 </div>
               )}
@@ -217,7 +209,6 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
             >
               <FontAwesomeIcon icon={faHeart} className="text-[#095550]" />
             </button>
-            <FontAwesomeIcon icon={faBell} className="text-gray-500 text-xl cursor-pointer" />
             <img src={user?.profilePhotoPath || '/default-avatar.png'} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
             <button
               onClick={handleSettingsClick}
@@ -230,7 +221,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
               className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm"
             >
               <FontAwesomeIcon icon={faSignOutAlt} className="mr-1 text-[#095550]" />
-              Logout
+              Déconnexion
             </button>
           </div>
         </div>

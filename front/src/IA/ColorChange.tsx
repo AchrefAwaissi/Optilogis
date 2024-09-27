@@ -147,10 +147,10 @@ const ColorChange: React.FC = () => {
 
   return (
     <div className="p-4 max-w-4xl mx-auto min-h-screen overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-4">Color Transfer</h2>
+      <h2 className="text-2xl font-bold mb-4">Changement de couleur</h2>
       
       <div className="mb-4">
-        <label className="block mb-2">Room Image:</label>
+        <label className="block mb-2">Photo de la pièce:</label>
         <div 
           className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors h-64 flex items-center justify-center"
           onClick={() => roomImageInputRef.current?.click()}
@@ -161,7 +161,7 @@ const ColorChange: React.FC = () => {
               className="max-w-full max-h-full object-contain"
             />
           ) : (
-            <p>Click to upload room image</p>
+            <p>Cliquer pour importer l'image</p>
           )}
         </div>
         <input 
@@ -174,20 +174,20 @@ const ColorChange: React.FC = () => {
       </div>
 
       <div className="mb-4">
-        <label className="block mb-2">Area to Paint:</label>
+        <label className="block mb-2">Surface à peindre:</label>
         <select 
           value={area} 
           onChange={(e) => setArea(e.target.value as 'wall' | 'ceiling' | 'floor')}
           className="w-full p-2 border rounded"
         >
-          <option value="wall">Wall</option>
-          <option value="ceiling">Ceiling</option>
-          <option value="floor">Floor</option>
+          <option value="wall">Mur</option>
+          <option value="ceiling">Plafond</option>
+          <option value="floor">Sol</option>
         </select>
       </div>
 
       <div className="mb-4">
-        <label className="block mb-2">Color:</label>
+        <label className="block mb-2">Couleur:</label>
         <input 
           type="text" 
           value={color} 
@@ -203,7 +203,7 @@ const ColorChange: React.FC = () => {
           disabled={loading}
           className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          {loading ? 'Generating...' : 'Generate'}
+          {loading ? 'En cours...' : 'Générer'}
         </button>
       </div>
       
@@ -211,7 +211,7 @@ const ColorChange: React.FC = () => {
 
       {resultImageUrl && (
         <div className="mt-8">
-          <h3 className="text-xl font-bold mb-2">Result:</h3>
+          <h3 className="text-xl font-bold mb-2">Résultat:</h3>
           <img src={resultImageUrl} alt="Color Transfer Result" className="w-full border rounded-lg" />
         </div>
       )}

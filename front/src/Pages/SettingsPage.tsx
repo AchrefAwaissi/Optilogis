@@ -102,7 +102,7 @@ const SettingsPage: React.FC = () => {
         value={formData[name] as string}
         onChange={handleChange}
         className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
-        placeholder={`Your ${label}`}
+        placeholder={`${label}`}
         disabled={!isEditing}
       />
     </div>
@@ -116,7 +116,7 @@ const SettingsPage: React.FC = () => {
             <div className="relative mb-4 md:mb-0 md:mr-6">
               <img
                 src={previewUrl || "/default-avatar.png"}
-                alt="Profile"
+                alt="Profil"
                 className="w-24 h-24 rounded-full object-cover"
               />
               {isEditing && (
@@ -147,7 +147,7 @@ const SettingsPage: React.FC = () => {
                 : 'bg-[#095550] text-white hover:bg-[#074440]'
               }`}
           >
-            {isEditing ? 'Cancel' : 'Edit'}
+            {isEditing ? 'Annuler' : 'Editer'}
           </button>
         </div>
 
@@ -160,7 +160,7 @@ const SettingsPage: React.FC = () => {
         <div className="overflow-y-auto max-h-[calc(100vh-300px)]">
           <form onSubmit={handleProfileSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField label="Username" name="username" />
+              <InputField label="Nom d'utilisateur" name="username" />
               <InputField label="Email" name="email" type="email" />
               {isEditing && (
                 <>
@@ -178,7 +178,7 @@ const SettingsPage: React.FC = () => {
                 </svg>
                 <div>
                   <p className="text-lg text-[#030303] font-poppins">{formData.email}</p>
-                  <p className="text-sm text-[#828282] font-poppins">1 month ago</p>
+                  <p className="text-sm text-[#828282] font-poppins"></p>
                 </div>
               </div>
             </div>
@@ -188,7 +188,7 @@ const SettingsPage: React.FC = () => {
             {isEditing && (
               <div className="mt-8 flex justify-start">
                 <button type="submit" className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300">
-                  Save Changes
+                  Sauvegardez les changements
                 </button>
               </div>
             )}

@@ -134,7 +134,6 @@ const HouseListings: React.FC<HouseListingsProps> = ({ houses, onHouseSelect, ci
   return (
     <div className="flex flex-col items-center space-y-4 p-4 pb-20">
       <h2 className="text-2xl font-bold mb-4 self-start w-full">
-        {filteredHouses.length} Résultats {showFavorites ? "favoris" : ""} {city ? `à ${city}` : "toutes les villes"}
       </h2>
       {filteredHouses.map((house) => (
         <PropertyCard

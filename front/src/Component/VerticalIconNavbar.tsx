@@ -8,7 +8,6 @@ import {
   faCube,
   faAddressBook,
   faCog,
-  faSignOutAlt,
   IconDefinition,
   faSignInAlt,
 } from "@fortawesome/free-solid-svg-icons";
@@ -64,7 +63,7 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick, is
   const menuItems: MenuItem[] = [
     { icon: faHome, label: "Home", path: "/" },
     ...(isAuthenticated ? [{ icon: faPlus, label: "Add", path: "/publish" }] : []), // Condition pour afficher "Add"
-    { icon: faCube, label: "Planification", path: "/Planner" },
+    ...(isAuthenticated ? [{ icon: faCube, label: "Planification", path: "/Planner" }] : []), // Condition pour afficher "My items"
     ...(isAuthenticated ? [{ icon: faList, label: "My Items", path: "/manage-items" }] : []), // Condition pour afficher "My items"
     ...(isAuthenticated ? [{ icon: faCog, label: "Settings", path: "/settings" }] : []), // Condition pour afficher "Settings"
     { icon: faAddressBook, label: "Contact", path: "/contact" },

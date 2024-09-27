@@ -13,7 +13,7 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Transfert de Couleur
+              Changement de Couleur
             </div>
             <div className="text-[#807f7f] text-base mb-4">
             Changez la couleur de votre chambre selon votre teinte préférée.</div>

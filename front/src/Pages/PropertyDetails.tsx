@@ -5,7 +5,7 @@ import {
   faRulerCombined, faCompass, faWheelchair, faBuilding,
   faWarehouse, faCar, faBox, faWineBottle, faTree,
   faShare, faHeart, faExpand, faPlus, faCheckCircle,
-  faEnvelope, faTimes
+  faEnvelope, faTimes, faInfoCircle
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebookF, faTwitter, faLinkedinIn
@@ -88,12 +88,10 @@ interface IconButtonProps {
   isLiked?: boolean;
 }
 interface NeighborhoodInfo {
-  name: string;
   population: string;
   amenities: string[];
   safety: string;
   transport: string[];
-  imageUrl: string; // Ajoutez cette ligne
 }
 const IconButton: React.FC<IconButtonProps> = ({ icon, onClick, isLiked }) => (
   <button
@@ -140,12 +138,10 @@ const PropertyDetails: React.FC = () => {
   const [showSharePopup, setShowSharePopup] = useState(false);
   const [showNeighborhoodPopup, setShowNeighborhoodPopup] = useState(false);
   const [neighborhoodInfo, setNeighborhoodInfo] = useState<NeighborhoodInfo>({
-    name: '',
     population: '',
     amenities: [],
     safety: '',
     transport: [],
-    imageUrl: '' // Ajoutez cette ligne
   });
 
   useEffect(() => {
@@ -273,9 +269,21 @@ const PropertyDetails: React.FC = () => {
     if (tab === '3D') {
       setShow3DView(!show3DView);
     } else if (tab === 'quartier') {
-      setShowNeighborhoodPopup(true);
-      fetchNeighborhoodInfo();
+      // Remove the popup opening logic from here
+      // Just update the map view as needed
+      if (map) {
+        map.setTilt(0);
+        map.setMapTypeId('roadmap');
+        if (neighborhoodBoundary) {
+          neighborhoodBoundary.setMap(map);
+        }
+      }
     }
+  };
+
+  const handleInfoClick = () => {
+    setShowNeighborhoodPopup(true);
+    fetchNeighborhoodInfo();
   };
 
   const handleMapInteraction = () => {
@@ -423,7 +431,6 @@ const PropertyDetails: React.FC = () => {
         const imageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lon}&zoom=12&size=100x100&maptype=satellite&key=${googleMapsApiKey}`;
         
         setNeighborhoodInfo({
-          name: `${house.city} Centre`,
           population: 'Environ 50,000 habitants',
           amenities: [
             'Plusieurs parcs et espaces verts',
@@ -436,7 +443,6 @@ const PropertyDetails: React.FC = () => {
             'Station de métro à 5 minutes à pied',
             'Arrêts de bus fréquents'
           ],
-          imageUrl: imageUrl
         });
       }
     } catch (error) {
@@ -447,7 +453,6 @@ const PropertyDetails: React.FC = () => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-8 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
         <div className="flex justify-between items-start mb-4">
-          <h2 className="text-2xl font-bold">{neighborhoodInfo.name}</h2>
           <button onClick={() => setShowNeighborhoodPopup(false)} className="text-gray-500 hover:text-gray-700">
             <FontAwesomeIcon icon={faTimes} />
           </button>
@@ -530,6 +535,13 @@ const PropertyDetails: React.FC = () => {
             >
               Voir quartier
             </button>
+            <button
+            className="px-4 py-2 text-sm font-medium rounded-md bg-gray-200 text-gray-700"
+            onClick={handleInfoClick}
+          >
+            <FontAwesomeIcon icon={faInfoCircle} className="mr-2" />
+            Informations
+          </button>
           </div>
           <div className="h-64 md:h-80 relative">
             {activeTab === 'quartier' || activeTab === '3D' ? (
@@ -668,19 +680,7 @@ const PropertyDetails: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
-              <div className="flex items-center">
-                <img
-                  src={neighborhoodInfo.imageUrl || 'https://via.placeholder.com/40'}
-                  alt={neighborhoodInfo.name}
-                  className="w-10 h-10 rounded-full object-cover mr-3"
-                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                    const target = e.target as HTMLImageElement;
-                    target.onerror = null;
-                    target.src = 'https://via.placeholder.com/40';
-                  }}
-                />
-                <h2 className="text-2xl font-bold text-[#095550]">{neighborhoodInfo.name}</h2>
-              </div>
+              <h2 className="text-2xl font-bold">Informations sur le quartier</h2>
               <button onClick={() => setShowNeighborhoodPopup(false)} className="text-gray-500 hover:text-gray-700">
                 <FontAwesomeIcon icon={faTimes} />
               </button>

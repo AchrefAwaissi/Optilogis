@@ -221,14 +221,14 @@ const ManageItems: React.FC = () => {
 
   return (
     <div className="min-h-screen h-screen w-full overflow-y-auto px-4 py-8 pb-12">
-      <h1 className="text-2xl font-bold mb-6 text-center">Manage Your Properties</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">Gestion des annonces</h1>
       {message && (
         <div className={`mb-4 p-3 rounded ${message.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
           {message.text}
         </div>
       )}
       {userItems.length === 0 ? (
-        <p className="text-center py-4">You haven't posted any properties yet.</p>
+        <p className="text-center py-4">Vous n'avez pas encore publié d'annonce.</p>
       ) : (
         <div className="flex flex-col items-center space-y-4">
           {userItems.map(item => (
@@ -367,7 +367,7 @@ const ManageItems: React.FC = () => {
             type="submit"
             className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            Update Property
+            Mettre à jour votre annonce
           </button>
         </form>
       )}

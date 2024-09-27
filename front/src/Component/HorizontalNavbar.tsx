@@ -111,14 +111,14 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
               className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm mb-2"
             >
               <FontAwesomeIcon icon={faSignInAlt} className="mr-1 text-[#095550]" />
-              Sign In
+              Se connecter
             </button>
             <button
               onClick={onSignUpClick}
               className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm"
             >
               <FontAwesomeIcon icon={faUserPlus} className="mr-1 text-[#095550]" />
-              Sign Up
+              S'inqcrire
             </button>
           </div>
         </div>
@@ -143,7 +143,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
               <FontAwesomeIcon icon={faSearch} className="text-gray-500 text-lg mr-2" />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Recherche..."
                 className="bg-transparent outline-none w-full text-gray-500 text-sm"
               />
             </div>
@@ -243,7 +243,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
               className="bg-black-500 hover:text-blue-600 text-black py-1 px-2 rounded flex items-center text-sm"
             >
               <FontAwesomeIcon icon={faSignOutAlt} className="mr-1 text-[#095550]" />
-              Logout
+              Se déconnecter
             </button>
           </div>
         </div>

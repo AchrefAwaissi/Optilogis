@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const Planner: React.FC = () => {
   return (
     <div className="flex flex-col sm:flex-row flex-wrap gap-6 justify-center items-center p-6 bg-white-100">
-      <div className="overflow-y-auto max-h-[600px] w-full flex flex-wrap justify-center gap-6 p-4">
+      <div className="overflow-y-auto max-h-[850px] w-full flex flex-wrap justify-center gap-6 p-4">
         
         {/* Furniture Placement Card (Active) */}
         <div className="relative bg-white p-4 rounded-lg shadow-lg max-w-xl w-full sm:w-[300px]">

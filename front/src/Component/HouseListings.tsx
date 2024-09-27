@@ -72,8 +72,8 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
       onClick={onClick}
       style={{ maxHeight: '300px' }}
     >
-   <div className="relative w-full h-32 sm:w-28 sm:h-28 m-2">
-  <div
+      <div className="relative w-full h-48 sm:w-40 sm:h-40 m-2">
+      <div
     className="w-full h-full rounded-xl bg-center bg-cover bg-no-repeat"
     style={{ backgroundImage: `url(${imageUrl})` }}
   />
@@ -89,8 +89,6 @@ const PropertyCard: React.FC<{ house: House; onClick: () => void }> = ({ house, 
     <span className="text-xs font-semibold">{likeCount}</span>
   </button>
 </div>
-
-
       <div className="flex-1 p-4 flex flex-col justify-between">
         <div>
           <h3 className="text-lg font-medium text-gray-800 mb-1">{house.title}</h3>

@@ -150,14 +150,27 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
           </div>
 
           <div className="hidden lg:flex items-center space-x-4">
-            <button
-              onClick={onFavoritesToggle}
-              className={`text-gray-500 hover:text-red-500 p-2 rounded flex items-center justify-center ${showFavorites ? 'text-red-500' : ''}`}
-              aria-label="Favorites"
-            >
-              <FontAwesomeIcon icon={faHeart} className="text-[#095550]" />
-            </button>
-            <FontAwesomeIcon icon={faBell} className="text-gray-500 text-xl cursor-pointer" />
+             {/* Icône de cœur */}
+             <button
+  onClick={onFavoritesToggle}
+  className="p-2 rounded flex items-center justify-center"
+  aria-label="Favorites"
+>
+  <FontAwesomeIcon
+    icon={faHeart}
+    className={showFavorites ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}
+  />
+</button>
+
+
+<FontAwesomeIcon
+  icon={faBell}
+  className="text-xl cursor-pointer"
+  style={{ color: '#095550' }}
+  aria-label="Notifications"
+ />
+
+
             <div className="relative" ref={dropdownRef}>
               <img 
                 src={user?.profilePhotoPath || '/default-avatar.png'} 
@@ -201,12 +214,13 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
         <div className="lg:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <NavLinks />
           <div className="flex items-center bg-gray-100 rounded-lg w-full h-10 px-3 mt-2">
-            <FontAwesomeIcon icon={faSearch} className="text-gray-500 text-lg mr-2" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="bg-transparent outline-none w-full text-gray-500 text-sm"
-            />
+          <FontAwesomeIcon icon={faSearch} style={{ color: '#095550' }} className="text-lg mr-2" />
+<input
+  type="text"
+  placeholder="Search..."
+  className="bg-transparent outline-none w-full text-gray-500 text-sm"
+/>
+
           </div>
           <div className="flex justify-between items-center mt-2">
             <button

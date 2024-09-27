@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 
 const Planner: React.FC = () => {
   return (
-    <div className="flex flex-col sm:flex-row flex-wrap gap-6 justify-center items-center p-6 bg-white-100">
-      <div className="overflow-y-auto max-h-[600px] w-full flex flex-wrap justify-center gap-6 p-4">
+    <div className="flex flex-col sm:flex-row flex-wrap gap-6 justify-center items-center p-6 bg-white-100 min-h-screen">
+      <div className="overflow-hidden w-full flex flex-wrap justify-center gap-6 p-4">
         
         {/* Color Transfer Card */}
         <div className="relative bg-white p-4 rounded-lg shadow-lg max-w-xl w-full sm:w-[300px]">
@@ -52,7 +52,7 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              API de recherche de meubles
+              Recherche de meubles
             </div>
             <div className="text-[#807f7f] text-base mb-4">
               Recherchez des meubles à partir de notre base de données d'articles

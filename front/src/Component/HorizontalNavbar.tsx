@@ -185,14 +185,14 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <FontAwesomeIcon icon={faCog} className="mr-2" />
-                    Settings
+                    Paramètres
                   </button>
                   <button
                     onClick={handleLogoutClick}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-                    Logout
+                    Déconnexion
                   </button>
                 </div>
               )}

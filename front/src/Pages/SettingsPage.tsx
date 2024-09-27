@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface FormData {
@@ -35,7 +35,7 @@ const SettingsPage: React.FC = () => {
     }
   }, [user]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, files } = e.target;
     if (name === 'profilePhoto' && files && files[0]) {
       setFormData(prev => ({ ...prev, profilePhoto: files[0] }));
@@ -43,9 +43,9 @@ const SettingsPage: React.FC = () => {
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
-  };
+  }, []);
 
-  const handleProfileSubmit = async (e: React.FormEvent) => {
+  const handleProfileSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage(null);
 
@@ -77,10 +77,10 @@ const SettingsPage: React.FC = () => {
     } catch (error) {
       setMessage({ type: 'error', text: 'Echec de la mise à jour du profil !' });
     }
-  };
+  }, [formData, updateUser]);
 
-  const toggleEdit = () => {
-    setIsEditing(!isEditing);
+  const toggleEdit = useCallback(() => {
+    setIsEditing(prev => !prev);
     if (isEditing) {
       // Reset form data when canceling edit
       setFormData(prevState => ({
@@ -91,22 +91,7 @@ const SettingsPage: React.FC = () => {
         confirmPassword: '',
       }));
     }
-  };
-
-  const InputField: React.FC<{ label: string; name: keyof FormData; type?: string }> = ({ label, name, type = 'text' }) => (
-    <div className="mb-4">
-      <label className="block text-[#030303] text-xl font-poppins mb-2">{label}</label>
-      <input
-        type={type}
-        name={name}
-        value={formData[name] as string}
-        onChange={handleChange}
-        className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
-        placeholder={`Your ${label}`}
-        disabled={!isEditing}
-      />
-    </div>
-  );
+  }, [isEditing, user]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -142,10 +127,11 @@ const SettingsPage: React.FC = () => {
           </div>
           <button
             onClick={toggleEdit}
-            className={`font-bold py-2 px-4 rounded-lg transition duration-300 ${isEditing
+            className={`font-bold py-2 px-4 rounded-lg transition duration-300 ${
+              isEditing
                 ? 'bg-[#e6efee] text-[#095550] hover:bg-[#d1e0df]'
                 : 'bg-[#095550] text-white hover:bg-[#074440]'
-              }`}
+            }`}
           >
             {isEditing ? 'Cancel' : 'Edit'}
           </button>
@@ -160,12 +146,61 @@ const SettingsPage: React.FC = () => {
         <div className="overflow-y-auto max-h-[calc(100vh-300px)]">
           <form onSubmit={handleProfileSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <InputField label="Username" name="username" />
-              <InputField label="Email" name="email" type="email" />
+              {/* Username field */}
+              <div className="mb-4">
+                <label className="block text-[#030303] text-xl font-poppins mb-2">Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Your Username"
+                  disabled={!isEditing}
+                />
+              </div>
+
+              {/* Email field */}
+              <div className="mb-4">
+                <label className="block text-[#030303] text-xl font-poppins mb-2">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                  placeholder="Your Email"
+                  disabled={!isEditing}
+                />
+              </div>
+
               {isEditing && (
                 <>
-                  <InputField label="Nouveau mot de passe" name="password" type="password" />
-                  <InputField label="Confirmez le mot de passe" name="confirmPassword" type="password" />
+                  {/* Password field */}
+                  <div className="mb-4">
+                    <label className="block text-[#030303] text-xl font-poppins mb-2">Nouveau mot de passe</label>
+                    <input
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                      placeholder="Your New Password"
+                    />
+                  </div>
+
+                  {/* Confirm Password field */}
+                  <div className="mb-4">
+                    <label className="block text-[#030303] text-xl font-poppins mb-2">Confirmez le mot de passe</label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                      className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
+                      placeholder="Confirm Your New Password"
+                    />
+                  </div>
                 </>
               )}
             </div>
@@ -183,8 +218,6 @@ const SettingsPage: React.FC = () => {
               </div>
             </div>
 
-
-
             {isEditing && (
               <div className="mt-8 flex justify-start">
                 <button type="submit" className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300">
@@ -199,4 +232,4 @@ const SettingsPage: React.FC = () => {
   );
 };
 
-export default SettingsPage;
+export default React.memo(SettingsPage);

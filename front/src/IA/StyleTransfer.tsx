@@ -25,12 +25,13 @@ const StyleTransfer: React.FC = () => {
   const styleImageInputRef = useRef<HTMLInputElement>(null);
 
   const spaceTypes = [
-    'bedroom', 'bathroom', 'living_room', 'dining_room', 'kitchen',
-    'bed_and_living_room', 'living_and_dining_room', 'dining_and_kitchen',
-    'working_room', 'home_gym', 'home_office', 'kids_room', 'living_dining',
-    'small_kitchen', 'small_living_room', 'toilet', 'walk_in_closet',
-    'patio', 'small_garden'
-  ];
+    'chambre', 'salle_de_bain', 'salon', 'salle_à_manger', 'cuisine',
+    'chambre_et_salon', 'salon_et_salle_à_manger', 'salle_à_manger_et_cuisine',
+    'bureau', 'salle_de_sport', 'bureau_à_domicile', 'chambre_d_enfant', 'salon_salle_à_manger',
+    'petite_cuisine', 'petit_salon', 'toilettes', 'dressing',
+    'patio', 'petit_jardin'
+];
+
 
   const handleImageUpload = async (file: File, setImagePublicId: React.Dispatch<React.SetStateAction<string>>) => {
     try {
@@ -107,11 +108,12 @@ const StyleTransfer: React.FC = () => {
 
   return (
     <div className="p-4 max-w-4xl mx-auto min-h-screen overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-4">Style Transfer</h2>
+      <h2 className="text-2xl font-bold mb-4">Changement de Style</h2>
       
       <div className="grid grid-cols-2 gap-4 mb-4">
+  
         <div>
-          <label className="block mb-2">Room Image:</label>
+          <label className="block mb-2">Images de la pièce:</label>
           <div 
             className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors h-64 flex items-center justify-center"
             onClick={() => roomImageInputRef.current?.click()}
@@ -122,7 +124,7 @@ const StyleTransfer: React.FC = () => {
                 className="max-w-full max-h-full object-contain"
               />
             ) : (
-              <p>Click to upload room image</p>
+              <p>Cliquez pour charger une image</p>
             )}
           </div>
           <input 
@@ -134,7 +136,7 @@ const StyleTransfer: React.FC = () => {
           />
         </div>
         <div>
-          <label className="block mb-2">Style Image:</label>
+          <label className="block mb-2">Image de Style:</label>
           <div 
             className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors h-64 flex items-center justify-center"
             onClick={() => styleImageInputRef.current?.click()}
@@ -145,7 +147,7 @@ const StyleTransfer: React.FC = () => {
                 className="max-w-full max-h-full object-contain"
               />
             ) : (
-              <p>Click to upload style image</p>
+              <p>Cliquez pour charger l'image de style</p>
             )}
           </div>
           <input 
@@ -159,18 +161,18 @@ const StyleTransfer: React.FC = () => {
       </div>
   
       <div className="mb-4">
-        <label className="block mb-2">Renovate Type:</label>
+        <label className="block mb-2">Type de rénovation:</label>
         <select 
           value="residential"
           disabled
           className="w-full p-2 border rounded bg-gray-100"
         >
-          <option value="residential">Residential</option>
+          <option value="residential">Résidentiel</option>
         </select>
       </div>
   
       <div className="mb-4">
-        <label className="block mb-2">Space Type:</label>
+        <label className="block mb-2">Type d'espace:</label>
         <select 
           value={spaceType} 
           onChange={(e) => setSpaceType(e.target.value)}
@@ -189,23 +191,23 @@ const StyleTransfer: React.FC = () => {
           onClick={handleReset}
           className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition-colors"
         >
-          Reset All
+          Par Défaut
         </button>
         <button 
           onClick={handleStyleTransfer} 
           disabled={loading || !roomImagePublicId || !styleImagePublicId}
           className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition-colors disabled:bg-gray-400"
         >
-          Generate
+          Génerer
         </button>
       </div>
       
-      {loading && <p className="text-center mt-4">Loading...</p>}
+      {loading && <p className="text-center mt-4">Chargement...</p>}
       
       {error && <p className="text-center mt-4 text-red-500">{error}</p>}
   
       <div className="mt-8">
-        <h3 className="text-xl font-bold mb-2">Results:</h3>
+        <h3 className="text-xl font-bold mb-2">Resultats:</h3>
         <div className="overflow-y-auto max-h-80">
           {resultImages.length > 0 ? (
             <div className="grid grid-cols-2 gap-4">
@@ -217,7 +219,7 @@ const StyleTransfer: React.FC = () => {
             <div className="grid grid-cols-2 gap-4">
               {[1, 2, 3, 4].map((_, index) => (
                 <div key={index} className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <span className="text-gray-400">Result image {index + 1}</span>
+                  <span className="text-gray-400">Résultat {index + 1}</span>
                 </div>
               ))}
             </div>

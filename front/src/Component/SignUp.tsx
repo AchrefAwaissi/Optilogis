@@ -232,7 +232,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
           <input
             type="text"
             name="username"
-            placeholder="Username"
+            placeholder="Nom d'utilisateur"
             value={formData.username}
             onChange={handleChange}
             style={styles.input}

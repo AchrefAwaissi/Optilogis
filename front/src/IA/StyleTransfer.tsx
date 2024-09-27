@@ -13,7 +13,7 @@ const cld = new Cloudinary({
 });
 
 const StyleTransfer: React.FC = () => {
-  const [apiKey] = useState<string>('sk-v8IV8Sh86ea2F64kzIofgRIs1Kk');
+  const [apiKey] = useState<string>('sk-iYiywwNzEzcDy-ZarW4fwNWscUs');
   const [roomImagePublicId, setRoomImagePublicId] = useState<string>('');
   const [styleImagePublicId, setStyleImagePublicId] = useState<string>('');
   const [spaceType, setSpaceType] = useState<string>('bedroom');

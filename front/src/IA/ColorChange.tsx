@@ -13,7 +13,7 @@ const cld = new Cloudinary({
 });
 
 const ColorChange: React.FC = () => {
-  const [apiKey] = useState<string>('sk-v8IV8Sh86ea2F64kzIofgRIs1Kk');
+  const [apiKey] = useState<string>('sk-iYiywwNzEzcDy-ZarW4fwNWscUs');
   const [roomImage, setRoomImage] = useState<File | null>(null);
   const [roomImagePublicId, setRoomImagePublicId] = useState<string>('');
   const [area, setArea] = useState<'wall' | 'ceiling' | 'floor'>('wall');
@@ -100,7 +100,7 @@ const ColorChange: React.FC = () => {
 
   const checkResult = async (refId: string) => {
     const maxAttempts = 10;
-    const delayBetweenAttempts = 3000; // 3 seconds
+    const delayBetweenAttempts = 10000; // 3 seconds
 
     const pollResult = async (attemptCount: number): Promise<void> => {
       if (attemptCount >= maxAttempts) {

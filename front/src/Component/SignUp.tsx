@@ -205,7 +205,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
       <button onClick={onClose} style={styles.closeButton}>
         <FontAwesomeIcon icon={faTimes} />
       </button>
-      <h1 style={styles.title}>Sign Up</h1>
+      <h1 style={styles.title}>S'inscrire</h1>
       {error && <p style={styles.error}>{error}</p>}
       {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
       <form onSubmit={handleSubmit} style={styles.form}>
@@ -232,7 +232,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
           <input
             type="text"
             name="username"
-            placeholder="Username"
+            placeholder="Nom d'utilisateur"
             value={formData.username}
             onChange={handleChange}
             style={styles.input}
@@ -256,7 +256,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
           <input
             type="password"
             name="password"
-            placeholder="Password"
+            placeholder="Mot de passe"
             value={formData.password}
             onChange={handleChange}
             style={styles.input}
@@ -268,7 +268,7 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
           <input
             type="password"
             name="confirmPassword"
-            placeholder="Confirm Password"
+            placeholder="Confirmer mot de passe"
             value={formData.confirmPassword}
             onChange={handleChange}
             style={styles.input}
@@ -276,13 +276,13 @@ const SignUp: React.FC<SignUpProps> = ({ onClose, onToggleForm, onSuccess }) => 
           />
         </div>
         <button type="submit" style={styles.button}>
-          Sign Up
+          S'inscrire
         </button>
       </form>
       <div style={styles.footer}>
-        Already have an account?{' '}
+        Vous avez déjà un compte ?{' '}
         <span onClick={onToggleForm} style={styles.link}>
-          Sign In
+          Se connecter
         </span>
       </div>
     </div>

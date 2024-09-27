@@ -13,10 +13,10 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Furniture Placement
+              Placement de meubles
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Paste your preferred furniture within the room.
+              Placez vos meubles dans une pièce vide.
             </div>
             <Link to="/furniture-placement">
               <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300">
@@ -33,10 +33,10 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Color Transfer
+              Changement de couleur
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Change the color of your room to your preferred shade.
+              Changez la couleur de vos murs et de vos meubles en un clic.
             </div>
             <Link to="/color-transfer">
               <button className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300">
@@ -53,10 +53,10 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Style Transfer
+              Changement de style
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Redesign and render your space based on a reference image.
+              Changez le style de vos meubles en un clic.
             </div>
             <button 
               className="bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed"
@@ -74,10 +74,10 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Furniture Search API
+              Recherche de meubles
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Product discovery with our Home Product Search API.
+              Recherchez des meubles à partir d'une image et visualisez-les.
             </div>
             <button 
               className="bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed"
@@ -95,10 +95,10 @@ const Planner: React.FC = () => {
           </div>
           <div className="p-4">
             <div className="text-[#111212] text-xl font-bold mb-2">
-              Empty Room
+              Pièce vide
             </div>
             <div className="text-[#807f7f] text-base mb-4">
-              Furnish your empty space with furniture, Furniture Placement. Paste your preferred furniture within the room.
+              Visualisez une pièce vide et ajoutez-y des meubles.
             </div>
             <button 
               className="bg-gray-400 text-white font-bold py-3 px-6 rounded-lg cursor-not-allowed"

@@ -143,7 +143,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
       <button onClick={onClose} style={styles.closeButton}>
         <FontAwesomeIcon icon={faTimes} />
       </button>
-      <h1 style={styles.title}>Sign In</h1>
+      <h1 style={styles.title}>Se connecter</h1>
       {error && <p style={styles.error}>{error}</p>}
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.inputContainer}>
@@ -170,7 +170,7 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
             required
           />
         </div>
-        <div style={styles.forgotPassword}>Forgot password?</div>
+        <div style={styles.forgotPassword}>Mot de passe oublié ?</div>
         <label style={styles.rememberMe}>
           <input
             type="checkbox"
@@ -178,16 +178,16 @@ const SignIn: React.FC<SignInProps> = ({ onClose, onToggleForm, onSuccess }) => 
             checked={rememberMe}
             onChange={(e) => setRememberMe(e.target.checked)}
           />
-          Remember me
+          Se souvenir de moi
         </label>
         <button type="submit" style={styles.button}>
-          Sign In
+          Connexion
         </button>
       </form>
       <div style={styles.footer}>
-        New here?{' '}
+        Vous n'avez pas de compte ?{' '}
         <span onClick={onToggleForm} style={styles.link}>
-          Sign Up
+          S'inscrire
         </span>
       </div>
     </div>

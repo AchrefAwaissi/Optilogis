@@ -101,7 +101,7 @@ const SettingsPage: React.FC = () => {
             <div className="relative mb-4 md:mb-0 md:mr-6">
               <img
                 src={previewUrl || "/default-avatar.png"}
-                alt="Profile"
+                alt="Profil"
                 className="w-24 h-24 rounded-full object-cover"
               />
               {isEditing && (
@@ -133,7 +133,7 @@ const SettingsPage: React.FC = () => {
                 : 'bg-[#095550] text-white hover:bg-[#074440]'
             }`}
           >
-            {isEditing ? 'Cancel' : 'Edit'}
+            {isEditing ? 'Annuler' : 'Modifier'}
           </button>
         </div>
 
@@ -148,14 +148,14 @@ const SettingsPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Username field */}
               <div className="mb-4">
-                <label className="block text-[#030303] text-xl font-poppins mb-2">Username</label>
+                <label className="block text-[#030303] text-xl font-poppins mb-2">Nom d'utilisateur</label>
                 <input
                   type="text"
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
                   className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
-                  placeholder="Your Username"
+                  placeholder="Nom d'utilisateur"
                   disabled={!isEditing}
                 />
               </div>
@@ -169,7 +169,7 @@ const SettingsPage: React.FC = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
-                  placeholder="Your Email"
+                  placeholder="Email"
                   disabled={!isEditing}
                 />
               </div>
@@ -185,7 +185,7 @@ const SettingsPage: React.FC = () => {
                       value={formData.password}
                       onChange={handleChange}
                       className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
-                      placeholder="Your New Password"
+                      placeholder="Nouveau mot de passe"
                     />
                   </div>
 
@@ -198,7 +198,7 @@ const SettingsPage: React.FC = () => {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       className="w-full bg-[#f9f9f9] text-[#030303] text-lg font-light font-poppins p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#095550]"
-                      placeholder="Confirm Your New Password"
+                      placeholder="Confirmez votre mot de passe"
                     />
                   </div>
                 </>
@@ -213,7 +213,6 @@ const SettingsPage: React.FC = () => {
                 </svg>
                 <div>
                   <p className="text-lg text-[#030303] font-poppins">{formData.email}</p>
-                  <p className="text-sm text-[#828282] font-poppins">1 month ago</p>
                 </div>
               </div>
             </div>
@@ -221,7 +220,7 @@ const SettingsPage: React.FC = () => {
             {isEditing && (
               <div className="mt-8 flex justify-start">
                 <button type="submit" className="bg-[#095550] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#074440] transition duration-300">
-                  Save Changes
+                  Sauvegarder les changements
                 </button>
               </div>
             )}

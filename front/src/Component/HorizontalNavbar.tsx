@@ -143,7 +143,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
               <FontAwesomeIcon icon={faSearch} className="text-gray-500 text-lg mr-2" />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Recherche..."
                 className="bg-transparent outline-none w-full text-gray-500 text-sm"
               />
             </div>
@@ -185,14 +185,14 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <FontAwesomeIcon icon={faCog} className="mr-2" />
-                    Settings
+                    Paramètres
                   </button>
                   <button
                     onClick={handleLogoutClick}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                   >
                     <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-                    Logout
+                    Déconnexion
                   </button>
                 </div>
               )}
@@ -217,7 +217,7 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
           <FontAwesomeIcon icon={faSearch} style={{ color: '#095550' }} className="text-lg mr-2" />
 <input
   type="text"
-  placeholder="Search..."
+  placeholder="Recherche..."
   className="bg-transparent outline-none w-full text-gray-500 text-sm"
 />
 

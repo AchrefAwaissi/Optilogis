@@ -27,6 +27,11 @@ interface User {
   // Ajoutez d'autres propriétés utilisateur si nécessaire
 }
 
+interface Location {
+  location: string;
+  lat: number;
+  lon: number;
+}   
 // ProtectedRoute component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -42,6 +47,7 @@ const App: React.FC = () => {
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
   const [showFavorites, setShowFavorites] = useState<boolean>(false);
+  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const { user, signout } = useAuth();
 
   const handleAuthSuccess = (userData: User) => {
@@ -65,6 +71,11 @@ const App: React.FC = () => {
     setShowFavorites(!showFavorites);
   };
 
+  const handleLocationSelect = (location: Location) => {
+    setSelectedLocation(location);
+    // Cette fonction sera passée à la fois à HorizontalNavbar et à HomePage
+  };
+
   return (
     <Router>
       <ItemProvider>
@@ -83,11 +94,16 @@ const App: React.FC = () => {
                   onSignUpClick={() => handleAuthClick(true)}
                   onFavoritesToggle={handleFavoritesToggle}
                   showFavorites={showFavorites}
+                  onLocationSelect={handleLocationSelect}
                 />
 
                 <main className="flex-1 overflow-hidden">
                   <Routes>
-                    <Route path="/" element={<HomePage showFavorites={showFavorites} />} />
+                    <Route path="/" element={<HomePage 
+                    showFavorites={showFavorites}
+                    selectedLocation={selectedLocation}
+                    onLocationSelect={handleLocationSelect}
+                     />} />
                     <Route path="/search" element={<SearchPage />} />
                     <Route path="/property-details" element={<PropertyDetails />} />
                     <Route path="/Planner" element={<Planner />} />

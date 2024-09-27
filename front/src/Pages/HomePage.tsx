@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMap, faList, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faMap, faList } from "@fortawesome/free-solid-svg-icons";
 import HouseListings from "../Component/HouseListings";
 import Filter from "../Component/Filter";
 import MapComponent from "../Component/Map";
@@ -11,20 +11,21 @@ import { useAuth } from "../contexts/AuthContext";
 
 interface HomePageProps {
   showFavorites: boolean;
+  selectedLocation: Location | null;
+  onLocationSelect: (location: Location) => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ showFavorites }) => {
+const HomePage: React.FC<HomePageProps> = ({ showFavorites, selectedLocation, onLocationSelect }) => {
   const { getUserItems } = useItems();
   const { user } = useAuth();
   const [houses, setHouses] = useState<House[]>([]);
   const [filteredHouses, setFilteredHouses] = useState<House[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
   const [filterCriteria, setFilterCriteria] = useState<FilterCriteria>({
     location: "",
     minPrice: 0,
-    maxPrice:15000,
+    maxPrice: 15000,
     minSize: 0,
     maxSize: 1000,
     typeOfHousing: "",
@@ -57,6 +58,12 @@ const HomePage: React.FC<HomePageProps> = ({ showFavorites }) => {
   useEffect(() => {
     filterHouses();
   }, [houses, filterCriteria, showFavorites]);
+
+  useEffect(() => {
+    if (selectedLocation) {
+      handleLocationSelect(selectedLocation);
+    }
+  }, [selectedLocation]);
 
   const fetchHouses = async () => {
     try {
@@ -153,12 +160,12 @@ const HomePage: React.FC<HomePageProps> = ({ showFavorites }) => {
 
   const handleLocationSelect = (location: Location) => {
     console.log("Selected location:", location);
-    setSelectedLocation(location);
     setFilterCriteria((prevCriteria) => ({
       ...prevCriteria,
       location: location.location,
     }));
     setCurrentCity(location.location);
+    onLocationSelect(location);  // Propagate the selection to the parent component
   };
 
   const handleHouseSelect = (house: House) => {

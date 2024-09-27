@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faSignOutAlt, faHeart, faSearch, faBell, faSignInAlt, faUserPlus, faCog } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faSignOutAlt, faHeart, faBell, faSignInAlt, faUserPlus, faCog } from '@fortawesome/free-solid-svg-icons';
 import logo from "../image/logoa.png";
+import SearchInput from './SearchInput'; // Assurez-vous que ce chemin est correct
 
 interface User {
   username: string;
@@ -16,6 +17,13 @@ interface HorizontalNavbarProps {
   onSignUpClick: () => void;
   onFavoritesToggle: () => void;
   showFavorites: boolean;
+  onLocationSelect: (location: Location) => void;
+}
+
+interface Location {
+  location: string;
+  lat: number;
+  lon: number;
 }
 
 const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({ 
@@ -24,34 +32,31 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
   onSignInClick, 
   onSignUpClick,
   onFavoritesToggle,
-  showFavorites 
+  showFavorites,
+  onLocationSelect
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
+  const toggleMenu = useCallback(() => {
+    setIsOpen(prev => !prev);
+  }, []);
 
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown);
-  };
+  const toggleDropdown = useCallback(() => {
+    setShowDropdown(prev => !prev);
+  }, []);
 
-  const closeDropdown = () => {
+  const handleSettingsClick = useCallback(() => {
     setShowDropdown(false);
-  };
-
-  const handleSettingsClick = () => {
-    closeDropdown();
     navigate('/settings');
-  };
+  }, [navigate]);
 
-  const handleLogoutClick = () => {
-    closeDropdown();
+  const handleLogoutClick = useCallback(() => {
+    setShowDropdown(false);
     onLogout();
-  };
+  }, [onLogout]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -86,7 +91,6 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
     </>
   );
 
-  // Mobile navbar for non-logged in users
   const MobileNavbar = () => (
     <header className="bg-white shadow-md sticky top-0 left-0 w-full z-50 lg:hidden">
       <div className="container mx-auto px-4">
@@ -126,7 +130,6 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
     </header>
   );
 
-  // Full navbar for logged in users (both mobile and PC)
   const FullNavbar = () => (
     <header className="bg-white shadow-md sticky top-0 left-0 w-full z-50">
       <div className="container mx-auto px-4">
@@ -139,37 +142,27 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
           </div>
 
           <div className="hidden lg:flex flex-grow justify-center mx-4">
-            <div className="flex items-center bg-gray-100 rounded-lg w-full max-w-md h-10 px-3">
-              <FontAwesomeIcon icon={faSearch} className="text-gray-500 text-lg mr-2" />
-              <input
-                type="text"
-                placeholder="Search..."
-                className="bg-transparent outline-none w-full text-gray-500 text-sm"
-              />
-            </div>
+            <SearchInput onLocationSelect={onLocationSelect} />
           </div>
 
           <div className="hidden lg:flex items-center space-x-4">
-             {/* Icône de cœur */}
-             <button
-  onClick={onFavoritesToggle}
-  className="p-2 rounded flex items-center justify-center"
-  aria-label="Favorites"
->
-  <FontAwesomeIcon
-    icon={faHeart}
-    className={showFavorites ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}
-  />
-</button>
+            <button
+              onClick={onFavoritesToggle}
+              className="p-2 rounded flex items-center justify-center"
+              aria-label="Favorites"
+            >
+              <FontAwesomeIcon
+                icon={faHeart}
+                className={showFavorites ? 'text-red-500' : 'text-gray-500 hover:text-red-500'}
+              />
+            </button>
 
-
-<FontAwesomeIcon
-  icon={faBell}
-  className="text-xl cursor-pointer"
-  style={{ color: '#095550' }}
-  aria-label="Notifications"
- />
-
+            <FontAwesomeIcon
+              icon={faBell}
+              className="text-xl cursor-pointer"
+              style={{ color: '#095550' }}
+              aria-label="Notifications"
+            />
 
             <div className="relative" ref={dropdownRef}>
               <img 
@@ -213,14 +206,8 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
       {isOpen && (
         <div className="lg:hidden px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <NavLinks />
-          <div className="flex items-center bg-gray-100 rounded-lg w-full h-10 px-3 mt-2">
-          <FontAwesomeIcon icon={faSearch} style={{ color: '#095550' }} className="text-lg mr-2" />
-<input
-  type="text"
-  placeholder="Search..."
-  className="bg-transparent outline-none w-full text-gray-500 text-sm"
-/>
-
+          <div className="mt-2">
+            <SearchInput onLocationSelect={onLocationSelect} />
           </div>
           <div className="flex justify-between items-center mt-2">
             <button
@@ -254,4 +241,4 @@ const HorizontalNavbar: React.FC<HorizontalNavbarProps> = ({
   return user ? <FullNavbar /> : <MobileNavbar />;
 };
 
-export default HorizontalNavbar;
+export default React.memo(HorizontalNavbar);

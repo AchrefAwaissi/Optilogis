@@ -78,7 +78,7 @@ export class ContactService {
     }
 
     const mailOptions = {
-      from: '"Service de Contact Optilogis" <vetswyt673@gmail.com>',
+      from: '"Service de Contact Optilogis"',
       to: 'Achrefawaissi@gmail.com',
       replyTo: email,
       subject: `Nouveau message de contact de ${name} (${email})`,

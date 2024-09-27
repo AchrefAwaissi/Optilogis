@@ -87,8 +87,12 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
     });
   };
 
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onFilterChange({ maxPrice: parseInt(e.target.value) });
+  const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFilterChange({ minPrice: parseInt(e.target.value), maxPrice: filterCriteria.maxPrice });
+  };
+  
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onFilterChange({ maxPrice: parseInt(e.target.value), minPrice: filterCriteria.minPrice });
   };
 
   const handleRangeChange = (
@@ -199,18 +203,28 @@ const PropertyFilter: React.FC<PropertyFilterProps> = ({
         </div>
 
         <div className="p-4">
-          <h3 className="text-sm font-semibold text-gray-500 mb-2">Fourchette de prix</h3>
+        <h3 className="text-sm font-semibold text-gray-500 mb-2">Fourchette de prix</h3>
+
+        <div className="flex justify-between mb-2">
           <input
-            type="range"
+            type="number"
             min="100"
-            max="200000"
-            value={filterCriteria.maxPrice}
-            onChange={handlePriceChange}
-            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            style={{
-              accentColor: '#095550',
-            }}
+            max={filterCriteria.maxPrice || 15000}
+            value={filterCriteria.minPrice || 100}
+            onChange={handleMinPriceChange}
+            className="w-1/2 mr-2 border border-gray-300 rounded-md p-1"
+            placeholder="Prix minimum"
           />
+          <input
+            type="number"
+            min={filterCriteria.minPrice || 100}
+            max="15000"
+            value={filterCriteria.maxPrice || 15000}
+            onChange={handleMaxPriceChange}
+            className="w-1/2 border border-gray-300 rounded-md p-1"
+            placeholder="Prix maximum"
+          />
+        </div>
           <div className="flex justify-between mt-2 text-sm text-gray-600">
             <span>100€</span>
             <span>{filterCriteria.maxPrice}€</span>

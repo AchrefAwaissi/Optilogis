@@ -14,7 +14,7 @@ export const mapContainerStyle = { height: '90vh', width: '100%' };
 
 export const defaultCenter = { lat: 44.8378, lng: -0.5792 };
 
-export const defaultZoom = 13;
+export const defaultZoom = 12;
 
 export const getMarkerIcon = (type: 'school' | 'hospital' | 'supermarket' | 'restaurant') => {
   switch (type) {

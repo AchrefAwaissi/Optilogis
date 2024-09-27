@@ -66,8 +66,8 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick, is
     ...(isAuthenticated ? [{ icon: faPlus, label: "Add", path: "/publish" }] : []), // Condition pour afficher "Add"
     { icon: faCube, label: "Planification", path: "/Planner" },
     ...(isAuthenticated ? [{ icon: faList, label: "My Items", path: "/manage-items" }] : []), // Condition pour afficher "My items"
-    { icon: faAddressBook, label: "Contact", path: "/contact" },
     ...(isAuthenticated ? [{ icon: faCog, label: "Settings", path: "/settings" }] : []), // Condition pour afficher "Settings"
+    { icon: faAddressBook, label: "Contact", path: "/contact" },
   ];
 
   return (

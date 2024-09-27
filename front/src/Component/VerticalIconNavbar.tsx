@@ -63,9 +63,9 @@ const VerticalIconNavbar: React.FC<VerticalIconNavbarProps> = ({ onAuthClick, is
   const menuItems: MenuItem[] = [
     { icon: faHome, label: "Home", path: "/" },
     ...(isAuthenticated ? [{ icon: faPlus, label: "Add", path: "/publish" }] : []), // Condition pour afficher "Add"
-    ...(isAuthenticated ? [{ icon: faCube, label: "Planification", path: "/Planner" }] : []), // Condition pour afficher "My items"
     ...(isAuthenticated ? [{ icon: faList, label: "My Items", path: "/manage-items" }] : []), // Condition pour afficher "My items"
     ...(isAuthenticated ? [{ icon: faCog, label: "Settings", path: "/settings" }] : []), // Condition pour afficher "Settings"
+    ...(isAuthenticated ? [{ icon: faCube, label: "Planification", path: "/Planner" }] : []), // Condition pour afficher "My items"
     { icon: faAddressBook, label: "Contact", path: "/contact" },
   ];
 

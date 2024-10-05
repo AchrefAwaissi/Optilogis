@@ -89,3 +89,9 @@ Le projet est divisé en deux dossiers principaux :
 - **Backend** : Nest.JS
 - **Base de données** : MongoDB
 - **Autres** : Google Maps API, Authentification JWT, etc.
+
+## Auteurs
+
+- [@JK](https://github.com/john1340a)
+- [@Achref](https://github.com/AchrefAwaissi)
+- [@Ilies](https://github.com/iliesskalli)

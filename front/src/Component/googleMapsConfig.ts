@@ -1,6 +1,6 @@
 import { useJsApiLoader } from '@react-google-maps/api';
 
-const googleMapsApiKey = "AIzaSyCOnIlHn-koZ_qYwmD2YuTYxn4vYME5Kqg";
+const googleMapsApiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '';
 
 export const useGoogleMapsLoader = () => {
   return useJsApiLoader({

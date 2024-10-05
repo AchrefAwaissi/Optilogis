@@ -4,7 +4,7 @@ import { Cloudinary } from "@cloudinary/url-gen";
 import { AdvancedImage } from "@cloudinary/react";
 import { fill } from "@cloudinary/url-gen/actions/resize";
 
-const CLOUD_NAME = 'dxynfkwzx';
+const CLOUD_NAME = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
 // Configure Cloudinary
 const cld = new Cloudinary({
   cloud: {

@@ -20,7 +20,7 @@ import { useAuth } from "../contexts/AuthContext";
 import axios from 'axios'; 
 import PaymentForm from '../Component/PaymentForm';
 
-const stripePromise = loadStripe('pk_live_cI4tcOUyxlMYq9uSo8ZAKFfv00gI78MHLK');
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_KEY || '');
 
 interface House {
   likes: string[];

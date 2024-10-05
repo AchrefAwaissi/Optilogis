@@ -13,7 +13,7 @@ const cld = new Cloudinary({
 });
 
 const EmptyRoom: React.FC = () => {
-  const [apiKey] = useState<string>('sk-iYiywwNzEzcDy-ZarW4fwNWscUs');
+  const [apiKey] = useState<string>(process.env.REACT_APP_SPACELY_API_KEY || '');
   const [image, setImage] = useState<File | null>(null);
   const [imagePublicId, setImagePublicId] = useState<string>('');
   const [spaceType, setSpaceType] = useState<string>('bedroom');

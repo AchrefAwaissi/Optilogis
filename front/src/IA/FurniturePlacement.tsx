@@ -20,7 +20,7 @@ interface Placement {
 }
 
 const FurniturePlacement: React.FC = () => {
-  const [apiKey] = useState<string>('sk-iYiywwNzEzcDy-ZarW4fwNWscUs');
+  const [apiKey] = useState<string>(process.env.REACT_APP_SPACELY_API_KEY || '');
   const [roomImage, setRoomImage] = useState<File | null>(null);
   const [productImage, setProductImage] = useState<File | null>(null);
   const [roomImagePublicId, setRoomImagePublicId] = useState<string>('');

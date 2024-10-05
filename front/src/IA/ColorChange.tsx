@@ -13,7 +13,7 @@ const cld = new Cloudinary({
 });
 
 const ColorChange: React.FC = () => {
-  const [apiKey] = useState<string>('sk-iYiywwNzEzcDy-ZarW4fwNWscUs');
+  const [apiKey] = useState<string>(process.env.REACT_APP_SPACELY_API_KEY || '');
   const [roomImage, setRoomImage] = useState<File | null>(null);
   const [roomImagePublicId, setRoomImagePublicId] = useState<string>('');
   const [area, setArea] = useState<'wall' | 'ceiling' | 'floor'>('wall');

@@ -13,7 +13,7 @@ const cld = new Cloudinary({
 });
 
 const SearchArticle: React.FC = () => {
-  const [apiKey] = useState<string>('sk-v8IV8Sh86ea2F64kzIofgRIs1Kk');
+  const [apiKey] = useState<string>(process.env.REACT_APP_SPACELY_API_KEY || '');
   const [image, setImage] = useState<File | null>(null);
   const [imagePublicId, setImagePublicId] = useState<string>('');
   const [result, setResult] = useState<any>(null);

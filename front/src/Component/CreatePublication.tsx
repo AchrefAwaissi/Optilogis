@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent, FormEvent, useCallback } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { useItems } from '../contexts/ItemContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -77,6 +77,7 @@ const CreatePublication: React.FC = () => {
   const { createItem } = useItems();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const messageRef = useRef<HTMLDivElement>(null);
 
   const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -154,6 +155,12 @@ const CreatePublication: React.FC = () => {
     setShowAllImages(prev => !prev);
   }, []);
 
+  const scrollToMessage = useCallback(() => {
+    if (messageRef.current) {
+      messageRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
+
   const handleSubmit = useCallback(async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage(null);
@@ -173,8 +180,10 @@ const CreatePublication: React.FC = () => {
     } catch (error) {
       setMessage({ type: 'error', text: 'Erreur lors de la création de la publication' });
       console.error('Erreur lors de l\'envoi:', error);
+    } finally {
+      setTimeout(scrollToMessage, 100);
     }
-  }, [formData, images, createItem]);
+  }, [formData, images, createItem, scrollToMessage]);
 
   useEffect(() => {
     const handleClickOutside = () => setShowSuggestions(false);
@@ -194,10 +203,14 @@ const CreatePublication: React.FC = () => {
   return (
     <div className="w-full bg-white overflow-y-auto" style={{ maxHeight: 'calc(100vh - 64px)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-[#030303] font-poppins mb-8">Publier une annonce</h1>
+        <h1 className="text-3xl font-bold text-[#030303] font-poppins mb-8"
+            ref={messageRef}
+            >Publier une annonce</h1>
 
         {message && (
-          <div className={`mb-4 p-3 rounded ${message.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+          <div 
+            className={`mb-4 p-3 rounded ${message.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}
+          >
             {message.text}
           </div>
         )}
